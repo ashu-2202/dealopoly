@@ -18,6 +18,8 @@ export const viewport: Viewport = {
   themeColor: "#111415",
 };
 
+import { AuthProvider } from "./_components/auth-provider";
+
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" className="dark">
@@ -33,7 +35,9 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

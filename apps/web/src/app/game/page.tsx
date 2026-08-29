@@ -1447,11 +1447,39 @@ export default function GamePage(props: {
       {/* Payment Resolution Modal */}
       {pending?.type === "payment" && pending.debtorPlayerId === actualPlayerId && (() => {
         const payableCards = [
-          ...(you?.bank || []),
+          ...(you?.bank || []).map((c) => ({
+            ...c,
+            source: "bank" as const,
+            color: undefined as CardColor | undefined,
+            isHouse: false,
+            isHotel: false,
+          })),
           ...(you?.propertySets.flatMap((s) => {
-            const items = [...s.cards];
-            if (s.houseCard) items.push(s.houseCard);
-            if (s.hotelCard) items.push(s.hotelCard);
+            const items = s.cards.map((c) => ({
+              ...c,
+              source: "property" as const,
+              color: s.color as CardColor,
+              isHouse: false,
+              isHotel: false,
+            }));
+            if (s.houseCard) {
+              items.push({
+                ...s.houseCard,
+                source: "property" as const,
+                color: s.color as CardColor,
+                isHouse: true,
+                isHotel: false,
+              });
+            }
+            if (s.hotelCard) {
+              items.push({
+                ...s.hotelCard,
+                source: "property" as const,
+                color: s.color as CardColor,
+                isHouse: false,
+                isHotel: true,
+              });
+            }
             return items;
           }) || []),
         ].filter((c) => c.value > 0);
@@ -1597,7 +1625,7 @@ export default function GamePage(props: {
                               );
                             }}
                             style={{
-                              padding: "8px 12px",
+                              padding: "7px 12px",
                               borderRadius: "8px",
                               background: isSelected
                                 ? "var(--primary)"
@@ -1616,12 +1644,58 @@ export default function GamePage(props: {
                               opacity: isDisabled ? 0.45 : 1,
                               display: "inline-flex",
                               alignItems: "center",
-                              gap: "6px",
+                              gap: "8px",
                               transition: "all 0.15s ease",
                             }}
                           >
+                            {/* Color / Source Badge */}
+                            {card.source === "property" && card.color ? (
+                              <span
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  padding: "2px 6px",
+                                  borderRadius: "4px",
+                                  backgroundColor: COLOR_CONFIG[card.color]?.hex || "#0055A4",
+                                  color: COLOR_CONFIG[card.color]?.textHex || "#FFFFFF",
+                                  fontSize: "0.62rem",
+                                  fontWeight: 800,
+                                  textTransform: "uppercase",
+                                  letterSpacing: "0.04em",
+                                  flexShrink: 0,
+                                  boxShadow: `0 0 6px ${COLOR_CONFIG[card.color]?.hex || "#0055A4"}40`,
+                                }}
+                              >
+                                {card.isHouse ? "🏠 House" : card.isHotel ? "🏨 Hotel" : COLOR_CONFIG[card.color]?.name || card.color}
+                              </span>
+                            ) : (
+                              <span
+                                style={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "3px",
+                                  padding: "2px 6px",
+                                  borderRadius: "4px",
+                                  backgroundColor: "rgba(102, 223, 117, 0.2)",
+                                  color: "#66df75",
+                                  border: "1px solid rgba(102, 223, 117, 0.3)",
+                                  fontSize: "0.62rem",
+                                  fontWeight: 800,
+                                  letterSpacing: "0.04em",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                <span className="material-symbols-outlined" style={{ fontSize: "11px" }}>
+                                  payments
+                                </span>
+                                BANK
+                              </span>
+                            )}
+
                             <span>{card.name}</span>
-                            <span style={{ fontFamily: "var(--mono)", fontSize: "0.72rem" }}>(${card.value}M)</span>
+                            <span style={{ fontFamily: "var(--mono)", fontSize: "0.72rem", opacity: isSelected ? 0.9 : 0.75 }}>
+                              (${card.value}M)
+                            </span>
                             {isSelected && (
                               <span className="material-symbols-outlined" style={{ fontSize: "15px", fontWeight: 900 }}>
                                 check

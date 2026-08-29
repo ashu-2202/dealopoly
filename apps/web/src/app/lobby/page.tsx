@@ -2,6 +2,7 @@
 
 import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { AppShell } from "../_components/app-shell";
 import {
   getStoredProfile,
@@ -16,6 +17,7 @@ export default function LobbyPage(props: {
 }) {
   const searchParams = props.searchParams ? use(props.searchParams) : undefined;
   const router = useRouter();
+  const { data: session } = useSession();
 
   const urlRoomCode = searchParams?.room || searchParams?.code;
   const urlPlayerName = searchParams?.player;
@@ -30,7 +32,8 @@ export default function LobbyPage(props: {
   useEffect(() => {
     async function initRoom() {
       const profile = getStoredProfile();
-      const playerName = urlPlayerName || profile.name;
+      const playerName = urlPlayerName || session?.user?.name || profile.name;
+      const userId = session?.user?.id;
 
       if (urlRoomCode) {
         // Check for existing session token
@@ -45,6 +48,7 @@ export default function LobbyPage(props: {
             const joinRes = await joinRoomApi({
               roomCode: urlRoomCode,
               playerName,
+              userId,
             });
             saveRoomSession(urlRoomCode, joinRes.playerId, joinRes.sessionToken);
             setRoomCode(joinRes.roomCode);
@@ -60,6 +64,7 @@ export default function LobbyPage(props: {
           const createRes = await createRoomApi({
             hostName: playerName,
             botCount: 0,
+            userId,
           });
           saveRoomSession(createRes.roomCode, createRes.hostPlayerId, createRes.sessionToken);
           setRoomCode(createRes.roomCode);
@@ -75,7 +80,7 @@ export default function LobbyPage(props: {
     }
 
     initRoom();
-  }, [urlRoomCode, urlPlayerName, router]);
+  }, [urlRoomCode, urlPlayerName, session, router]);
 
   const { isConnected, roomInfo, lastError, addBot, removePlayer, startGame } =
     useGameSocket({

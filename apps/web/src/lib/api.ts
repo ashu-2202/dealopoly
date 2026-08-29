@@ -41,6 +41,7 @@ export interface JoinRoomResponse {
 export async function createRoomApi(params: {
   hostName?: string;
   botCount?: number;
+  userId?: string;
 }): Promise<CreateRoomResponse> {
   const res = await fetch(`${API_BASE}/api/rooms`, {
     method: "POST",
@@ -59,6 +60,7 @@ export async function createRoomApi(params: {
 export async function joinRoomApi(params: {
   roomCode: string;
   playerName?: string;
+  userId?: string;
 }): Promise<JoinRoomResponse> {
   const res = await fetch(`${API_BASE}/api/rooms/join`, {
     method: "POST",

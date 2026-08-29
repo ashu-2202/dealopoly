@@ -5,6 +5,7 @@ import { useState } from "react";
 import { JoinRoomDialog } from "./_components/join-room-dialog";
 import { PlayBotsDialog } from "./_components/play-bots-dialog";
 import { HeroCardShowcase } from "./_components/hero-card-showcase";
+import { UserNav } from "./_components/user-nav";
 
 const features = [
   {
@@ -80,9 +81,7 @@ export default function HomePage() {
           <button type="button" className="nav-action-btn" aria-label="Settings">
             <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>settings</span>
           </button>
-          <div className="user-avatar-badge" title="Guest Player">
-            YP
-          </div>
+          <UserNav />
         </div>
       </header>
 

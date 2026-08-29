@@ -14,12 +14,15 @@ export interface RoomSeat {
 export type RoomStatus = "lobby" | "in_progress" | "completed";
 
 export interface Room {
+  id?: string;
   code: string;
   hostPlayerId: string;
   status: RoomStatus;
   seats: RoomSeat[];
   maxSeats: number;
   gameState?: GameState;
+  dbGameId?: string;
+  nextSequenceNum?: number;
   createdAt: number;
   lastActivityAt: number;
 }

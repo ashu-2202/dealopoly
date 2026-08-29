@@ -14,6 +14,15 @@ export function createGameServer() {
   server.register(cors, { origin: true });
   server.register(fastifyWebsocket);
 
+  // Hook to hydrate active rooms from Postgres when server is ready
+  server.addHook("onReady", async () => {
+    try {
+      await roomManager.hydrateRoomsFromDb();
+    } catch (err: unknown) {
+      server.log.warn({ err }, "Could not hydrate active rooms from DB");
+    }
+  });
+
   // Health endpoint
   server.get("/health", async () => ({
     service: "dealopoly-game-server",
@@ -23,12 +32,13 @@ export function createGameServer() {
 
   // REST: Create Room
   server.post<{
-    Body: { hostName?: string; botCount?: number };
+    Body: { hostName?: string; botCount?: number; userId?: string };
   }>("/api/rooms", async (request, reply) => {
-    const { hostName = "Host", botCount = 0 } = request.body || {};
+    const { hostName = "Host", botCount = 0, userId } = request.body || {};
     try {
-      const { room, hostPlayerId, sessionToken } = roomManager.createRoom(hostName, {
+      const { room, hostPlayerId, sessionToken } = await roomManager.createRoom(hostName, {
         botCount,
+        userId,
       });
       return reply.code(201).send({
         roomCode: room.code,
@@ -44,15 +54,17 @@ export function createGameServer() {
 
   // REST: Join Room
   server.post<{
-    Body: { roomCode: string; playerName?: string };
+    Body: { roomCode: string; playerName?: string; userId?: string };
   }>("/api/rooms/join", async (request, reply) => {
-    const { roomCode, playerName = "Player" } = request.body || {};
+    const { roomCode, playerName = "Player", userId } = request.body || {};
     if (!roomCode) {
       return reply.code(400).send({ error: "Room code is required" });
     }
 
     try {
-      const { room, playerId, sessionToken } = roomManager.joinRoom(roomCode, playerName);
+      const { room, playerId, sessionToken } = await roomManager.joinRoom(roomCode, playerName, {
+        userId,
+      });
       return reply.code(200).send({
         roomCode: room.code,
         playerId,
@@ -117,10 +129,10 @@ export function createGameServer() {
           return;
         }
 
-        socket.on("message", (raw) => {
+        socket.on("message", async (raw) => {
           try {
             const data = JSON.parse(raw.toString());
-            handleSocketMessage(roomCode, playerId, data, socket);
+            await handleSocketMessage(roomCode, playerId, data, socket);
           } catch (err: unknown) {
             const message = err instanceof Error ? err.message : "Invalid message format";
             socket.send(
@@ -140,7 +152,7 @@ export function createGameServer() {
     );
   });
 
-  function handleSocketMessage(
+  async function handleSocketMessage(
     roomCode: string,
     playerId: string,
     data: Record<string, unknown>,
@@ -156,7 +168,7 @@ export function createGameServer() {
 
       case "START_GAME":
         try {
-          roomManager.startGame(roomCode, playerId);
+          await roomManager.startGame(roomCode, playerId);
           triggerBotTurns(roomCode);
         } catch (err: unknown) {
           const message = err instanceof Error ? err.message : "Failed to start game";
@@ -166,7 +178,7 @@ export function createGameServer() {
 
       case "ADD_BOT":
         try {
-          roomManager.addBot(roomCode, playerId);
+          await roomManager.addBot(roomCode, playerId);
         } catch (err: unknown) {
           const message = err instanceof Error ? err.message : "Failed to add bot";
           socket.send(JSON.stringify({ type: "ERROR", code: "ADD_BOT_FAILED", message }));
@@ -175,7 +187,7 @@ export function createGameServer() {
 
       case "REMOVE_PLAYER":
         try {
-          roomManager.removePlayer(roomCode, playerId, data["targetPlayerId"] as string);
+          await roomManager.removePlayer(roomCode, playerId, data["targetPlayerId"] as string);
         } catch (err: unknown) {
           const message = err instanceof Error ? err.message : "Failed to remove player";
           socket.send(JSON.stringify({ type: "ERROR", code: "REMOVE_FAILED", message }));
@@ -184,7 +196,7 @@ export function createGameServer() {
 
       case "COMMAND":
         try {
-          roomManager.applyCommand(roomCode, playerId, data["command"] as GameCommand);
+          await roomManager.applyCommand(roomCode, playerId, data["command"] as GameCommand);
           triggerBotTurns(roomCode);
         } catch (err: unknown) {
           const message = err instanceof Error ? err.message : "Command rejected";
@@ -210,7 +222,7 @@ export function createGameServer() {
     let iterations = 0;
     const maxIterations = 30;
 
-    const runNextBotStep = () => {
+    const runNextBotStep = async () => {
       if (!room.gameState || room.status !== "in_progress" || iterations++ > maxIterations) return;
 
       // Check if reaction or payment is waiting for a bot
@@ -240,7 +252,7 @@ export function createGameServer() {
       const botCommand = BotController.getNextBotAction(room.gameState, targetBotId);
       if (botCommand) {
         try {
-          roomManager.applyCommand(roomCode, targetBotId, botCommand);
+          await roomManager.applyCommand(roomCode, targetBotId, botCommand);
           // Chain next step if bot is still active or another bot needs to act
           setTimeout(runNextBotStep, 400);
         } catch {
