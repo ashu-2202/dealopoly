@@ -42,6 +42,11 @@ export function useGameSocket({
   const socketRef = useRef<WebSocket | null>(null);
   const pingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const onGameStartedRef = useRef(onGameStarted);
+  useEffect(() => {
+    onGameStartedRef.current = onGameStarted;
+  }, [onGameStarted]);
+
   useEffect(() => {
     if (!roomCode || !playerId || !sessionToken) return;
 
@@ -83,8 +88,8 @@ export function useGameSocket({
         switch (msg.type) {
           case "ROOM_STATE":
             setRoomInfo(msg.room);
-            if (msg.room.isStarted && onGameStarted) {
-              onGameStarted();
+            if (msg.room.isStarted && onGameStartedRef.current) {
+              onGameStartedRef.current();
             }
             break;
 
@@ -97,10 +102,10 @@ export function useGameSocket({
             break;
 
           case "ERROR":
-            setLastError(msg.message || "An error occurred");
+            setLastError(msg.message);
             break;
         }
-      } catch {
+      } catch (err) {
         // Ignore JSON parse error
       }
     };
@@ -122,7 +127,7 @@ export function useGameSocket({
       }
       ws.close();
     };
-  }, [roomCode, playerId, sessionToken, onGameStarted]);
+  }, [roomCode, playerId, sessionToken]);
 
   const sendCommand = useCallback((command: GameCommand) => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
