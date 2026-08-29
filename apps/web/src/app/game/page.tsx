@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, use, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Card } from "../_components/card";
 import { GameOverSummary } from "../_components/game-over-summary";
@@ -12,6 +12,13 @@ import { useGameClient } from "../../lib/use-game-client";
 import type { CardColor } from "@dealopoly/shared";
 import { COLOR_CONFIG } from "@dealopoly/shared";
 import { type CardInstance, type PropertySet, calculateSetRent } from "@dealopoly/game-engine";
+
+const OPPONENT_PALETTES = [
+  { class: "avatar-theme--purple", badge: "🟣", hex: "#c084fc" },
+  { class: "avatar-theme--orange", badge: "🟠", hex: "#fb923c" },
+  { class: "avatar-theme--emerald", badge: "🟢", hex: "#34d399" },
+  { class: "avatar-theme--amber", badge: "🟡", hex: "#fbbf24" },
+];
 
 export default function GamePage(props: {
   searchParams?: Promise<{ room?: string; mode?: string }>;
@@ -27,8 +34,18 @@ export default function GamePage(props: {
 
   const [selectedCard, setSelectedCard] = useState<CardInstance | null>(null);
   const [selectedWildRentColor, setSelectedWildRentColor] = useState<CardColor | null>(null);
-  const [isMobileActivityOpen, setIsMobileActivityOpen] = useState(false);
+  const [isActivityDrawerOpen, setIsActivityDrawerOpen] = useState(false);
+  const [unreadActivityCount, setUnreadActivityCount] = useState(0);
+  const [isDiscardInspectorOpen, setIsDiscardInspectorOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [liveReelEvent, setLiveReelEvent] = useState<{
+    id: string;
+    icon: string;
+    title: string;
+    description: string;
+  } | null>(null);
+  const lastSeenHistoryLengthRef = useRef(0);
+
   const [targetingAction, setTargetingAction] = useState<{
     card: CardInstance;
     type: "deal_breaker" | "sly_deal" | "forced_deal" | "debt_collector" | "wild_rent";
@@ -52,6 +69,83 @@ export default function GamePage(props: {
     sessionToken,
     isLocalMode: isBotMode,
   });
+
+  useEffect(() => {
+    if (!gameState?.history || gameState.history.length === 0) return;
+    const historyLen = gameState.history.length;
+
+    if (historyLen > lastSeenHistoryLengthRef.current) {
+      const newEvents = gameState.history.slice(lastSeenHistoryLengthRef.current);
+      lastSeenHistoryLengthRef.current = historyLen;
+
+      if (!isActivityDrawerOpen) {
+        setUnreadActivityCount((prev) => prev + newEvents.length);
+      }
+
+      // Find latest high-impact event for the Action Reel
+      const latestNotable = [...newEvents].reverse().find((evt) =>
+        ["action_played", "rent_charged", "property_played", "game_won", "card_banked"].includes(evt.type)
+      );
+
+      if (latestNotable) {
+        let icon = "bolt";
+        let title = "ACTION PLAYED";
+
+        if (latestNotable.type === "action_played") {
+          const actionDefId = (latestNotable as unknown as { actionCard?: CardInstance }).actionCard?.defId;
+          if (actionDefId === "action-deal-breaker") {
+            icon = "gavel";
+            title = "⚡ DEAL BREAKER!";
+          } else if (actionDefId === "action-just-say-no") {
+            icon = "shield";
+            title = "🛡️ JUST SAY NO!";
+          } else if (actionDefId === "action-forced-deal" || actionDefId === "action-force-deal") {
+            icon = "swap_horiz";
+            title = "🔄 FORCED DEAL";
+          } else if (actionDefId === "action-sly-deal") {
+            icon = "visibility";
+            title = "🕵️ SLY DEAL";
+          } else if (actionDefId === "action-debt-collector") {
+            icon = "payments";
+            title = "💵 DEBT COLLECTOR";
+          } else if (actionDefId === "action-its-my-birthday") {
+            icon = "cake";
+            title = "🎂 IT'S MY BIRTHDAY!";
+          } else if (actionDefId === "action-pass-go") {
+            icon = "fast_forward";
+            title = "🚀 PASS GO (+2 Cards)";
+          }
+        } else if (latestNotable.type === "rent_charged") {
+          icon = "monetization_on";
+          title = "💸 RENT COLLECTED";
+        } else if (latestNotable.type === "property_played") {
+          if ((latestNotable as unknown as { setCompleted?: boolean }).setCompleted) {
+            icon = "star";
+            title = "🎉 FULL SET COMPLETED!";
+          } else {
+            icon = "domain";
+            title = "🏠 PROPERTY PLAYED";
+          }
+        } else if (latestNotable.type === "game_won") {
+          icon = "emoji_events";
+          title = "👑 VICTORY!";
+        }
+
+        setLiveReelEvent({
+          id: latestNotable.id,
+          icon,
+          title,
+          description: latestNotable.message,
+        });
+
+        const timer = setTimeout(() => {
+          setLiveReelEvent(null);
+        }, 2600);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [gameState?.history, isActivityDrawerOpen]);
 
   if (!gameState) {
     return (
@@ -256,16 +350,30 @@ export default function GamePage(props: {
             </span>
           </Link>
 
+          {/* Activity Drawer Toggle */}
           <button
             type="button"
-            className="game-icon-btn"
-            onClick={() => setIsMobileActivityOpen(true)}
-            title="Activity Log"
+            className="game-activity-toggle-btn"
+            onClick={() => {
+              setIsActivityDrawerOpen(true);
+              setUnreadActivityCount(0);
+            }}
+            title="Match Activity"
           >
             <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
               feed
             </span>
+            <span className="game-desktop-only">Activity</span>
+            {unreadActivityCount > 0 && (
+              <span className="game-activity-unread-badge">{unreadActivityCount}</span>
+            )}
           </button>
+
+          <Link href="/cards" className="game-icon-btn game-desktop-only" title="Card Catalogue">
+            <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+              menu_book
+            </span>
+          </Link>
 
           <Link href="/lobby" className="game-icon-btn game-desktop-only" title="Lobby">
             <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
@@ -286,18 +394,18 @@ export default function GamePage(props: {
           </button>
 
           <div
-            className="game-desktop-only"
+            className="game-desktop-only avatar-theme--blue"
             style={{
-              width: "32px",
-              height: "32px",
+              width: "34px",
+              height: "34px",
               borderRadius: "50%",
-              background: "var(--primary-deep)",
-              border: "1.5px solid var(--primary)",
               display: "grid",
               placeItems: "center",
               fontWeight: 800,
-              fontSize: "0.8rem",
+              fontSize: "0.85rem",
               color: "#FFFFFF",
+              border: "1.5px solid #60a5fa",
+              boxShadow: "0 0 10px rgba(59, 130, 246, 0.4)",
             }}
             title={you?.name || "Player"}
           >
@@ -333,30 +441,38 @@ export default function GamePage(props: {
       <div className="game-layout-grid">
         {/* Main Game Arena */}
         <main className="game-main-arena">
-          {/* Opponents Row */}
+          {/* Opponents Seating Area */}
           <div className="game-opponents-strip">
-            {opponents.map((opp) => {
+            {opponents.map((opp, oppIdx) => {
               const completedCount = opp.propertySets.filter((s) => s.isComplete).length;
               const isOppActive = gameState.turn.activePlayerId === opp.id;
+              const palette = OPPONENT_PALETTES[oppIdx % OPPONENT_PALETTES.length] || OPPONENT_PALETTES[0]!;
 
               return (
                 <div
                   key={opp.id}
-                  className={`game-opponent-card ${isOppActive ? "game-opponent-card--active" : ""}`}
+                  className={`game-opponent-seat ${isOppActive ? "game-opponent-seat--active" : ""}`}
                   onClick={() => setViewingOpponentId(opp.id)}
-                  style={{ cursor: "pointer" }}
                   title={`View ${opp.name}'s Table`}
                 >
-                  <div className="game-opponent-avatar-wrap">
+                  <div className={`game-opponent-avatar-wrap ${palette.class}`}>
                     <span>{opp.name[0]?.toUpperCase()}</span>
-                    <span className="game-opponent-hand-badge">{opp.handCount}</span>
+                    <span className="game-opponent-hand-badge">🃏 {opp.handCount}</span>
                   </div>
 
                   <div className="game-opponent-info">
-                    <span className="game-opponent-name">{opp.name} {opp.isBot && "(Bot)"}</span>
+                    <div className="game-opponent-name-row">
+                      <span className="game-opponent-name">{opp.name} {opp.isBot && "(Bot)"}</span>
+                      {isOppActive && (
+                        <span className="game-opponent-turn-tag">
+                          THINKING...
+                        </span>
+                      )}
+                    </div>
+
                     <div className="game-opponent-metrics">
-                      <span style={{ color: "#66df75" }}>${opp.bankTotal}M</span>
-                      <span style={{ color: "var(--primary)" }}>★ {completedCount}/3</span>
+                      <span className="game-opponent-bank-val">${opp.bankTotal}M</span>
+                      <span style={{ color: "var(--primary)" }}>★ {completedCount}/3 Sets</span>
                     </div>
 
                     {/* Mini Property Sets Preview */}
@@ -379,8 +495,27 @@ export default function GamePage(props: {
             })}
           </div>
 
-          {/* Central Table Center (Draw Pile & Discard Pile) */}
+          {/* Central Table Center (Deck, Discard & Action Reel) */}
           <div className="game-center-stage">
+            {/* Live Animated Action Reel */}
+            {liveReelEvent && (
+              <div className="game-action-reel">
+                <div className="game-action-reel-icon-wrap">
+                  <span className="material-symbols-outlined" style={{ color: "var(--primary)", fontSize: "20px" }}>
+                    {liveReelEvent.icon}
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "2px", minWidth: 0 }}>
+                  <span style={{ fontSize: "0.72rem", color: "#66df75", fontWeight: 800, letterSpacing: "0.05em" }}>
+                    {liveReelEvent.title}
+                  </span>
+                  <span className="game-action-reel-text">
+                    {liveReelEvent.description}
+                  </span>
+                </div>
+              </div>
+            )}
+
             <div className="game-piles-wrapper">
               {/* 3D Stacked Draw Pile */}
               <div
@@ -406,7 +541,11 @@ export default function GamePage(props: {
               </div>
 
               {/* Discard Pile */}
-              <div className="game-discard-pile">
+              <div
+                className="game-discard-pile"
+                onClick={() => setIsDiscardInspectorOpen(true)}
+                title="Tap to Inspect Discard Pile"
+              >
                 {gameState.discardPileTop ? (
                   <div className="game-discard-card-view">
                     <div
@@ -452,8 +591,8 @@ export default function GamePage(props: {
               <span>
                 {isYourTurn
                   ? gameState.turn.phase === "draw"
-                    ? "Your Turn: Draw 2 cards to begin"
-                    : "Your Turn: Select a card from your hand to play"
+                    ? "✨ Your Turn: Draw 2 cards to begin ✨"
+                    : `⚡ Your Turn: ${gameState.turn.actionsRemaining} action${gameState.turn.actionsRemaining === 1 ? "" : "s"} left`
                   : `${activePlayer?.name} is playing their turn...`}
               </span>
             </div>
@@ -500,17 +639,6 @@ export default function GamePage(props: {
                       ★ {you?.propertySets.filter((s) => s.isComplete).length || 0} / 3 Sets
                     </span>
                   </div>
-
-                  {isYourTurn && gameState.turn.phase === "action" && (
-                    <button
-                      type="button"
-                      onClick={handleEndTurn}
-                      className="game-end-turn-btn"
-                    >
-                      <span>End Turn</span>
-                      <span style={{ fontSize: "0.85em" }}>➔</span>
-                    </button>
-                  )}
                 </div>
 
                 <div className="game-properties-sets-grid">
@@ -551,6 +679,39 @@ export default function GamePage(props: {
                   )}
                 </div>
               </div>
+            </div>
+
+            {/* HUD Action Energy & Controls Bar */}
+            <div className="game-hud-controls-bar">
+              <div className="game-energy-indicator">
+                <span>ACTION ENERGY:</span>
+                <div className="game-energy-pips">
+                  {[1, 2, 3].map((pipNum) => {
+                    const isPipActive = isYourTurn && (gameState.turn.actionsRemaining >= pipNum);
+                    return (
+                      <div
+                        key={pipNum}
+                        className={`game-energy-pip ${isPipActive ? "game-energy-pip--active" : "game-energy-pip--spent"}`}
+                        title={isPipActive ? `Action ${pipNum} Available` : `Action ${pipNum} Spent`}
+                      />
+                    );
+                  })}
+                </div>
+                <span style={{ fontSize: "0.75rem", color: isYourTurn ? "var(--text)" : "var(--muted)" }}>
+                  ({isYourTurn ? `${gameState.turn.actionsRemaining} left` : "Waiting for turn"})
+                </span>
+              </div>
+
+              {isYourTurn && gameState.turn.phase === "action" && (
+                <button
+                  type="button"
+                  onClick={handleEndTurn}
+                  className={`game-end-turn-btn ${gameState.turn.actionsRemaining === 0 ? "game-end-turn-btn--pulse" : ""}`}
+                >
+                  <span>End Turn</span>
+                  <span style={{ fontSize: "0.85em" }}>➔</span>
+                </button>
+              )}
             </div>
 
             {/* Fanned Player Hand */}
@@ -956,39 +1117,6 @@ export default function GamePage(props: {
             </div>
           </div>
         </main>
-
-        {/* Activity Sidebar (Right) */}
-        <aside className="game-activity-sidebar">
-          <div className="game-activity-header">
-            <span className="material-symbols-outlined" style={{ fontSize: "18px", color: "var(--primary)" }}>
-              feed
-            </span>
-            <span>Activity Log</span>
-          </div>
-
-          <ol className="game-activity-list">
-            {gameState.history.slice(-12).reverse().map((evt) => {
-              const isYouEvt = evt.playerId === actualPlayerId;
-
-              return (
-                <li key={evt.id} className="game-activity-item">
-                  <div
-                    className="game-activity-bullet"
-                    style={{
-                      background: isYouEvt ? "var(--primary)" : evt.type.includes("rent") || evt.type.includes("action") ? "#ffb77d" : "#66df75",
-                    }}
-                  />
-                  <div>
-                    <span style={{ fontWeight: 600, color: "var(--text)" }}>{evt.message}</span>
-                    <div style={{ fontSize: "0.66rem", color: "var(--outline)", marginTop: "2px" }}>
-                      {new Date(evt.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-        </aside>
       </div>
 
       {/* Target Selection Modal (For Sly Deal / Deal Breaker / Debt Collector) */}
@@ -1643,60 +1771,6 @@ export default function GamePage(props: {
             >
               Discard {discardSelectedIds.length} / {pending.requiredDiscardCount} Cards
             </button>
-          </div>
-        </div>
-      )}
-      {/* Mobile Activity Log Drawer Sheet */}
-      {isMobileActivityOpen && (
-        <div className="game-activity-sheet" onClick={() => setIsMobileActivityOpen(false)}>
-          <div className="game-activity-sheet-content" onClick={(e) => e.stopPropagation()}>
-            <div className="game-activity-header" style={{ justifyContent: "space-between" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span className="material-symbols-outlined" style={{ fontSize: "18px", color: "var(--primary)" }}>
-                  feed
-                </span>
-                <span>Activity Log</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsMobileActivityOpen(false)}
-                className="game-icon-btn"
-                style={{ width: "28px", height: "28px" }}
-              >
-                ✕
-              </button>
-            </div>
-
-            <ol className="game-activity-list">
-              {gameState.history.slice(-25).reverse().map((evt) => {
-                const isYouEvt = evt.playerId === actualPlayerId;
-
-                return (
-                  <li key={evt.id} className="game-activity-item">
-                    <div
-                      className="game-activity-bullet"
-                      style={{
-                        background: isYouEvt
-                          ? "var(--primary)"
-                          : evt.type.includes("rent") || evt.type.includes("action")
-                            ? "#ffb77d"
-                            : "#66df75",
-                      }}
-                    />
-                    <div>
-                      <span style={{ fontWeight: 600, color: "var(--text)" }}>{evt.message}</span>
-                      <div style={{ fontSize: "0.66rem", color: "var(--outline)", marginTop: "2px" }}>
-                        {new Date(evt.timestamp).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                        })}
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
           </div>
         </div>
       )}
@@ -2541,6 +2615,145 @@ export default function GamePage(props: {
           </div>
         );
       })()}
+
+      {/* Slide-out Activity Drawer */}
+      {isActivityDrawerOpen && (
+        <div className="game-activity-drawer-backdrop" onClick={() => setIsActivityDrawerOpen(false)}>
+          <aside className="game-activity-drawer-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="game-activity-header">
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span className="material-symbols-outlined" style={{ fontSize: "20px", color: "var(--primary)" }}>
+                  feed
+                </span>
+                <span>Match Activity</span>
+              </div>
+              <button
+                type="button"
+                className="game-icon-btn"
+                onClick={() => setIsActivityDrawerOpen(false)}
+                title="Close Drawer"
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+                  close
+                </span>
+              </button>
+            </div>
+
+            <ul className="game-activity-list">
+              {gameState.history.length === 0 ? (
+                <li style={{ color: "var(--outline)", fontSize: "0.78rem", textAlign: "center", padding: "30px 10px" }}>
+                  Game started. Turn events will appear here in real-time.
+                </li>
+              ) : (
+                [...gameState.history].reverse().map((evt) => {
+                  let bulletColor = "var(--primary)";
+                  if (evt.type === "game_won") bulletColor = "#ffd700";
+                  else if (evt.type === "rent_charged" || evt.type === "card_banked") bulletColor = "#66df75";
+                  else if (evt.type === "action_played") bulletColor = "#ffb77d";
+                  else if (evt.type === "cards_drawn") bulletColor = "#a8c8ff";
+
+                  return (
+                    <li key={evt.id} className="game-activity-item">
+                      <span
+                        className="game-activity-bullet"
+                        style={{ backgroundColor: bulletColor }}
+                      />
+                      <div style={{ flex: 1 }}>
+                        <span style={{ color: "var(--text)" }}>{evt.message}</span>
+                        <div style={{ fontSize: "0.68rem", color: "var(--outline)", marginTop: "2px", fontFamily: "var(--mono)" }}>
+                          {new Date(evt.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+          </aside>
+        </div>
+      )}
+
+      {/* Discard Pile Inspector Modal */}
+      {isDiscardInspectorOpen && (
+        <div className="discard-inspector-modal" onClick={() => setIsDiscardInspectorOpen(false)}>
+          <div className="discard-inspector-box" onClick={(e) => e.stopPropagation()}>
+            <div className="discard-inspector-header">
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span className="material-symbols-outlined" style={{ color: "var(--primary)", fontSize: "22px" }}>
+                  layers
+                </span>
+                <h3 style={{ fontSize: "1.05rem", fontWeight: 800, margin: 0 }}>
+                  Discard Pile ({gameState.discardPile?.length || (gameState.discardPileTop ? 1 : 0)} Cards)
+                </h3>
+              </div>
+              <button
+                type="button"
+                className="game-icon-btn"
+                onClick={() => setIsDiscardInspectorOpen(false)}
+                title="Close"
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+                  close
+                </span>
+              </button>
+            </div>
+
+            <div className="discard-inspector-grid">
+              {gameState.discardPile && gameState.discardPile.length > 0 ? (
+                [...gameState.discardPile].reverse().map((c, i) => (
+                  <div key={`${c.instanceId}-${i}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+                    <Card
+                      card={{
+                        id: c.defId,
+                        name: c.name,
+                        type: c.type,
+                        primaryColor: c.primaryColor,
+                        secondaryColor: c.secondaryColor,
+                        value: c.value,
+                        setSize: c.setSize,
+                        description: c.description,
+                        icon: c.icon,
+                        count: 1,
+                      }}
+                      size="xs"
+                      isInteractive={false}
+                    />
+                    <span style={{ fontSize: "0.64rem", color: "var(--muted)", fontFamily: "var(--mono)" }}>
+                      {i === 0 ? "Top Card" : `#${gameState.discardPile!.length - i}`}
+                    </span>
+                  </div>
+                ))
+              ) : gameState.discardPileTop ? (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+                  <Card
+                    card={{
+                      id: gameState.discardPileTop.defId,
+                      name: gameState.discardPileTop.name,
+                      type: gameState.discardPileTop.type,
+                      primaryColor: gameState.discardPileTop.primaryColor,
+                      secondaryColor: gameState.discardPileTop.secondaryColor,
+                      value: gameState.discardPileTop.value,
+                      setSize: gameState.discardPileTop.setSize,
+                      description: gameState.discardPileTop.description,
+                      icon: gameState.discardPileTop.icon,
+                      count: 1,
+                    }}
+                    size="xs"
+                    isInteractive={false}
+                  />
+                  <span style={{ fontSize: "0.64rem", color: "var(--muted)", fontFamily: "var(--mono)" }}>
+                    Top Card
+                  </span>
+                </div>
+              ) : (
+                <p style={{ gridColumn: "1 / -1", textAlign: "center", color: "var(--muted)", padding: "24px 0" }}>
+                  Discard pile is currently empty.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
