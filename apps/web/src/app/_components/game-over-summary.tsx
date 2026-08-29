@@ -46,23 +46,64 @@ export function GameOverSummary({
   const isYouWinner = winnerId === currentPlayerId;
   const winner = winnerId ? gameState.players[winnerId] : null;
 
-  // Generate Confetti on victory
+  // Generate Confetti on victory (Full page)
   const [confettiPieces, setConfettiPieces] = useState<
     Array<{ id: number; left: number; bg: string; dur: number; delay: number; isRound: boolean }>
   >([]);
 
+  // Generate Continuous Confetti Shower for the Winner Card
+  const [winnerCardConfetti, setWinnerCardConfetti] = useState<
+    Array<{
+      id: number;
+      left: number;
+      bg: string;
+      dur: number;
+      delay: number;
+      sizeW: number;
+      sizeH: number;
+      isRound: boolean;
+      rotate: number;
+    }>
+  >([]);
+
   useEffect(() => {
+    const victoryPalette = [
+      "#ffd700", // Gold
+      "#f59e0b", // Amber
+      "#a8c8ff", // Light Blue
+      "#3b82f6", // Royal Blue
+      "#66df75", // Emerald Green
+      "#10b981", // Mint
+      "#ff7d7d", // Coral Red
+      "#ef4444", // Ruby
+      "#c084fc", // Royal Violet
+      "#ffffff", // Shimmer White
+    ];
+
+    // Winner Card continuous shower pieces
+    const cardShower = Array.from({ length: 65 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 110 - 5,
+      bg: victoryPalette[Math.floor(Math.random() * victoryPalette.length)] ?? "#ffd700",
+      dur: Math.random() * 2.2 + 2.4,
+      delay: -(Math.random() * 4.6), // Negative delay so shower is already in full flow on load!
+      sizeW: Math.random() * 6 + 6,
+      sizeH: Math.random() * 8 + 6,
+      isRound: Math.random() > 0.65,
+      rotate: Math.random() * 360,
+    }));
+    setWinnerCardConfetti(cardShower);
+
     if (isYouWinner) {
-      const colors = ["#a8c8ff", "#66df75", "#ffb77d", "#ffdad6", "#ffd700", "#ffffff"];
-      const pieces = Array.from({ length: 45 }, (_, i) => ({
+      const pagePieces = Array.from({ length: 50 }, (_, i) => ({
         id: i,
         left: Math.random() * 100,
-        bg: colors[Math.floor(Math.random() * colors.length)] ?? "#a8c8ff",
-        dur: Math.random() * 2.5 + 2,
-        delay: Math.random() * 1.5,
+        bg: victoryPalette[Math.floor(Math.random() * victoryPalette.length)] ?? "#a8c8ff",
+        dur: Math.random() * 2.5 + 2.5,
+        delay: -(Math.random() * 3.5),
         isRound: Math.random() > 0.5,
       }));
-      setConfettiPieces(pieces);
+      setConfettiPieces(pagePieces);
     }
   }, [isYouWinner]);
 
@@ -298,7 +339,28 @@ export function GameOverSummary({
             {isYouWinner ? "VICTORY" : "GAME OVER"}
           </h1>
 
-          <div className="victory-winner-card">
+          <div className="victory-winner-card-container">
+            {/* Continuous Confetti Shower under/behind the Winner Card */}
+            <div className="victory-card-confetti-shower" aria-hidden="true">
+              {winnerCardConfetti.map((c) => (
+                <div
+                  key={c.id}
+                  className="victory-card-confetti-piece"
+                  style={{
+                    left: `${c.left}%`,
+                    backgroundColor: c.bg,
+                    width: `${c.sizeW}px`,
+                    height: `${c.sizeH}px`,
+                    animationDuration: `${c.dur}s`,
+                    animationDelay: `${c.delay}s`,
+                    borderRadius: c.isRound ? "50%" : "2px",
+                    transform: `rotate(${c.rotate}deg)`,
+                  }}
+                />
+              ))}
+            </div>
+
+            <div className="victory-winner-card">
             <div className="victory-avatar-wrapper">
               {/* Dealopoly Championship Crown */}
               <div className="victory-champion-crown" aria-label="Dealopoly Champion Crown">
@@ -442,7 +504,8 @@ export function GameOverSummary({
               </span>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
         {/* Standings and Highlights Grid */}
         <div className="victory-grid-layout">
