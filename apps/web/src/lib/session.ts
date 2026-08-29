@@ -47,23 +47,58 @@ export function saveProfileName(name: string): PlayerProfile {
   return updated;
 }
 
+type RoomSession = { playerId: string; token: string; timestamp: number };
+
 export function saveRoomSession(roomCode: string, playerId: string, token: string): void {
   if (typeof window === "undefined") return;
   try {
     const sessions = getRoomSessions();
-    sessions[roomCode] = { playerId, token, timestamp: Date.now() };
+    if (!sessions[roomCode]) {
+      sessions[roomCode] = [];
+    } else if (!Array.isArray(sessions[roomCode])) {
+      // Migrate old format
+      sessions[roomCode] = [sessions[roomCode] as unknown as RoomSession];
+    }
+
+    const roomSessions = sessions[roomCode] as RoomSession[];
+    const existingIndex = roomSessions.findIndex((s) => s.playerId === playerId);
+    if (existingIndex >= 0) {
+      roomSessions[existingIndex] = { playerId, token, timestamp: Date.now() };
+    } else {
+      roomSessions.push({ playerId, token, timestamp: Date.now() });
+    }
+    
     localStorage.setItem(STORAGE_KEY_SESSIONS, JSON.stringify(sessions));
   } catch {
     // Ignore quota error
   }
 }
 
-export function getRoomSession(roomCode: string): { playerId: string; token: string } | null {
+export function getRoomSession(roomCode: string, preferredPlayerId?: string): { playerId: string; token: string } | null {
   const sessions = getRoomSessions();
-  return sessions[roomCode] || null;
+  const roomSessions = sessions[roomCode];
+  if (!roomSessions) return null;
+
+  if (Array.isArray(roomSessions)) {
+    if (roomSessions.length === 0) return null;
+    
+    if (preferredPlayerId) {
+      const match = roomSessions.find((s) => s.playerId === preferredPlayerId);
+      if (match) return match;
+    }
+    
+    // Sort by most recently used
+    const sorted = [...roomSessions].sort((a, b) => b.timestamp - a.timestamp);
+    return sorted[0] || null;
+  } else {
+    // Old format migration fallback
+    const oldSession = roomSessions as unknown as RoomSession;
+    if (preferredPlayerId && oldSession.playerId !== preferredPlayerId) return null;
+    return oldSession;
+  }
 }
 
-function getRoomSessions(): Record<string, { playerId: string; token: string; timestamp: number }> {
+function getRoomSessions(): Record<string, RoomSession[] | RoomSession> {
   if (typeof window === "undefined") return {};
   try {
     const raw = localStorage.getItem(STORAGE_KEY_SESSIONS);

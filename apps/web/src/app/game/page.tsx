@@ -29,18 +29,20 @@ export default function GamePage(props: {
     bots?: string;
     difficulty?: "easy" | "medium" | "hard";
     player?: string;
+    name?: string;
   }>;
 }) {
   const searchParams = props.searchParams ? use(props.searchParams) : undefined;
   const urlRoomCode = searchParams?.room;
+  const urlPlayerId = searchParams?.player;
   const isBotMode = searchParams?.mode === "bot" || !urlRoomCode || urlRoomCode === "solo";
   const botCount = searchParams?.bots ? parseInt(searchParams.bots, 10) : undefined;
   const botDifficulty = searchParams?.difficulty;
-  const customPlayerName = searchParams?.player;
+  const customPlayerName = searchParams?.name; // 'player' is now ID, 'name' is name if needed
 
   const profile = getStoredProfile();
-  const session = urlRoomCode ? getRoomSession(urlRoomCode) : null;
-  const playerId = session?.playerId || profile.id;
+  const session = urlRoomCode ? getRoomSession(urlRoomCode, urlPlayerId) : null;
+  const playerId = session?.playerId || urlPlayerId || profile.id;
   const sessionToken = session?.token;
 
   const [selectedCard, setSelectedCard] = useState<CardInstance | null>(null);

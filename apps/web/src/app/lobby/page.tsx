@@ -101,7 +101,7 @@ export default function LobbyPage(props: {
       playerId,
       sessionToken,
       onGameStarted: () => {
-        router.push(`/game?room=${roomCode}`);
+        router.push(`/game?room=${roomCode}&player=${playerId}`);
       },
     });
 
