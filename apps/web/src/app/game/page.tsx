@@ -497,25 +497,6 @@ export default function GamePage(props: {
 
           {/* Central Table Center (Deck, Discard & Action Reel) */}
           <div className="game-center-stage">
-            {/* Live Animated Action Reel */}
-            {liveReelEvent && (
-              <div className="game-action-reel">
-                <div className="game-action-reel-icon-wrap">
-                  <span className="material-symbols-outlined" style={{ color: "var(--primary)", fontSize: "20px" }}>
-                    {liveReelEvent.icon}
-                  </span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "2px", minWidth: 0 }}>
-                  <span style={{ fontSize: "0.72rem", color: "#66df75", fontWeight: 800, letterSpacing: "0.05em" }}>
-                    {liveReelEvent.title}
-                  </span>
-                  <span className="game-action-reel-text">
-                    {liveReelEvent.description}
-                  </span>
-                </div>
-              </div>
-            )}
-
             <div className="game-piles-wrapper">
               {/* 3D Stacked Draw Pile */}
               <div
@@ -596,6 +577,25 @@ export default function GamePage(props: {
                   : `${activePlayer?.name} is playing their turn...`}
               </span>
             </div>
+
+            {/* Live Animated Action Reel (Positioned below Turn Prompt) */}
+            {liveReelEvent && (
+              <div className="game-action-reel">
+                <div className="game-action-reel-icon-wrap">
+                  <span className="material-symbols-outlined" style={{ color: "var(--primary)", fontSize: "20px" }}>
+                    {liveReelEvent.icon}
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "2px", minWidth: 0 }}>
+                  <span style={{ fontSize: "0.72rem", color: "#66df75", fontWeight: 800, letterSpacing: "0.05em" }}>
+                    {liveReelEvent.title}
+                  </span>
+                  <span className="game-action-reel-text">
+                    {liveReelEvent.description}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Bottom Player Stage (Bank, Properties, Hand) */}
