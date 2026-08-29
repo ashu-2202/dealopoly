@@ -848,20 +848,65 @@ export default function GamePage(props: {
         </main>
       </div>
 
-      {/* Target Selection Modal (For Sly Deal / Deal Breaker / Debt Collector) */}
+      {/* Target Selection Modal (For Sly Deal / Deal Breaker / Debt Collector / Forced Deal / Wild Rent) */}
       {targetingAction && (
         <div className="join-dialog-overlay" role="dialog" aria-modal="true">
-          <div className="dialog-scrim" onClick={() => setTargetingAction(null)} />
-          <div className="dialog-panel" style={{ padding: "24px", maxWidth: "480px" }}>
-            <h2 style={{ color: "var(--primary)", marginBottom: "8px" }}>
-              🎯 Select Target: {targetingAction.card.name}
-            </h2>
-            <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginBottom: "16px" }}>
-              Choose an opponent or property to target with this action:
-            </p>
+          <div
+            className="dialog-scrim"
+            onClick={() => {
+              setTargetingAction(null);
+              setSelectedWildRentColor(null);
+            }}
+          />
+          <div className="dialog-panel dialog-panel--wide">
+            <div className="texture-overlay" />
+            <div className="sheet-handle" />
 
-            {/* Wild Rent Dedicated Flow: Color Selection + Opponent Selection */}
-            {targetingAction.type === "wild_rent" ? (
+            {/* Sticky Header */}
+            <div className="dialog-header">
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontSize: "24px", color: "var(--primary)" }}
+                >
+                  {targetingAction.type === "deal_breaker"
+                    ? "gavel"
+                    : targetingAction.type === "forced_deal"
+                    ? "published_with_changes"
+                    : targetingAction.type === "sly_deal"
+                    ? "swap_horiz"
+                    : targetingAction.type === "debt_collector"
+                    ? "payments"
+                    : "local_atm"}
+                </span>
+                <div>
+                  <h2 style={{ color: "var(--primary)", fontSize: "1.15rem", margin: 0 }}>
+                    Select Target: {targetingAction.card.name}
+                  </h2>
+                  <p style={{ color: "var(--muted)", fontSize: "0.74rem", margin: "2px 0 0" }}>
+                    Choose properties or opponents to target with this action
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="dialog-close-btn"
+                onClick={() => {
+                  setTargetingAction(null);
+                  setSelectedWildRentColor(null);
+                }}
+                aria-label="Close dialog"
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>
+                  close
+                </span>
+              </button>
+            </div>
+
+            {/* Scrollable Body */}
+            <div className="dialog-body">
+              {/* Wild Rent Dedicated Flow: Color Selection + Opponent Selection */}
+              {targetingAction.type === "wild_rent" ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                 <div>
                   <p style={{ fontSize: "0.76rem", fontWeight: 700, color: "var(--primary)", marginBottom: "8px", letterSpacing: "0.05em" }}>
@@ -1314,18 +1359,21 @@ export default function GamePage(props: {
                 ))}
               </div>
             )}
+            </div>
 
-            <button
-              type="button"
-              className="button button--secondary button--full"
-              style={{ marginTop: "16px" }}
-              onClick={() => {
-                setTargetingAction(null);
-                setSelectedWildRentColor(null);
-              }}
-            >
-              Cancel
-            </button>
+            {/* Sticky Footer */}
+            <div className="dialog-footer">
+              <button
+                type="button"
+                className="button button--secondary button--full"
+                onClick={() => {
+                  setTargetingAction(null);
+                  setSelectedWildRentColor(null);
+                }}
+              >
+                Cancel Action
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1334,51 +1382,64 @@ export default function GamePage(props: {
       {pending?.type === "reaction_window" && pending.waitingForPlayerId === actualPlayerId && (
         <div className="join-dialog-overlay" role="dialog" aria-modal="true">
           <div className="dialog-scrim" />
-          <div className="dialog-panel" style={{ textAlign: "center", padding: "28px" }}>
-            <h2 style={{ color: "#ef4444", marginBottom: "8px" }}>
-              {pending.justSayNoChainCount > 0 ? "⚠️ ACTION BLOCKED!" : "⚠️ ACTION TARGETED YOU!"}
-            </h2>
-            <p style={{ marginBottom: "16px", color: "var(--on-surface-variant)", fontSize: "0.9rem" }}>
-              {pending.justSayNoChainCount > 0
-                ? `${gameState.players[pending.initiatorPlayerId === actualPlayerId ? pending.targetPlayerId : pending.initiatorPlayerId]?.name} played a Just Say No against your ${pending.actionCard.name}! Do you want to counter it with another Just Say No?`
-                : `${pending.actionCard.name} was played against you. Do you want to block it?`}
-            </p>
+          <div className="dialog-panel" style={{ maxWidth: "480px" }}>
+            <div className="texture-overlay" />
+            <div className="sheet-handle" />
 
-            {you?.hand?.some((c) => c.defId === "action-just-say-no") ? (
-              <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-                <button
-                  type="button"
-                  className="button button--primary"
-                  style={{ background: "#10b981", borderColor: "#10b981" }}
-                  onClick={() => {
-                    const jsn = you.hand?.find((c) => c.defId === "action-just-say-no");
-                    handleReaction("just_say_no", jsn?.instanceId);
-                  }}
-                >
-                  PLAY JUST SAY NO!
-                </button>
-                <button
-                  type="button"
-                  className="button button--secondary"
-                  onClick={() => handleReaction("pass")}
-                >
-                  Pass (Accept Action)
-                </button>
+            <div className="dialog-header">
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span className="material-symbols-outlined" style={{ color: "#ef4444", fontSize: "24px" }}>
+                  warning
+                </span>
+                <h2 style={{ color: "#ef4444", fontSize: "1.15rem", margin: 0 }}>
+                  {pending.justSayNoChainCount > 0 ? "Action Blocked!" : "Action Targeted You!"}
+                </h2>
               </div>
-            ) : (
-              <div>
-                <p style={{ fontSize: "0.8rem", color: "var(--outline)", marginBottom: "14px" }}>
-                  (You don't have a Just Say No card)
-                </p>
-                <button
-                  type="button"
-                  className="button button--secondary"
-                  onClick={() => handleReaction("pass")}
-                >
-                  Continue
-                </button>
-              </div>
-            )}
+            </div>
+
+            <div className="dialog-body" style={{ textAlign: "center", padding: "20px 24px" }}>
+              <p style={{ margin: 0, color: "var(--on-surface-variant)", fontSize: "0.9rem", lineHeight: 1.5 }}>
+                {pending.justSayNoChainCount > 0
+                  ? `${gameState.players[pending.initiatorPlayerId === actualPlayerId ? pending.targetPlayerId : pending.initiatorPlayerId]?.name} played a Just Say No against your ${pending.actionCard.name}! Do you want to counter it with another Just Say No?`
+                  : `${pending.actionCard.name} was played against you. Do you want to block it?`}
+              </p>
+
+              {you?.hand?.some((c) => c.defId === "action-just-say-no") ? (
+                <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "12px" }}>
+                  <button
+                    type="button"
+                    className="button button--primary"
+                    style={{ background: "#10b981", borderColor: "#10b981" }}
+                    onClick={() => {
+                      const jsn = you.hand?.find((c) => c.defId === "action-just-say-no");
+                      handleReaction("just_say_no", jsn?.instanceId);
+                    }}
+                  >
+                    PLAY JUST SAY NO!
+                  </button>
+                  <button
+                    type="button"
+                    className="button button--secondary"
+                    onClick={() => handleReaction("pass")}
+                  >
+                    Pass (Accept Action)
+                  </button>
+                </div>
+              ) : (
+                <div style={{ marginTop: "12px" }}>
+                  <p style={{ fontSize: "0.8rem", color: "var(--outline)", marginBottom: "12px" }}>
+                    (You don&apos;t have a Just Say No card)
+                  </p>
+                  <button
+                    type="button"
+                    className="button button--secondary button--full"
+                    onClick={() => handleReaction("pass")}
+                  >
+                    Continue
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -1387,62 +1448,77 @@ export default function GamePage(props: {
       {pending?.type === "payment" && pending.debtorPlayerId === actualPlayerId && (
         <div className="join-dialog-overlay" role="dialog" aria-modal="true">
           <div className="dialog-scrim" />
-          <div className="dialog-panel" style={{ padding: "24px", maxWidth: "520px" }}>
-            <h2 style={{ color: "#f59e0b", marginBottom: "8px" }}>💳 Payment Required</h2>
-            <p style={{ marginBottom: "16px", fontSize: "0.88rem" }}>
-              {pending.reason} — You owe <b>${pending.amountDue}M</b> to {gameState.players[pending.creditorPlayerId]?.name}.
-            </p>
+          <div className="dialog-panel dialog-panel--wide">
+            <div className="texture-overlay" />
+            <div className="sheet-handle" />
 
-            <p style={{ fontSize: "0.76rem", color: "var(--outline)", marginBottom: "8px" }}>
-              Select table cards (Bank cash or Properties) to settle the bill:
-            </p>
-
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "16px" }}>
-              {[...(you?.bank || []), ...(you?.propertySets.flatMap((s) => {
-                  const items = [...s.cards];
-                  if (s.houseCard) items.push(s.houseCard);
-                  if (s.hotelCard) items.push(s.hotelCard);
-                  return items;
-                }) || [])]
-                .filter(c => c.value > 0) // Exclude 0-value cards like 10-Color Wild
-                .map((card) => {
-                const isSelected = paymentSelectedIds.includes(card.instanceId);
-
-                return (
-                  <button
-                    key={card.instanceId}
-                    type="button"
-                    onClick={() => {
-                      setPaymentSelectedIds((prev) =>
-                        isSelected
-                          ? prev.filter((id) => id !== card.instanceId)
-                          : [...prev, card.instanceId],
-                      );
-                    }}
-                    style={{
-                      padding: "8px 12px",
-                      borderRadius: "8px",
-                      background: isSelected ? "var(--primary)" : "var(--surface)",
-                      color: isSelected ? "var(--on-primary)" : "inherit",
-                      border: "1px solid var(--outline)",
-                      cursor: "pointer",
-                      fontSize: "0.78rem",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {card.name} (${card.value}M) {isSelected && "✓"}
-                  </button>
-                );
-              })}
+            <div className="dialog-header">
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span className="material-symbols-outlined" style={{ color: "#f59e0b", fontSize: "24px" }}>
+                  payments
+                </span>
+                <h2 style={{ color: "#f59e0b", fontSize: "1.15rem", margin: 0 }}>Payment Required</h2>
+              </div>
             </div>
 
-            <button
-              type="button"
-              className="button button--primary button--full"
-              onClick={handlePaymentSubmit}
-            >
-              Submit Payment
-            </button>
+            <div className="dialog-body">
+              <p style={{ margin: 0, fontSize: "0.88rem" }}>
+                {pending.reason} — You owe <b>${pending.amountDue}M</b> to {gameState.players[pending.creditorPlayerId]?.name}.
+              </p>
+
+              <p style={{ fontSize: "0.76rem", color: "var(--outline)", margin: 0 }}>
+                Select table cards (Bank cash or Properties) to settle the bill:
+              </p>
+
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                {[...(you?.bank || []), ...(you?.propertySets.flatMap((s) => {
+                    const items = [...s.cards];
+                    if (s.houseCard) items.push(s.houseCard);
+                    if (s.hotelCard) items.push(s.hotelCard);
+                    return items;
+                  }) || [])]
+                  .filter(c => c.value > 0)
+                  .map((card) => {
+                  const isSelected = paymentSelectedIds.includes(card.instanceId);
+
+                  return (
+                    <button
+                      key={card.instanceId}
+                      type="button"
+                      onClick={() => {
+                        setPaymentSelectedIds((prev) =>
+                          isSelected
+                            ? prev.filter((id) => id !== card.instanceId)
+                            : [...prev, card.instanceId],
+                        );
+                      }}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: "8px",
+                        background: isSelected ? "var(--primary)" : "var(--surface)",
+                        color: isSelected ? "var(--on-primary)" : "inherit",
+                        border: "1px solid var(--outline)",
+                        cursor: "pointer",
+                        fontSize: "0.78rem",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {card.name} (${card.value}M) {isSelected && "✓"}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="dialog-footer">
+              <button
+                type="button"
+                className="button button--primary button--full"
+                onClick={handlePaymentSubmit}
+              >
+                Submit Payment
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1451,55 +1527,70 @@ export default function GamePage(props: {
       {pending?.type === "discard" && pending.playerId === actualPlayerId && (
         <div className="join-dialog-overlay" role="dialog" aria-modal="true">
           <div className="dialog-scrim" />
-          <div className="dialog-panel" style={{ padding: "24px", maxWidth: "520px" }}>
-            <h2 style={{ color: "#ef4444", marginBottom: "8px" }}>🃏 Hand Limit Exceeded</h2>
-            <p style={{ marginBottom: "16px", fontSize: "0.88rem" }}>
-              You have {you?.hand?.length} cards. Please select <b>{pending.requiredDiscardCount}</b> card(s) to discard:
-            </p>
+          <div className="dialog-panel dialog-panel--wide">
+            <div className="texture-overlay" />
+            <div className="sheet-handle" />
 
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "16px" }}>
-              {you?.hand?.map((card) => {
-                const isSelected = discardSelectedIds.includes(card.instanceId);
-
-                return (
-                  <button
-                    key={card.instanceId}
-                    type="button"
-                    onClick={() => {
-                      setDiscardSelectedIds((prev) =>
-                        isSelected
-                          ? prev.filter((id) => id !== card.instanceId)
-                          : [...prev, card.instanceId],
-                      );
-                    }}
-                    style={{
-                      padding: "8px 12px",
-                      borderRadius: "8px",
-                      background: isSelected ? "#ef4444" : "var(--surface)",
-                      color: isSelected ? "#ffffff" : "inherit",
-                      border: "1px solid var(--outline)",
-                      cursor: "pointer",
-                      fontSize: "0.78rem",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {card.name} {isSelected && "✕"}
-                  </button>
-                );
-              })}
+            <div className="dialog-header">
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span className="material-symbols-outlined" style={{ color: "#ef4444", fontSize: "24px" }}>
+                  delete_sweep
+                </span>
+                <h2 style={{ color: "#ef4444", fontSize: "1.15rem", margin: 0 }}>Hand Limit Exceeded</h2>
+              </div>
             </div>
 
-            <button
-              type="button"
-              className="button button--primary button--full"
-              disabled={discardSelectedIds.length !== pending.requiredDiscardCount}
-              onClick={handleDiscardSubmit}
-              style={{
-                opacity: discardSelectedIds.length !== pending.requiredDiscardCount ? 0.5 : 1,
-              }}
-            >
-              Discard {discardSelectedIds.length} / {pending.requiredDiscardCount} Cards
-            </button>
+            <div className="dialog-body">
+              <p style={{ margin: 0, fontSize: "0.88rem" }}>
+                You have {you?.hand?.length} cards. Please select <b>{pending.requiredDiscardCount}</b> card(s) to discard:
+              </p>
+
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                {you?.hand?.map((card) => {
+                  const isSelected = discardSelectedIds.includes(card.instanceId);
+
+                  return (
+                    <button
+                      key={card.instanceId}
+                      type="button"
+                      onClick={() => {
+                        setDiscardSelectedIds((prev) =>
+                          isSelected
+                            ? prev.filter((id) => id !== card.instanceId)
+                            : [...prev, card.instanceId],
+                        );
+                      }}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: "8px",
+                        background: isSelected ? "#ef4444" : "var(--surface)",
+                        color: isSelected ? "#ffffff" : "inherit",
+                        border: "1px solid var(--outline)",
+                        cursor: "pointer",
+                        fontSize: "0.78rem",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {card.name} {isSelected && "✕"}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="dialog-footer">
+              <button
+                type="button"
+                className="button button--primary button--full"
+                disabled={discardSelectedIds.length !== pending.requiredDiscardCount}
+                onClick={handleDiscardSubmit}
+                style={{
+                  opacity: discardSelectedIds.length !== pending.requiredDiscardCount ? 0.5 : 1,
+                }}
+              >
+                Discard {discardSelectedIds.length}/{pending.requiredDiscardCount} Cards
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -2413,10 +2504,13 @@ export default function GamePage(props: {
         return (
           <div className="join-dialog-overlay" role="dialog" aria-modal="true" style={{ zIndex: 300 }}>
             <div className="dialog-scrim" onClick={() => setViewingOpponentId(null)} />
-            <div className="dialog-panel" style={{ padding: "16px", maxWidth: "900px", width: "95%" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", borderBottom: "1px solid var(--outline-variant)", paddingBottom: "12px" }}>
+            <div className="dialog-panel dialog-panel--table">
+              <div className="texture-overlay" />
+              <div className="sheet-handle" />
+
+              <div className="dialog-header">
                 <div>
-                  <h2 style={{ fontSize: "1.1rem", marginBottom: "4px" }}>{opp.name}&apos;s Table</h2>
+                  <h2 style={{ fontSize: "1.1rem", margin: "0 0 4px" }}>{opp.name}&apos;s Table</h2>
                   <div className="game-opponent-metrics" style={{ fontSize: "0.8rem" }}>
                     <span>{opp.handCount} Cards in Hand (Hidden)</span>
                     <span>•</span>
@@ -2425,90 +2519,93 @@ export default function GamePage(props: {
                 </div>
                 <button
                   type="button"
+                  className="dialog-close-btn"
                   onClick={() => setViewingOpponentId(null)}
-                  style={{ background: "none", border: "none", color: "var(--outline)", cursor: "pointer" }}
+                  aria-label="Close dialog"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: "28px" }}>close</span>
+                  <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>close</span>
                 </button>
               </div>
 
               {/* Exact replica of bottom table layout but for opponent */}
-              <div className="game-player-assets-row" style={{ minHeight: "220px" }}>
-                {/* Bank Panel */}
-                <div className="game-bank-panel">
-                  <div className="game-bank-header">
-                    <span className="game-bank-title">BANK</span>
-                    <span className="game-bank-count-pill">{opp.bank.length} cards</span>
-                  </div>
+              <div className="dialog-body">
+                <div className="game-player-assets-row" style={{ minHeight: "220px" }}>
+                  {/* Bank Panel */}
+                  <div className="game-bank-panel">
+                    <div className="game-bank-header">
+                      <span className="game-bank-title">BANK</span>
+                      <span className="game-bank-count-pill">{opp.bank.length} cards</span>
+                    </div>
 
-                  <div className="game-bank-balance-display">
-                    <span className="game-bank-total">${opp.bankTotal}M</span>
-                  </div>
+                    <div className="game-bank-balance-display">
+                      <span className="game-bank-total">${opp.bankTotal}M</span>
+                    </div>
 
-                  <div className="game-bank-cards-fan" style={{ flexWrap: "wrap", justifyContent: "center" }}>
-                    {opp.bank.length === 0 ? (
-                      <span style={{ fontSize: "0.68rem", color: "var(--outline)", padding: "2px 0" }}>
-                        No banked cash
-                      </span>
-                    ) : (
-                      opp.bank.map((card) => (
-                        <span key={card.instanceId} className="game-bank-card-mini">
-                          {card.name} (${card.value}M)
+                    <div className="game-bank-cards-fan" style={{ flexWrap: "wrap", justifyContent: "center" }}>
+                      {opp.bank.length === 0 ? (
+                        <span style={{ fontSize: "0.68rem", color: "var(--outline)", padding: "2px 0" }}>
+                          No banked cash
                         </span>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                {/* Properties Panel */}
-                <div className="game-properties-panel">
-                  <div className="game-properties-header">
-                    <div className="game-properties-title-group">
-                      <span className="game-properties-title-label">
-                        PROPERTIES
-                      </span>
-                      <span className="game-properties-completed-badge">
-                        ★ {opp.propertySets.filter((s) => s.isComplete).length} / 3 Sets
-                      </span>
+                      ) : (
+                        opp.bank.map((card) => (
+                          <span key={card.instanceId} className="game-bank-card-mini">
+                            {card.name} (${card.value}M)
+                          </span>
+                        ))
+                      )}
                     </div>
                   </div>
 
-                  <div className="game-properties-sets-grid">
-                    {opp.propertySets.length === 0 ? (
-                      <span style={{ fontSize: "0.7rem", color: "var(--outline)", padding: "4px 0" }}>
-                        No property sets laid down yet.
-                      </span>
-                    ) : (
-                      opp.propertySets.map((set) => {
-                        const colorHex = COLOR_CONFIG[set.color]?.hex || "#0055a4";
+                  {/* Properties Panel */}
+                  <div className="game-properties-panel">
+                    <div className="game-properties-header">
+                      <div className="game-properties-title-group">
+                        <span className="game-properties-title-label">
+                          PROPERTIES
+                        </span>
+                        <span className="game-properties-completed-badge">
+                          ★ {opp.propertySets.filter((s) => s.isComplete).length} / 3 Sets
+                        </span>
+                      </div>
+                    </div>
 
-                        return (
-                          <div
-                            key={set.setId}
-                            className={`game-property-set-box ${set.isComplete ? "game-property-set-box--complete" : ""}`}
-                          >
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `2px solid ${colorHex}`, paddingBottom: "2px" }}>
-                              <span style={{ fontSize: "0.68rem", fontWeight: 800, color: colorHex, textTransform: "uppercase" }}>
-                                {set.color}
-                              </span>
-                              <span style={{ fontFamily: "var(--mono)", fontSize: "0.68rem", fontWeight: 700 }}>
-                                {set.cards.length}/{set.setSize} {set.isComplete && "★"}
-                              </span>
-                            </div>
+                    <div className="game-properties-sets-grid">
+                      {opp.propertySets.length === 0 ? (
+                        <span style={{ fontSize: "0.7rem", color: "var(--outline)", padding: "4px 0" }}>
+                          No property sets laid down yet.
+                        </span>
+                      ) : (
+                        opp.propertySets.map((set) => {
+                          const colorHex = COLOR_CONFIG[set.color as CardColor]?.hex || "#0055A4";
 
-                            <div style={{ display: "flex", flexDirection: "column", gap: "2px", fontSize: "0.64rem", color: "var(--muted)" }}>
-                              {set.cards.map((c) => (
-                                <span key={c.instanceId} style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "120px" }}>
-                                  • {c.name}
+                          return (
+                            <div
+                              key={set.setId}
+                              className={`game-property-set-box ${set.isComplete ? "game-property-set-box--complete" : ""}`}
+                            >
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `2px solid ${colorHex}`, paddingBottom: "2px" }}>
+                                <span style={{ fontSize: "0.68rem", fontWeight: 800, color: colorHex, textTransform: "uppercase" }}>
+                                  {set.color}
                                 </span>
-                              ))}
-                              {set.hasHouse && <span style={{ color: "#66df75", fontWeight: 700 }}>🏠 House (+$3M)</span>}
-                              {set.hasHotel && <span style={{ color: "#ffb77d", fontWeight: 700 }}>🏨 Hotel (+$4M)</span>}
+                                <span style={{ fontFamily: "var(--mono)", fontSize: "0.68rem", fontWeight: 700 }}>
+                                  {set.cards.length}/{set.setSize} {set.isComplete && "★"}
+                                </span>
+                              </div>
+
+                              <div style={{ display: "flex", flexDirection: "column", gap: "2px", fontSize: "0.64rem", color: "var(--muted)" }}>
+                                {set.cards.map((c) => (
+                                  <span key={c.instanceId} style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "120px" }}>
+                                    • {c.name}
+                                  </span>
+                                ))}
+                                {set.hasHouse && <span style={{ color: "#66df75", fontWeight: 700 }}>🏠 House (+$3M)</span>}
+                                {set.hasHotel && <span style={{ color: "#ffb77d", fontWeight: 700 }}>🏨 Hotel (+$4M)</span>}
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })
-                    )}
+                          );
+                        })
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
