@@ -568,12 +568,12 @@ export class RoomManager {
     return seat;
   }
 
-  public detachSocket(code: string, playerId: string): void {
+  public detachSocket(code: string, playerId: string, socket: WebSocket): void {
     const room = this.rooms.get(code);
     if (!room) return;
 
     const seat = room.seats.find((s) => s.playerId === playerId);
-    if (seat) {
+    if (seat && seat.socket === socket) {
       seat.isConnected = false;
       seat.socket = undefined;
       room.lastActivityAt = Date.now();

@@ -154,7 +154,7 @@ export function createGameServer() {
         });
 
         socket.on("close", () => {
-          roomManager.detachSocket(roomCode, playerId);
+          roomManager.detachSocket(roomCode, playerId, socket);
         });
       },
     );
