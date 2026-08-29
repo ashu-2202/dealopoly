@@ -137,15 +137,19 @@ export default function GamePage(props: {
           title,
           description: latestNotable.message,
         });
-
-        const timer = setTimeout(() => {
-          setLiveReelEvent(null);
-        }, 2600);
-
-        return () => clearTimeout(timer);
       }
     }
   }, [gameState?.history, isActivityDrawerOpen]);
+
+  // Auto-dismiss liveReelEvent after 1 second
+  useEffect(() => {
+    if (!liveReelEvent) return;
+    const timer = setTimeout(() => {
+      setLiveReelEvent(null);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [liveReelEvent]);
 
   if (!gameState) {
     return (
