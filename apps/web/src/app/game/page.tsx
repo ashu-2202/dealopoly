@@ -2,6 +2,7 @@
 
 import { useState, use, useEffect, useRef } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "../_components/card";
 import { GameOverSummary } from "../_components/game-over-summary";
 import {
@@ -751,369 +752,6 @@ export default function GamePage(props: {
                         size="sm"
                         isInteractive={isYourTurn && gameState.turn.phase === "action"}
                       />
-
-                      {/* Floating Action Menu on Selected Card */}
-                      {isSelected && (
-                        <div className="game-card-action-popover" onClick={(e) => e.stopPropagation()}>
-                          {/* Property Card Actions */}
-                          {card.type === "property" && (
-                            <button
-                              type="button"
-                              className="game-popover-btn game-popover-btn--primary"
-                              onClick={() => handlePlayProperty(card)}
-                            >
-                              🏠 Play to Set
-                            </button>
-                          )}
-
-                          {/* Wild Property Card Actions */}
-                          {card.type === "property-wild" && (
-                            <>
-                              {card.primaryColor !== "all" ? (
-                                <>
-                                  {(() => {
-                                    const canPrimary = you?.propertySets.some(
-                                      (s) => s.color === card.primaryColor && !s.isComplete
-                                    );
-                                    const canSecondary = you?.propertySets.some(
-                                      (s) => s.color === card.secondaryColor && !s.isComplete
-                                    );
-
-                                    if (canPrimary || canSecondary) {
-                                      return (
-                                        <>
-                                          {canPrimary && (
-                                            <button
-                                              type="button"
-                                              className="game-popover-btn game-popover-btn--primary"
-                                              onClick={() => handlePlayProperty(card, card.primaryColor)}
-                                            >
-                                              Play: {card.primaryColor?.toUpperCase()}
-                                            </button>
-                                          )}
-                                          {canSecondary && (
-                                            <button
-                                              type="button"
-                                              className="game-popover-btn game-popover-btn--primary"
-                                              onClick={() => handlePlayProperty(card, card.secondaryColor)}
-                                            >
-                                              Play: {card.secondaryColor?.toUpperCase()}
-                                            </button>
-                                          )}
-                                        </>
-                                      );
-                                    }
-
-                                    return (
-                                      <span style={{ fontSize: "0.62rem", color: "#fcd34d", textAlign: "center", padding: "2px" }}>
-                                        ⚠️ Needs existing property
-                                      </span>
-                                    );
-                                  })()}
-                                </>
-                              ) : (
-                                <>
-                                  {(() => {
-                                    const eligibleSets = you?.propertySets.filter((s) => !s.isComplete) || [];
-                                    if (eligibleSets.length > 0) {
-                                      return (
-                                        <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-                                          <span style={{ fontSize: "0.62rem", color: "var(--muted)", fontWeight: 700, textAlign: "center" }}>
-                                            Attach to Set:
-                                          </span>
-                                          {eligibleSets.map((s) => (
-                                            <button
-                                              key={s.setId}
-                                              type="button"
-                                              className="game-popover-btn game-popover-btn--primary"
-                                              onClick={() => handlePlayProperty(card, s.color, s.setId)}
-                                            >
-                                              {s.color.toUpperCase()} ({s.cards.length}/{s.setSize})
-                                            </button>
-                                          ))}
-                                        </div>
-                                      );
-                                    }
-
-                                    return (
-                                      <span style={{ fontSize: "0.62rem", color: "#fcd34d", textAlign: "center", padding: "2px" }}>
-                                        ⚠️ Needs existing property
-                                      </span>
-                                    );
-                                  })()}
-                                </>
-                              )}
-                            </>
-                          )}
-
-                          {/* Bank Action (Any card with value > 0) */}
-                          {card.value > 0 && (
-                            <button
-                              type="button"
-                              className="game-popover-btn game-popover-btn--bank"
-                              onClick={() => handleBankCard(card)}
-                            >
-                              💰 Deposit ${card.value}M
-                            </button>
-                          )}
-
-                          {/* Action: Pass Go */}
-                          {card.defId === "action-pass-go" && (
-                            <button
-                              type="button"
-                              className="game-popover-btn game-popover-btn--primary"
-                              onClick={() => handlePlayAction(card)}
-                            >
-                              ⚡ Draw 2 Cards
-                            </button>
-                          )}
-
-                          {/* Action: Deal Breaker */}
-                          {card.defId === "action-deal-breaker" && (
-                            <button
-                              type="button"
-                              className="game-popover-btn game-popover-btn--primary"
-                              onClick={() => setTargetingAction({ card, type: "deal_breaker" })}
-                            >
-                              👑 Steal Full Set
-                            </button>
-                          )}
-
-                          {/* Action: Sly Deal */}
-                          {card.defId === "action-sly-deal" && (
-                            <button
-                              type="button"
-                              className="game-popover-btn game-popover-btn--primary"
-                              onClick={() => setTargetingAction({ card, type: "sly_deal" })}
-                            >
-                              🤝 Steal 1 Property
-                            </button>
-                          )}
-
-                          {/* Action: Forced Deal */}
-                          {(card.defId === "action-forced-deal" || card.defId === "action-force-deal") && (
-                            <button
-                              type="button"
-                              className="game-popover-btn game-popover-btn--primary"
-                              onClick={() => setTargetingAction({ card, type: "forced_deal" })}
-                            >
-                              🔄 Swap Property
-                            </button>
-                          )}
-
-                          {/* Action: Debt Collector */}
-                          {card.defId === "action-debt-collector" && (
-                            <button
-                              type="button"
-                              className="game-popover-btn game-popover-btn--primary"
-                              onClick={() => setTargetingAction({ card, type: "debt_collector" })}
-                            >
-                              💵 Charge $5M
-                            </button>
-                          )}
-
-                          {/* Action: Birthday */}
-                          {card.defId === "action-its-my-birthday" && (
-                            <button
-                              type="button"
-                              className="game-popover-btn game-popover-btn--primary"
-                              onClick={() => handlePlayAction(card)}
-                            >
-                              🎂 Birthday ($2M All)
-                            </button>
-                          )}
-
-                          {/* Action: Double The Rent */}
-                          {card.defId === "action-double-the-rent" && (() => {
-                            const rentCardsInHand = you?.hand?.filter((c) => c.type === "rent") || [];
-                            const canDouble = gameState.turn.actionsRemaining >= 2;
-
-                            if (rentCardsInHand.length === 0) {
-                              return (
-                                <span style={{ fontSize: "0.62rem", color: "var(--muted)", textAlign: "center", padding: "2px" }}>
-                                  ℹ️ Play with a Rent card
-                                </span>
-                              );
-                            }
-
-                            if (!canDouble) {
-                              return (
-                                <span style={{ fontSize: "0.62rem", color: "#fcd34d", textAlign: "center", padding: "2px" }}>
-                                  ⚠️ Needs 2 actions to double
-                                </span>
-                              );
-                            }
-
-                            return (
-                              <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-                                {rentCardsInHand.map((rCard) => {
-                                  if (rCard.primaryColor === "all") {
-                                    return (
-                                      <button
-                                        key={rCard.instanceId}
-                                        type="button"
-                                        className="game-popover-btn game-popover-btn--primary"
-                                        style={{ background: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)", color: "#FFFFFF" }}
-                                        onClick={() => setTargetingAction({ card: rCard, type: "wild_rent", doubleRentCardId: card.instanceId })}
-                                      >
-                                        🔥 2x Wild Rent (1 Player)
-                                      </button>
-                                    );
-                                  }
-
-                                  return (
-                                    <div key={rCard.instanceId} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                                      {rCard.primaryColor && (
-                                        <button
-                                          type="button"
-                                          className="game-popover-btn game-popover-btn--primary"
-                                          style={{ background: COLOR_CONFIG[rCard.primaryColor as CardColor]?.hex || "var(--primary)", color: "#FFFFFF" }}
-                                          onClick={() => handlePlayRent(rCard, rCard.primaryColor as CardColor, undefined, card.instanceId)}
-                                        >
-                                          🔥 2x {rCard.primaryColor.toUpperCase()}
-                                        </button>
-                                      )}
-                                      {rCard.secondaryColor && (
-                                        <button
-                                          type="button"
-                                          className="game-popover-btn game-popover-btn--primary"
-                                          style={{ background: COLOR_CONFIG[rCard.secondaryColor as CardColor]?.hex || "var(--primary)", color: "#FFFFFF" }}
-                                          onClick={() => handlePlayRent(rCard, rCard.secondaryColor as CardColor, undefined, card.instanceId)}
-                                        >
-                                          🔥 2x {rCard.secondaryColor.toUpperCase()}
-                                        </button>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            );
-                          })()}
-
-                          {/* Action: House */}
-                          {card.defId === "action-house" && (() => {
-                            const eligibleSets = you?.propertySets.filter(
-                              (s) => s.isComplete && !s.hasHouse && s.color !== "railroad" && s.color !== "utility"
-                            ) || [];
-
-                            if (eligibleSets.length > 0) {
-                              return eligibleSets.map((set) => (
-                                <button
-                                  key={set.setId}
-                                  type="button"
-                                  className="game-popover-btn game-popover-btn--primary"
-                                  onClick={() => handlePlayAction(card, undefined, set.setId)}
-                                >
-                                  🏠 House: {set.color.toUpperCase()}
-                                </button>
-                              ));
-                            }
-                            return (
-                              <span style={{ fontSize: "0.62rem", color: "#fcd34d", textAlign: "center", padding: "2px" }}>
-                                ⚠️ Needs full set
-                              </span>
-                            );
-                          })()}
-
-                          {/* Action: Hotel */}
-                          {card.defId === "action-hotel" && (() => {
-                            const eligibleSets = you?.propertySets.filter(
-                              (s) => s.isComplete && s.hasHouse && !s.hasHotel
-                            ) || [];
-
-                            if (eligibleSets.length > 0) {
-                              return eligibleSets.map((set) => (
-                                <button
-                                  key={set.setId}
-                                  type="button"
-                                  className="game-popover-btn game-popover-btn--primary"
-                                  onClick={() => handlePlayAction(card, undefined, set.setId)}
-                                >
-                                  🏨 Hotel: {set.color.toUpperCase()}
-                                </button>
-                              ));
-                            }
-                            return (
-                              <span style={{ fontSize: "0.62rem", color: "#fcd34d", textAlign: "center", padding: "2px" }}>
-                                ⚠️ Needs House first
-                              </span>
-                            );
-                          })()}
-
-                          {/* Rent Card */}
-                          {card.type === "rent" && (() => {
-                            const doubleRentInHand = you?.hand?.find((c) => c.defId === "action-double-the-rent");
-                            const canDouble = !!doubleRentInHand && gameState.turn.actionsRemaining >= 2;
-
-                            return (
-                              <>
-                                {card.primaryColor !== "all" ? (
-                                  <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                                    {card.primaryColor && (
-                                      <button
-                                        type="button"
-                                        className="game-popover-btn game-popover-btn--primary"
-                                        onClick={() => handlePlayRent(card, card.primaryColor as CardColor)}
-                                      >
-                                        Rent: {card.primaryColor.toUpperCase()}
-                                      </button>
-                                    )}
-                                    {canDouble && doubleRentInHand && card.primaryColor && (
-                                      <button
-                                        type="button"
-                                        className="game-popover-btn game-popover-btn--primary"
-                                        style={{ background: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)", color: "#FFFFFF" }}
-                                        onClick={() => handlePlayRent(card, card.primaryColor as CardColor, undefined, doubleRentInHand.instanceId)}
-                                      >
-                                        🔥 2x {card.primaryColor.toUpperCase()} (2 Actions)
-                                      </button>
-                                    )}
-                                    {card.secondaryColor && (
-                                      <button
-                                        type="button"
-                                        className="game-popover-btn game-popover-btn--primary"
-                                        onClick={() => handlePlayRent(card, card.secondaryColor as CardColor)}
-                                      >
-                                        Rent: {card.secondaryColor.toUpperCase()}
-                                      </button>
-                                    )}
-                                    {canDouble && doubleRentInHand && card.secondaryColor && (
-                                      <button
-                                        type="button"
-                                        className="game-popover-btn game-popover-btn--primary"
-                                        style={{ background: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)", color: "#FFFFFF" }}
-                                        onClick={() => handlePlayRent(card, card.secondaryColor as CardColor, undefined, doubleRentInHand.instanceId)}
-                                      >
-                                        🔥 2x {card.secondaryColor.toUpperCase()} (2 Actions)
-                                      </button>
-                                    )}
-                                  </div>
-                                ) : (
-                                  <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                                    <button
-                                      type="button"
-                                      className="game-popover-btn game-popover-btn--primary"
-                                      onClick={() => setTargetingAction({ card, type: "wild_rent" })}
-                                    >
-                                      Wild Rent (1 Player)
-                                    </button>
-                                    {canDouble && doubleRentInHand && (
-                                      <button
-                                        type="button"
-                                        className="game-popover-btn game-popover-btn--primary"
-                                        style={{ background: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)", color: "#FFFFFF" }}
-                                        onClick={() => setTargetingAction({ card, type: "wild_rent", doubleRentCardId: doubleRentInHand.instanceId })}
-                                      >
-                                        🔥 2x Wild Rent (2 Actions)
-                                      </button>
-                                    )}
-                                  </div>
-                                )}
-                              </>
-                            );
-                          })()}
-                        </div>
-                      )}
                     </div>
                   );
                 })}
@@ -1868,646 +1506,767 @@ export default function GamePage(props: {
         </div>
       )}
 
-      {/* Mobile Card Action Bottom Sheet */}
-      {selectedCard && (
-        <div className="game-card-mobile-modal" onClick={() => setSelectedCard(null)}>
-          <div className="game-card-mobile-sheet" onClick={(e) => e.stopPropagation()}>
-            {/* Header with close button */}
-            <div className="game-mobile-card-header">
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span className="material-symbols-outlined" style={{ fontSize: "20px", color: "var(--primary)" }}>
-                  playing_cards
-                </span>
-                <b style={{ fontSize: "0.92rem", color: "var(--text)" }}>Play Card</b>
+      {/* Interactive Framer Motion Card Action Dialog */}
+      <AnimatePresence>
+        {selectedCard && (
+          <motion.div
+            className="game-card-action-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            onClick={() => setSelectedCard(null)}
+          >
+            <motion.div
+              className="game-card-action-dialog"
+              initial={{ scale: 0.88, y: 24, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 16, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350, mass: 0.7 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header with Card Type Pill and Close Button */}
+              <div className="game-card-action-header">
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+                  <span className="game-card-type-tag">
+                    {selectedCard.type === "property" && "🏠 PROPERTY"}
+                    {selectedCard.type === "property-wild" && "🌈 WILD PROPERTY"}
+                    {selectedCard.type === "money" && "💰 CASH"}
+                    {selectedCard.type === "action" && "⚡ ACTION CARD"}
+                    {selectedCard.type === "rent" && "💸 RENT"}
+                  </span>
+                  <b style={{ fontSize: "0.95rem", color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {selectedCard.name}
+                  </b>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedCard(null)}
+                  className="game-icon-btn"
+                  style={{ width: "32px", height: "32px", flexShrink: 0 }}
+                  title="Close"
+                >
+                  ✕
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setSelectedCard(null)}
-                className="game-icon-btn"
-                style={{ width: "30px", height: "30px" }}
-              >
-                ✕
-              </button>
-            </div>
 
-            {/* Centered Full Card Preview */}
-            <div className="game-card-modal-preview">
-              <Card
-                card={{
-                  id: selectedCard.defId,
-                  name: selectedCard.name,
-                  type: selectedCard.type,
-                  primaryColor: selectedCard.primaryColor,
-                  secondaryColor: selectedCard.secondaryColor,
-                  value: selectedCard.value,
-                  setSize: selectedCard.setSize,
-                  description: selectedCard.description,
-                  icon: selectedCard.icon,
-                  count: 1,
-                }}
-                size="sm"
-                isInteractive={false}
-              />
-            </div>
-
-            {/* Action Buttons */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {/* Regular Property */}
-              {selectedCard.type === "property" && (
-                <button
-                  type="button"
-                  className="button button--primary button--full"
-                  style={{ padding: "12px", fontSize: "0.9rem" }}
-                  onClick={() => handlePlayProperty(selectedCard)}
-                >
-                  🏠 Play to Property Set
-                </button>
-              )}
-
-              {/* Wild Property Dual Color */}
-              {selectedCard.type === "property-wild" && selectedCard.primaryColor !== "all" && (() => {
-                const canPrimary = you?.propertySets.some(
-                  (s) => s.color === selectedCard.primaryColor && !s.isComplete
-                );
-                const canSecondary = you?.propertySets.some(
-                  (s) => s.color === selectedCard.secondaryColor && !s.isComplete
-                );
-
-                if (canPrimary || canSecondary) {
-                  return (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                      <span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 700 }}>
-                        Attach to Existing Property Set:
-                      </span>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-                        {canPrimary && (
-                          <button
-                            type="button"
-                            className="button button--primary"
-                            style={{
-                              background: COLOR_CONFIG[selectedCard.primaryColor!]?.hex || "var(--primary)",
-                              color: COLOR_CONFIG[selectedCard.primaryColor!]?.textHex || "#FFFFFF",
-                              padding: "12px 8px",
-                              fontSize: "0.82rem",
-                              fontWeight: 800,
-                            }}
-                            onClick={() => handlePlayProperty(selectedCard, selectedCard.primaryColor)}
-                          >
-                            Play as {selectedCard.primaryColor?.toUpperCase()}
-                          </button>
-                        )}
-                        {canSecondary && (
-                          <button
-                            type="button"
-                            className="button button--primary"
-                            style={{
-                              background: COLOR_CONFIG[selectedCard.secondaryColor!]?.hex || "var(--primary)",
-                              color: COLOR_CONFIG[selectedCard.secondaryColor!]?.textHex || "#FFFFFF",
-                              padding: "12px 8px",
-                              fontSize: "0.82rem",
-                              fontWeight: 800,
-                            }}
-                            onClick={() => handlePlayProperty(selectedCard, selectedCard.secondaryColor)}
-                          >
-                            Play as {selectedCard.secondaryColor?.toUpperCase()}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                }
-
-                return (
+              {/* Body */}
+              <div className="game-card-action-body">
+                {/* Spotlight Card Preview with Glowing Backdrop */}
+                <div className="game-card-spotlight-wrap">
                   <div
+                    className="game-card-spotlight-glow"
                     style={{
-                      padding: "8px 12px",
-                      background: "rgba(245, 158, 11, 0.15)",
-                      border: "1px solid rgba(245, 158, 11, 0.4)",
-                      borderRadius: "8px",
-                      fontSize: "0.75rem",
-                      color: "#fcd34d",
-                      lineHeight: 1.3,
+                      background:
+                        COLOR_CONFIG[selectedCard.primaryColor || selectedCard.currentColor || "dark-blue"]?.hex ||
+                        "var(--primary)",
                     }}
-                  >
-                    ⚠️ Wild Property Cards must attach to an existing {selectedCard.primaryColor?.toUpperCase()} or {selectedCard.secondaryColor?.toUpperCase()} property set on your table. You can deposit it into your bank for ${selectedCard.value}M.
-                  </div>
-                );
-              })()}
-
-              {/* Wild Property Multicolor (All 10 Colors) */}
-              {selectedCard.type === "property-wild" && selectedCard.primaryColor === "all" && (() => {
-                const eligibleSets = you?.propertySets.filter((s) => !s.isComplete) || [];
-
-                if (eligibleSets.length > 0) {
-                  return (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                      <span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 700 }}>
-                        Attach to Existing Incomplete Set:
-                      </span>
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                        {eligibleSets.map((set) => (
-                          <button
-                            key={set.setId}
-                            type="button"
-                            className="button"
-                            style={{
-                              backgroundColor: COLOR_CONFIG[set.color]?.hex || "var(--surface-high)",
-                              color: COLOR_CONFIG[set.color]?.textHex || "#FFFFFF",
-                              padding: "10px 8px",
-                              fontSize: "0.75rem",
-                              fontWeight: 800,
-                              borderRadius: "8px",
-                              textAlign: "center",
-                              textTransform: "uppercase",
-                            }}
-                            onClick={() => handlePlayProperty(selectedCard, set.color, set.setId)}
-                          >
-                            {set.color.replace("-", " ")} ({set.cards.length}/{set.setSize})
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                }
-
-                return (
-                  <div
-                    style={{
-                      padding: "8px 12px",
-                      background: "rgba(245, 158, 11, 0.15)",
-                      border: "1px solid rgba(245, 158, 11, 0.4)",
-                      borderRadius: "8px",
-                      fontSize: "0.75rem",
-                      color: "#fcd34d",
-                      lineHeight: 1.3,
+                  />
+                  <Card
+                    card={{
+                      id: selectedCard.defId,
+                      name: selectedCard.name,
+                      type: selectedCard.type,
+                      primaryColor: selectedCard.primaryColor,
+                      secondaryColor: selectedCard.secondaryColor,
+                      value: selectedCard.value,
+                      setSize: selectedCard.setSize,
+                      description: selectedCard.description,
+                      icon: selectedCard.icon,
+                      count: 1,
                     }}
-                  >
-                    ⚠️ Multicolor Wild Card must be attached to an existing incomplete property set on your table. You currently have no eligible sets.
-                  </div>
-                );
-              })()}
+                    size="sm"
+                    isInteractive={false}
+                  />
+                </div>
 
-              {/* Bank Action (Any card with value > 0) */}
-              {selectedCard.value > 0 && (
-                <button
-                  type="button"
-                  className="button button--full"
-                  style={{
-                    background: "rgba(39, 166, 68, 0.2)",
-                    border: "1.5px solid #10b981",
-                    color: "#86efac",
-                    padding: "12px",
-                    fontSize: "0.88rem",
-                    fontWeight: 800,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                  onClick={() => handleBankCard(selectedCard)}
-                >
-                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>savings</span>
-                  💰 Deposit ${selectedCard.value}M into Bank
-                </button>
-              )}
-
-              {/* Action: Pass Go */}
-              {selectedCard.defId === "action-pass-go" && (
-                <button
-                  type="button"
-                  className="button button--primary button--full"
-                  style={{ padding: "12px", fontSize: "0.88rem" }}
-                  onClick={() => handlePlayAction(selectedCard)}
-                >
-                  ⚡ Draw 2 Cards
-                </button>
-              )}
-
-              {/* Action: Deal Breaker */}
-              {selectedCard.defId === "action-deal-breaker" && (
-                <button
-                  type="button"
-                  className="button button--primary button--full"
-                  style={{ padding: "12px", fontSize: "0.88rem" }}
-                  onClick={() => {
-                    const cardToTarget = selectedCard;
-                    setSelectedCard(null);
-                    setTargetingAction({ card: cardToTarget, type: "deal_breaker" });
-                  }}
-                >
-                  👑 Steal Full Set (Deal Breaker)
-                </button>
-              )}
-
-              {/* Action: Sly Deal */}
-              {selectedCard.defId === "action-sly-deal" && (
-                <button
-                  type="button"
-                  className="button button--primary button--full"
-                  style={{ padding: "12px", fontSize: "0.88rem" }}
-                  onClick={() => {
-                    const cardToTarget = selectedCard;
-                    setSelectedCard(null);
-                    setTargetingAction({ card: cardToTarget, type: "sly_deal" });
-                  }}
-                >
-                  🤝 Steal 1 Property (Sly Deal)
-                </button>
-              )}
-
-              {/* Action: Debt Collector */}
-              {selectedCard.defId === "action-debt-collector" && (
-                <button
-                  type="button"
-                  className="button button--primary button--full"
-                  style={{ padding: "12px", fontSize: "0.88rem" }}
-                  onClick={() => {
-                    const cardToTarget = selectedCard;
-                    setSelectedCard(null);
-                    setTargetingAction({ card: cardToTarget, type: "debt_collector" });
-                  }}
-                >
-                  💵 Charge $5M (Debt Collector)
-                </button>
-              )}
-
-              {/* Action: Birthday */}
-              {selectedCard.defId === "action-its-my-birthday" && (
-                <button
-                  type="button"
-                  className="button button--primary button--full"
-                  style={{ padding: "12px", fontSize: "0.88rem" }}
-                  onClick={() => handlePlayAction(selectedCard)}
-                >
-                  🎂 It's My Birthday ($2M All)
-                </button>
-              )}
-
-              {/* Action: Forced Deal */}
-              {(selectedCard.defId === "action-forced-deal" || selectedCard.defId === "action-force-deal") && (
-                <button
-                  type="button"
-                  className="button button--primary button--full"
-                  style={{ padding: "12px", fontSize: "0.88rem" }}
-                  onClick={() => {
-                    const cardToTarget = selectedCard;
-                    setSelectedCard(null);
-                    setTargetingAction({ card: cardToTarget, type: "forced_deal" });
-                  }}
-                >
-                  🔄 Swap Properties (Forced Deal)
-                </button>
-              )}
-
-              {/* Action: House */}
-              {selectedCard.defId === "action-house" && (() => {
-                const eligibleSets = you?.propertySets.filter(
-                  (s) => s.isComplete && !s.hasHouse && s.color !== "railroad" && s.color !== "utility"
-                ) || [];
-
-                if (eligibleSets.length > 0) {
-                  return (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                      <span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 700 }}>
-                        Select Complete Set to Add House:
-                      </span>
-                      {eligibleSets.map((set) => (
-                        <button
-                          key={set.setId}
-                          type="button"
-                          className="button button--primary button--full"
-                          style={{
-                            backgroundColor: COLOR_CONFIG[set.color]?.hex || "var(--primary)",
-                            color: COLOR_CONFIG[set.color]?.textHex || "#FFFFFF",
-                            padding: "10px 12px",
-                            fontWeight: 800,
-                            fontSize: "0.84rem",
-                          }}
-                          onClick={() => handlePlayAction(selectedCard, undefined, set.setId)}
-                        >
-                          🏠 Add House to {set.color.toUpperCase()} (+ $3M Rent)
-                        </button>
-                      ))}
-                    </div>
-                  );
-                }
-
-                return (
-                  <div
-                    style={{
-                      padding: "8px 12px",
-                      background: "rgba(245, 158, 11, 0.15)",
-                      border: "1px solid rgba(245, 158, 11, 0.4)",
-                      borderRadius: "8px",
-                      fontSize: "0.75rem",
-                      color: "#fcd34d",
-                      lineHeight: 1.3,
-                    }}
-                  >
-                    ⚠️ You need a complete color property set (excluding Railroads and Utilities) to place a House. You can deposit it into your bank for $3M.
-                  </div>
-                );
-              })()}
-
-              {/* Action: Hotel */}
-              {selectedCard.defId === "action-hotel" && (() => {
-                const eligibleSets = you?.propertySets.filter(
-                  (s) => s.isComplete && s.hasHouse && !s.hasHotel
-                ) || [];
-
-                if (eligibleSets.length > 0) {
-                  return (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                      <span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 700 }}>
-                        Select Set with House to Add Hotel:
-                      </span>
-                      {eligibleSets.map((set) => (
-                        <button
-                          key={set.setId}
-                          type="button"
-                          className="button button--primary button--full"
-                          style={{
-                            backgroundColor: COLOR_CONFIG[set.color]?.hex || "var(--primary)",
-                            color: COLOR_CONFIG[set.color]?.textHex || "#FFFFFF",
-                            padding: "10px 12px",
-                            fontWeight: 800,
-                            fontSize: "0.84rem",
-                          }}
-                          onClick={() => handlePlayAction(selectedCard, undefined, set.setId)}
-                        >
-                          🏨 Add Hotel to {set.color.toUpperCase()} (+ $4M Rent)
-                        </button>
-                      ))}
-                    </div>
-                  );
-                }
-
-                return (
-                  <div
-                    style={{
-                      padding: "8px 12px",
-                      background: "rgba(245, 158, 11, 0.15)",
-                      border: "1px solid rgba(245, 158, 11, 0.4)",
-                      borderRadius: "8px",
-                      fontSize: "0.75rem",
-                      color: "#fcd34d",
-                      lineHeight: 1.3,
-                    }}
-                  >
-                    ⚠️ You need a complete property set with an existing House 🏠 to place a Hotel. You can deposit it into your bank for $4M.
-                  </div>
-                );
-              })()}
-
-              {/* Action: Double The Rent */}
-              {selectedCard.defId === "action-double-the-rent" && (() => {
-                const rentCardsInHand = you?.hand?.filter((c) => c.type === "rent") || [];
-                const canDouble = gameState.turn.actionsRemaining >= 2;
-
-                if (rentCardsInHand.length === 0) {
-                  return (
-                    <div
-                      style={{
-                        padding: "8px 12px",
-                        background: "rgba(168, 200, 255, 0.1)",
-                        border: "1px solid rgba(168, 200, 255, 0.3)",
-                        borderRadius: "8px",
-                        fontSize: "0.75rem",
-                        color: "var(--primary)",
-                        lineHeight: 1.3,
-                      }}
+                {/* Interactive Tactile Action Choices */}
+                <div className="game-card-action-options">
+                  {/* Regular Property */}
+                  {selectedCard.type === "property" && (
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="game-action-choice-btn game-action-choice-btn--primary"
+                      onClick={() => handlePlayProperty(selectedCard)}
                     >
-                      ℹ️ Double The Rent must be played together with a Rent card to double the rent charged. You currently have no Rent cards in your hand. You can deposit it into your bank for $1M.
-                    </div>
-                  );
-                }
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>domain</span>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          <span>Play to Property Set</span>
+                          <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>
+                            Add to your {selectedCard.primaryColor?.toUpperCase()} sets
+                          </span>
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined">arrow_forward</span>
+                    </motion.button>
+                  )}
 
-                if (!canDouble) {
-                  return (
-                    <div
-                      style={{
-                        padding: "8px 12px",
-                        background: "rgba(245, 158, 11, 0.15)",
-                        border: "1px solid rgba(245, 158, 11, 0.4)",
-                        borderRadius: "8px",
-                        fontSize: "0.75rem",
-                        color: "#fcd34d",
-                        lineHeight: 1.3,
-                      }}
-                    >
-                      ⚠️ Playing Double The Rent requires 2 available actions (1 for Rent + 1 for Double Rent). You only have {gameState.turn.actionsRemaining} action left this turn.
-                    </div>
-                  );
-                }
+                  {/* Wild Property Dual Color */}
+                  {selectedCard.type === "property-wild" && selectedCard.primaryColor !== "all" && (() => {
+                    const canPrimary = you?.propertySets.some(
+                      (s) => s.color === selectedCard.primaryColor && !s.isComplete
+                    );
+                    const canSecondary = you?.propertySets.some(
+                      (s) => s.color === selectedCard.secondaryColor && !s.isComplete
+                    );
 
-                return (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--primary)" }}>
-                      🔥 CHOOSE A RENT CARD TO DOUBLE (2 ACTIONS):
-                    </span>
-                    {rentCardsInHand.map((rCard) => {
-                      if (rCard.primaryColor === "all") {
-                        return (
-                          <button
-                            key={rCard.instanceId}
-                            type="button"
-                            className="button button--primary button--full"
-                            style={{
-                              background: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)",
-                              color: "#FFFFFF",
-                              padding: "10px 12px",
-                              fontSize: "0.82rem",
-                              fontWeight: 800,
-                            }}
-                            onClick={() => {
-                              const doubleCardId = selectedCard.instanceId;
-                              setSelectedCard(null);
-                              setSelectedWildRentColor(null);
-                              setTargetingAction({ card: rCard, type: "wild_rent", doubleRentCardId: doubleCardId });
-                            }}
-                          >
-                            🔥 2x Wild Rent (Target 1 Opponent)
-                          </button>
-                        );
-                      }
-
+                    if (canPrimary || canSecondary) {
                       return (
-                        <div key={rCard.instanceId} style={{ display: "grid", gridTemplateColumns: rCard.secondaryColor ? "1fr 1fr" : "1fr", gap: "6px" }}>
-                          {rCard.primaryColor && (
-                            <button
-                              type="button"
-                              className="button button--primary"
-                              style={{
-                                background: COLOR_CONFIG[rCard.primaryColor as CardColor]?.hex || "var(--primary)",
-                                color: "#FFFFFF",
-                                padding: "10px 6px",
-                                fontSize: "0.76rem",
-                                fontWeight: 800,
-                              }}
-                              onClick={() => handlePlayRent(rCard, rCard.primaryColor as CardColor, undefined, selectedCard.instanceId)}
-                            >
-                              🔥 2x {rCard.primaryColor.toUpperCase()}
-                            </button>
-                          )}
-                          {rCard.secondaryColor && (
-                            <button
-                              type="button"
-                              className="button button--primary"
-                              style={{
-                                background: COLOR_CONFIG[rCard.secondaryColor as CardColor]?.hex || "var(--primary)",
-                                color: "#FFFFFF",
-                                padding: "10px 6px",
-                                fontSize: "0.76rem",
-                                fontWeight: 800,
-                              }}
-                              onClick={() => handlePlayRent(rCard, rCard.secondaryColor as CardColor, undefined, selectedCard.instanceId)}
-                            >
-                              🔥 2x {rCard.secondaryColor.toUpperCase()}
-                            </button>
-                          )}
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                          <span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 700, letterSpacing: "0.04em" }}>
+                            SELECT SET COLOR TO ATTACH:
+                          </span>
+                          <div style={{ display: "grid", gridTemplateColumns: canPrimary && canSecondary ? "1fr 1fr" : "1fr", gap: "8px" }}>
+                            {canPrimary && (
+                              <motion.button
+                                type="button"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.97 }}
+                                className="button button--primary"
+                                style={{
+                                  background: COLOR_CONFIG[selectedCard.primaryColor!]?.hex || "var(--primary)",
+                                  color: COLOR_CONFIG[selectedCard.primaryColor!]?.textHex || "#FFFFFF",
+                                  padding: "12px 10px",
+                                  fontSize: "0.84rem",
+                                  fontWeight: 800,
+                                }}
+                                onClick={() => handlePlayProperty(selectedCard, selectedCard.primaryColor)}
+                              >
+                                🏠 {selectedCard.primaryColor?.toUpperCase()}
+                              </motion.button>
+                            )}
+                            {canSecondary && (
+                              <motion.button
+                                type="button"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.97 }}
+                                className="button button--primary"
+                                style={{
+                                  background: COLOR_CONFIG[selectedCard.secondaryColor!]?.hex || "var(--primary)",
+                                  color: COLOR_CONFIG[selectedCard.secondaryColor!]?.textHex || "#FFFFFF",
+                                  padding: "12px 10px",
+                                  fontSize: "0.84rem",
+                                  fontWeight: 800,
+                                }}
+                                onClick={() => handlePlayProperty(selectedCard, selectedCard.secondaryColor)}
+                              >
+                                🏠 {selectedCard.secondaryColor?.toUpperCase()}
+                              </motion.button>
+                            )}
+                          </div>
                         </div>
                       );
-                    })}
-                  </div>
-                );
-              })()}
+                    }
 
-              {/* Rent Card */}
-              {selectedCard.type === "rent" && (() => {
-                const doubleRentInHand = you?.hand?.find((c) => c.defId === "action-double-the-rent");
-                const canDouble = !!doubleRentInHand && gameState.turn.actionsRemaining >= 2;
+                    return (
+                      <div
+                        style={{
+                          padding: "10px 14px",
+                          background: "rgba(245, 158, 11, 0.15)",
+                          border: "1px solid rgba(245, 158, 11, 0.4)",
+                          borderRadius: "10px",
+                          fontSize: "0.78rem",
+                          color: "#fcd34d",
+                          lineHeight: 1.35,
+                        }}
+                      >
+                        ⚠️ Wild Property Cards must attach to an existing {selectedCard.primaryColor?.toUpperCase()} or {selectedCard.secondaryColor?.toUpperCase()} set on your table. You can bank it for cash below.
+                      </div>
+                    );
+                  })()}
 
-                return (
-                  <>
-                    {selectedCard.primaryColor !== "all" ? (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                        <div style={{ display: "grid", gridTemplateColumns: selectedCard.secondaryColor ? "1fr 1fr" : "1fr", gap: "8px" }}>
-                          {selectedCard.primaryColor && (
-                            <button
-                              type="button"
-                              className="button button--primary"
-                              style={{
-                                background: COLOR_CONFIG[selectedCard.primaryColor as CardColor]?.hex || "var(--primary)",
-                                color: "#FFFFFF",
-                                padding: "10px 6px",
-                                fontSize: "0.78rem",
-                                fontWeight: 800,
-                              }}
-                              onClick={() => handlePlayRent(selectedCard, selectedCard.primaryColor as CardColor)}
-                            >
-                              💸 Rent: {selectedCard.primaryColor.toUpperCase()}
-                            </button>
-                          )}
-                          {selectedCard.secondaryColor && (
-                            <button
-                              type="button"
-                              className="button button--primary"
-                              style={{
-                                background: COLOR_CONFIG[selectedCard.secondaryColor as CardColor]?.hex || "var(--primary)",
-                                color: "#FFFFFF",
-                                padding: "10px 6px",
-                                fontSize: "0.78rem",
-                                fontWeight: 800,
-                              }}
-                              onClick={() => handlePlayRent(selectedCard, selectedCard.secondaryColor as CardColor)}
-                            >
-                              💸 Rent: {selectedCard.secondaryColor.toUpperCase()}
-                            </button>
-                          )}
+                  {/* Wild Property Multicolor (All 10 Colors) */}
+                  {selectedCard.type === "property-wild" && selectedCard.primaryColor === "all" && (() => {
+                    const eligibleSets = you?.propertySets.filter((s) => !s.isComplete) || [];
+
+                    if (eligibleSets.length > 0) {
+                      return (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                          <span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 700, letterSpacing: "0.04em" }}>
+                            SELECT EXISTING INCOMPLETE SET:
+                          </span>
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                            {eligibleSets.map((set) => (
+                              <motion.button
+                                key={set.setId}
+                                type="button"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.97 }}
+                                className="button"
+                                style={{
+                                  backgroundColor: COLOR_CONFIG[set.color]?.hex || "var(--surface-high)",
+                                  color: COLOR_CONFIG[set.color]?.textHex || "#FFFFFF",
+                                  padding: "10px 8px",
+                                  fontSize: "0.78rem",
+                                  fontWeight: 800,
+                                  borderRadius: "10px",
+                                  textAlign: "center",
+                                  textTransform: "uppercase",
+                                }}
+                                onClick={() => handlePlayProperty(selectedCard, set.color, set.setId)}
+                              >
+                                {set.color.replace("-", " ")} ({set.cards.length}/{set.setSize})
+                              </motion.button>
+                            ))}
+                          </div>
                         </div>
+                      );
+                    }
 
-                        {canDouble && doubleRentInHand && (
-                          <div style={{ display: "grid", gridTemplateColumns: selectedCard.secondaryColor ? "1fr 1fr" : "1fr", gap: "8px" }}>
-                            {selectedCard.primaryColor && (
-                              <button
+                    return (
+                      <div
+                        style={{
+                          padding: "10px 14px",
+                          background: "rgba(245, 158, 11, 0.15)",
+                          border: "1px solid rgba(245, 158, 11, 0.4)",
+                          borderRadius: "10px",
+                          fontSize: "0.78rem",
+                          color: "#fcd34d",
+                          lineHeight: 1.35,
+                        }}
+                      >
+                        ⚠️ Multicolor Wild Card must attach to an existing incomplete property set on your table. You can bank it for cash below.
+                      </div>
+                    );
+                  })()}
+
+                  {/* Bank Action (Any card with monetary value > 0) */}
+                  {selectedCard.value > 0 && (
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="game-action-choice-btn game-action-choice-btn--bank"
+                      onClick={() => handleBankCard(selectedCard)}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>savings</span>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          <span>Deposit ${selectedCard.value}M into Bank</span>
+                          <span style={{ fontSize: "0.72rem", color: "rgba(134, 239, 172, 0.8)", fontWeight: 500 }}>
+                            Safe from rent & action steals
+                          </span>
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined">account_balance</span>
+                    </motion.button>
+                  )}
+
+                  {/* Action: Pass Go */}
+                  {selectedCard.defId === "action-pass-go" && (
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="game-action-choice-btn game-action-choice-btn--primary"
+                      onClick={() => handlePlayAction(selectedCard)}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>fast_forward</span>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          <span>Play Pass Go (+2 Cards)</span>
+                          <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>
+                            Instantly draw 2 extra cards into hand
+                          </span>
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined">add_card</span>
+                    </motion.button>
+                  )}
+
+                  {/* Action: Deal Breaker */}
+                  {selectedCard.defId === "action-deal-breaker" && (
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="game-action-choice-btn game-action-choice-btn--fire"
+                      onClick={() => {
+                        const cardToTarget = selectedCard;
+                        setSelectedCard(null);
+                        setTargetingAction({ card: cardToTarget, type: "deal_breaker" });
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>gavel</span>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          <span>👑 Deal Breaker (Steal Complete Set)</span>
+                          <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.85)", fontWeight: 500 }}>
+                            Steal an entire completed property set from an opponent!
+                          </span>
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined">arrow_forward</span>
+                    </motion.button>
+                  )}
+
+                  {/* Action: Sly Deal */}
+                  {selectedCard.defId === "action-sly-deal" && (
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="game-action-choice-btn game-action-choice-btn--primary"
+                      onClick={() => {
+                        const cardToTarget = selectedCard;
+                        setSelectedCard(null);
+                        setTargetingAction({ card: cardToTarget, type: "sly_deal" });
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>visibility</span>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          <span>🕵️ Sly Deal (Steal 1 Property)</span>
+                          <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>
+                            Steal 1 property card from any incomplete set
+                          </span>
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined">arrow_forward</span>
+                    </motion.button>
+                  )}
+
+                  {/* Action: Debt Collector */}
+                  {selectedCard.defId === "action-debt-collector" && (
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="game-action-choice-btn game-action-choice-btn--primary"
+                      onClick={() => {
+                        const cardToTarget = selectedCard;
+                        setSelectedCard(null);
+                        setTargetingAction({ card: cardToTarget, type: "debt_collector" });
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>payments</span>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          <span>💵 Debt Collector (Charge $5M)</span>
+                          <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>
+                            Target 1 player to pay you $5M in cash or property
+                          </span>
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined">arrow_forward</span>
+                    </motion.button>
+                  )}
+
+                  {/* Action: Birthday */}
+                  {selectedCard.defId === "action-its-my-birthday" && (
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="game-action-choice-btn game-action-choice-btn--primary"
+                      onClick={() => handlePlayAction(selectedCard)}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>cake</span>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          <span>🎂 It's My Birthday (Collect $2M from All)</span>
+                          <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>
+                            Every other player pays you $2M gift!
+                          </span>
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined">arrow_forward</span>
+                    </motion.button>
+                  )}
+
+                  {/* Action: Forced Deal */}
+                  {(selectedCard.defId === "action-forced-deal" || selectedCard.defId === "action-force-deal") && (
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="game-action-choice-btn game-action-choice-btn--primary"
+                      onClick={() => {
+                        const cardToTarget = selectedCard;
+                        setSelectedCard(null);
+                        setTargetingAction({ card: cardToTarget, type: "forced_deal" });
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>swap_horiz</span>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          <span>🔄 Forced Deal (Swap Properties)</span>
+                          <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>
+                            Force-swap 1 of your properties with an opponent's property
+                          </span>
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined">arrow_forward</span>
+                    </motion.button>
+                  )}
+
+                  {/* Action: House */}
+                  {selectedCard.defId === "action-house" && (() => {
+                    const eligibleSets = you?.propertySets.filter(
+                      (s) => s.isComplete && !s.hasHouse && s.color !== "railroad" && s.color !== "utility"
+                    ) || [];
+
+                    if (eligibleSets.length > 0) {
+                      return (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                          <span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 700, letterSpacing: "0.04em" }}>
+                            SELECT COMPLETE SET TO ADD HOUSE:
+                          </span>
+                          {eligibleSets.map((set) => (
+                            <motion.button
+                              key={set.setId}
+                              type="button"
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.97 }}
+                              className="button button--primary button--full"
+                              style={{
+                                backgroundColor: COLOR_CONFIG[set.color]?.hex || "var(--primary)",
+                                color: COLOR_CONFIG[set.color]?.textHex || "#FFFFFF",
+                                padding: "12px 14px",
+                                fontWeight: 800,
+                                fontSize: "0.86rem",
+                              }}
+                              onClick={() => handlePlayAction(selectedCard, undefined, set.setId)}
+                            >
+                              🏠 Add House to {set.color.toUpperCase()} (+ $3M Rent)
+                            </motion.button>
+                          ))}
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div
+                        style={{
+                          padding: "10px 14px",
+                          background: "rgba(245, 158, 11, 0.15)",
+                          border: "1px solid rgba(245, 158, 11, 0.4)",
+                          borderRadius: "10px",
+                          fontSize: "0.78rem",
+                          color: "#fcd34d",
+                          lineHeight: 1.35,
+                        }}
+                      >
+                        ⚠️ You need a complete color set (excluding Railroads & Utilities) to place a House. You can deposit it into your bank for $3M cash.
+                      </div>
+                    );
+                  })()}
+
+                  {/* Action: Hotel */}
+                  {selectedCard.defId === "action-hotel" && (() => {
+                    const eligibleSets = you?.propertySets.filter(
+                      (s) => s.isComplete && s.hasHouse && !s.hasHotel
+                    ) || [];
+
+                    if (eligibleSets.length > 0) {
+                      return (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                          <span style={{ fontSize: "0.75rem", color: "var(--muted)", fontWeight: 700, letterSpacing: "0.04em" }}>
+                            SELECT SET WITH HOUSE TO ADD HOTEL:
+                          </span>
+                          {eligibleSets.map((set) => (
+                            <motion.button
+                              key={set.setId}
+                              type="button"
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.97 }}
+                              className="button button--primary button--full"
+                              style={{
+                                backgroundColor: COLOR_CONFIG[set.color]?.hex || "var(--primary)",
+                                color: COLOR_CONFIG[set.color]?.textHex || "#FFFFFF",
+                                padding: "12px 14px",
+                                fontWeight: 800,
+                                fontSize: "0.86rem",
+                              }}
+                              onClick={() => handlePlayAction(selectedCard, undefined, set.setId)}
+                            >
+                              🏨 Add Hotel to {set.color.toUpperCase()} (+ $4M Rent)
+                            </motion.button>
+                          ))}
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div
+                        style={{
+                          padding: "10px 14px",
+                          background: "rgba(245, 158, 11, 0.15)",
+                          border: "1px solid rgba(245, 158, 11, 0.4)",
+                          borderRadius: "10px",
+                          fontSize: "0.78rem",
+                          color: "#fcd34d",
+                          lineHeight: 1.35,
+                        }}
+                      >
+                        ⚠️ You need a complete property set with an existing House 🏠 to place a Hotel. You can deposit it into your bank for $4M cash.
+                      </div>
+                    );
+                  })()}
+
+                  {/* Action: Double The Rent */}
+                  {selectedCard.defId === "action-double-the-rent" && (() => {
+                    const rentCardsInHand = you?.hand?.filter((c) => c.type === "rent") || [];
+                    const canDouble = gameState.turn.actionsRemaining >= 2;
+
+                    if (rentCardsInHand.length === 0) {
+                      return (
+                        <div
+                          style={{
+                            padding: "10px 14px",
+                            background: "rgba(168, 200, 255, 0.1)",
+                            border: "1px solid rgba(168, 200, 255, 0.3)",
+                            borderRadius: "10px",
+                            fontSize: "0.78rem",
+                            color: "var(--primary)",
+                            lineHeight: 1.35,
+                          }}
+                        >
+                          ℹ️ Double The Rent must be played together with a Rent card. You currently have no Rent cards in hand. You can bank it for $1M.
+                        </div>
+                      );
+                    }
+
+                    if (!canDouble) {
+                      return (
+                        <div
+                          style={{
+                            padding: "10px 14px",
+                            background: "rgba(245, 158, 11, 0.15)",
+                            border: "1px solid rgba(245, 158, 11, 0.4)",
+                            borderRadius: "10px",
+                            fontSize: "0.78rem",
+                            color: "#fcd34d",
+                            lineHeight: 1.35,
+                          }}
+                        >
+                          ⚠️ Playing Double The Rent requires 2 actions. You only have {gameState.turn.actionsRemaining} action left this turn.
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--primary)" }}>
+                          🔥 CHOOSE A RENT CARD TO DOUBLE (2 ACTIONS):
+                        </span>
+                        {rentCardsInHand.map((rCard) => {
+                          if (rCard.primaryColor === "all") {
+                            return (
+                              <motion.button
+                                key={rCard.instanceId}
                                 type="button"
-                                className="button button--primary"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.97 }}
+                                className="button button--primary button--full"
                                 style={{
                                   background: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)",
                                   color: "#FFFFFF",
-                                  padding: "10px 6px",
-                                  fontSize: "0.78rem",
+                                  padding: "12px 14px",
+                                  fontSize: "0.86rem",
                                   fontWeight: 800,
                                 }}
-                                onClick={() => handlePlayRent(selectedCard, selectedCard.primaryColor as CardColor, undefined, doubleRentInHand.instanceId)}
+                                onClick={() => {
+                                  const doubleCardId = selectedCard.instanceId;
+                                  setSelectedCard(null);
+                                  setSelectedWildRentColor(null);
+                                  setTargetingAction({ card: rCard, type: "wild_rent", doubleRentCardId: doubleCardId });
+                                }}
                               >
-                                🔥 2x {selectedCard.primaryColor.toUpperCase()} (2 Actions)
-                              </button>
+                                🔥 2x Wild Rent (Target 1 Opponent)
+                              </motion.button>
+                            );
+                          }
+
+                          return (
+                            <div key={rCard.instanceId} style={{ display: "grid", gridTemplateColumns: rCard.secondaryColor ? "1fr 1fr" : "1fr", gap: "8px" }}>
+                              {rCard.primaryColor && (
+                                <motion.button
+                                  type="button"
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.97 }}
+                                  className="button button--primary"
+                                  style={{
+                                    background: COLOR_CONFIG[rCard.primaryColor as CardColor]?.hex || "var(--primary)",
+                                    color: "#FFFFFF",
+                                    padding: "12px 8px",
+                                    fontSize: "0.82rem",
+                                    fontWeight: 800,
+                                  }}
+                                  onClick={() => handlePlayRent(rCard, rCard.primaryColor as CardColor, undefined, selectedCard.instanceId)}
+                                >
+                                  🔥 2x {rCard.primaryColor.toUpperCase()}
+                                </motion.button>
+                              )}
+                              {rCard.secondaryColor && (
+                                <motion.button
+                                  type="button"
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.97 }}
+                                  className="button button--primary"
+                                  style={{
+                                    background: COLOR_CONFIG[rCard.secondaryColor as CardColor]?.hex || "var(--primary)",
+                                    color: "#FFFFFF",
+                                    padding: "12px 8px",
+                                    fontSize: "0.82rem",
+                                    fontWeight: 800,
+                                  }}
+                                  onClick={() => handlePlayRent(rCard, rCard.secondaryColor as CardColor, undefined, selectedCard.instanceId)}
+                                >
+                                  🔥 2x {rCard.secondaryColor.toUpperCase()}
+                                </motion.button>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+
+                  {/* Rent Card */}
+                  {selectedCard.type === "rent" && (() => {
+                    const doubleRentInHand = you?.hand?.find((c) => c.defId === "action-double-the-rent");
+                    const canDouble = !!doubleRentInHand && gameState.turn.actionsRemaining >= 2;
+
+                    return (
+                      <>
+                        {selectedCard.primaryColor !== "all" ? (
+                          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            <div style={{ display: "grid", gridTemplateColumns: selectedCard.secondaryColor ? "1fr 1fr" : "1fr", gap: "8px" }}>
+                              {selectedCard.primaryColor && (
+                                <motion.button
+                                  type="button"
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.97 }}
+                                  className="button button--primary"
+                                  style={{
+                                    background: COLOR_CONFIG[selectedCard.primaryColor as CardColor]?.hex || "var(--primary)",
+                                    color: "#FFFFFF",
+                                    padding: "12px 8px",
+                                    fontSize: "0.84rem",
+                                    fontWeight: 800,
+                                  }}
+                                  onClick={() => handlePlayRent(selectedCard, selectedCard.primaryColor as CardColor)}
+                                >
+                                  💸 Rent: {selectedCard.primaryColor.toUpperCase()}
+                                </motion.button>
+                              )}
+                              {selectedCard.secondaryColor && (
+                                <motion.button
+                                  type="button"
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.97 }}
+                                  className="button button--primary"
+                                  style={{
+                                    background: COLOR_CONFIG[selectedCard.secondaryColor as CardColor]?.hex || "var(--primary)",
+                                    color: "#FFFFFF",
+                                    padding: "12px 8px",
+                                    fontSize: "0.84rem",
+                                    fontWeight: 800,
+                                  }}
+                                  onClick={() => handlePlayRent(selectedCard, selectedCard.secondaryColor as CardColor)}
+                                >
+                                  💸 Rent: {selectedCard.secondaryColor.toUpperCase()}
+                                </motion.button>
+                              )}
+                            </div>
+
+                            {canDouble && doubleRentInHand && (
+                              <div style={{ display: "grid", gridTemplateColumns: selectedCard.secondaryColor ? "1fr 1fr" : "1fr", gap: "8px" }}>
+                                {selectedCard.primaryColor && (
+                                  <motion.button
+                                    type="button"
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.97 }}
+                                    className="button button--primary"
+                                    style={{
+                                      background: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)",
+                                      color: "#FFFFFF",
+                                      padding: "12px 8px",
+                                      fontSize: "0.82rem",
+                                      fontWeight: 800,
+                                    }}
+                                    onClick={() => handlePlayRent(selectedCard, selectedCard.primaryColor as CardColor, undefined, doubleRentInHand.instanceId)}
+                                  >
+                                    🔥 2x {selectedCard.primaryColor.toUpperCase()} (2 Actions)
+                                  </motion.button>
+                                )}
+                                {selectedCard.secondaryColor && (
+                                  <motion.button
+                                    type="button"
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.97 }}
+                                    className="button button--primary"
+                                    style={{
+                                      background: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)",
+                                      color: "#FFFFFF",
+                                      padding: "12px 8px",
+                                      fontSize: "0.82rem",
+                                      fontWeight: 800,
+                                    }}
+                                    onClick={() => handlePlayRent(selectedCard, selectedCard.secondaryColor as CardColor, undefined, doubleRentInHand.instanceId)}
+                                  >
+                                    🔥 2x {selectedCard.secondaryColor.toUpperCase()} (2 Actions)
+                                  </motion.button>
+                                )}
+                              </div>
                             )}
-                            {selectedCard.secondaryColor && (
-                              <button
+                          </div>
+                        ) : (
+                          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            <motion.button
+                              type="button"
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.97 }}
+                              className="button button--primary button--full"
+                              style={{ padding: "12px", fontSize: "0.9rem" }}
+                              onClick={() => {
+                                const cardToTarget = selectedCard;
+                                setSelectedWildRentColor(null);
+                                setSelectedCard(null);
+                                setTargetingAction({ card: cardToTarget, type: "wild_rent" });
+                              }}
+                            >
+                              🎯 Charge Wild Rent (1 Opponent)
+                            </motion.button>
+                            {canDouble && doubleRentInHand && (
+                              <motion.button
                                 type="button"
-                                className="button button--primary"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.97 }}
+                                className="button button--primary button--full"
                                 style={{
                                   background: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)",
                                   color: "#FFFFFF",
-                                  padding: "10px 6px",
-                                  fontSize: "0.78rem",
+                                  padding: "12px",
+                                  fontSize: "0.9rem",
                                   fontWeight: 800,
                                 }}
-                                onClick={() => handlePlayRent(selectedCard, selectedCard.secondaryColor as CardColor, undefined, doubleRentInHand.instanceId)}
+                                onClick={() => {
+                                  const cardToTarget = selectedCard;
+                                  const doubleCardId = doubleRentInHand.instanceId;
+                                  setSelectedWildRentColor(null);
+                                  setSelectedCard(null);
+                                  setTargetingAction({ card: cardToTarget, type: "wild_rent", doubleRentCardId: doubleCardId });
+                                }}
                               >
-                                🔥 2x {selectedCard.secondaryColor.toUpperCase()} (2 Actions)
-                              </button>
+                                🔥 2x Wild Rent (1 Opponent) (2 Actions)
+                              </motion.button>
                             )}
                           </div>
                         )}
-                      </div>
-                    ) : (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                        <button
-                          type="button"
-                          className="button button--primary button--full"
-                          style={{ padding: "12px", fontSize: "0.88rem" }}
-                          onClick={() => {
-                            const cardToTarget = selectedCard;
-                            setSelectedWildRentColor(null);
-                            setSelectedCard(null);
-                            setTargetingAction({ card: cardToTarget, type: "wild_rent" });
-                          }}
-                        >
-                          🎯 Charge Wild Rent (1 Opponent)
-                        </button>
-                        {canDouble && doubleRentInHand && (
-                          <button
-                            type="button"
-                            className="button button--primary button--full"
-                            style={{
-                              background: "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)",
-                              color: "#FFFFFF",
-                              padding: "12px",
-                              fontSize: "0.88rem",
-                              fontWeight: 800,
-                            }}
-                            onClick={() => {
-                              const cardToTarget = selectedCard;
-                              const doubleCardId = doubleRentInHand.instanceId;
-                              setSelectedWildRentColor(null);
-                              setSelectedCard(null);
-                              setTargetingAction({ card: cardToTarget, type: "wild_rent", doubleRentCardId: doubleCardId });
-                            }}
-                          >
-                            🔥 2x Wild Rent (1 Opponent) (2 Actions)
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </>
-                );
-              })()}
-
-              <button
-                type="button"
-                className="button button--secondary button--full"
-                style={{ marginTop: "4px" }}
-                onClick={() => setSelectedCard(null)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Opponent Table View Modal */}
       {viewingOpponentId && (() => {
         const opp = opponents.find(o => o.id === viewingOpponentId);

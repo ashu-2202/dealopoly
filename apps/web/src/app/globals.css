@@ -3474,52 +3474,159 @@ p {
   box-shadow: 0 0 30px 8px rgba(168, 200, 255, 0.8), 0 16px 36px rgba(0,0,0,0.85) !important;
 }
 
-/* Floating Action Menu on Selected Card (Desktop) */
-.game-card-action-popover {
-  position: absolute;
-  bottom: calc(100% + 12px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--surface-high);
-  border: 1px solid var(--outline);
-  border-radius: 14px;
-  padding: 10px;
+/* ==========================================================================
+   FRAMER MOTION CARD ACTION DIALOG (DESKTOP & MOBILE)
+   ========================================================================== */
+.game-card-action-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  background: rgba(4, 7, 13, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.game-card-action-dialog {
+  background: linear-gradient(180deg, #182030 0%, #101622 100%);
+  border: 1px solid rgba(168, 200, 255, 0.25);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 88vh;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  z-index: 90;
-  min-width: 155px;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.8);
-  animation: pop-in 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 85, 164, 0.35);
+  overflow: hidden;
 }
 
-.game-popover-btn {
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 0.78rem;
+.game-card-action-header {
+  padding: 16px 20px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.game-card-type-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: rgba(168, 200, 255, 0.12);
+  border: 1px solid rgba(168, 200, 255, 0.3);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.game-card-action-body {
+  padding: 18px 20px 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.game-card-spotlight-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0 6px;
+  position: relative;
+}
+
+.game-card-spotlight-glow {
+  position: absolute;
+  width: 140px;
+  height: 180px;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.game-card-spotlight-wrap .monopoly-card {
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 20px rgba(168, 200, 255, 0.3) !important;
+  transform: scale(1.04) !important;
+  pointer-events: none;
+}
+
+.game-card-action-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Interactive tactile action choice buttons */
+.game-action-choice-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #FFFFFF;
+  font-family: var(--sans);
   font-weight: 700;
-  text-align: center;
-  transition: all 0.15s;
+  font-size: 0.88rem;
   cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  text-align: left;
 }
-.game-popover-btn--primary {
-  background: var(--primary);
-  color: var(--on-primary);
+
+.game-action-choice-btn--primary {
+  background: linear-gradient(135deg, #0055a4 0%, #003875 100%);
+  border-color: #a8c8ff;
+  box-shadow: 0 4px 14px rgba(0, 85, 164, 0.4);
 }
-.game-popover-btn--primary:hover {
-  filter: brightness(1.1);
+.game-action-choice-btn--primary:hover {
+  filter: brightness(1.12);
+  border-color: #FFFFFF;
 }
-.game-popover-btn--bank {
-  background: rgba(39, 166, 68, 0.2);
-  border: 1px solid rgba(102, 223, 117, 0.5);
+
+.game-action-choice-btn--bank {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(21, 128, 61, 0.3) 100%);
+  border-color: rgba(74, 222, 128, 0.5);
   color: #86efac;
 }
-.game-popover-btn--bank:hover {
-  background: rgba(39, 166, 68, 0.35);
+.game-action-choice-btn--bank:hover {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(21, 128, 61, 0.45) 100%);
+  border-color: #86efac;
 }
 
-.game-card-mobile-modal {
-  display: none;
+.game-action-choice-btn--fire {
+  background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+  border-color: #fca5a5;
+  color: #FFFFFF;
+  box-shadow: 0 4px 16px rgba(234, 88, 12, 0.5);
+}
+.game-action-choice-btn--fire:hover {
+  filter: brightness(1.15);
+}
+
+@media (max-width: 600px) {
+  .game-card-action-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .game-card-action-dialog {
+    max-width: 100%;
+    border-radius: 24px 24px 0 0;
+    max-height: 85vh;
+  }
 }
 
 /* Slide-out Activity Drawer (Desktop & Mobile) */
