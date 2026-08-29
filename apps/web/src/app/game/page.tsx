@@ -57,6 +57,23 @@ export default function GamePage(props: {
   const [discardSelectedIds, setDiscardSelectedIds] = useState<string[]>([]);
   const [viewingOpponentId, setViewingOpponentId] = useState<string | null>(null);
 
+  // Card Draw Flight Animation State
+  const [flyingCards, setFlyingCards] = useState<
+    Array<{
+      id: string;
+      startX: number;
+      startY: number;
+      endX: number;
+      endY: number;
+      delay: number;
+      rotate: number;
+    }>
+  >([]);
+  const drawPileRef = useRef<HTMLDivElement>(null);
+  const handContainerRef = useRef<HTMLDivElement>(null);
+  const prevHandCountRef = useRef<number>(0);
+  const isAnimatingDrawRef = useRef<boolean>(false);
+
   const {
     isLocal,
     isConnected,
@@ -209,9 +226,66 @@ export default function GamePage(props: {
     .filter((id) => id !== actualPlayerId)
     .map((id) => gameState.players[id]!);
 
+  const triggerDrawAnimation = (count: number = 2) => {
+    if (!drawPileRef.current || !handContainerRef.current) return;
+    const drawRect = drawPileRef.current.getBoundingClientRect();
+    const handRect = handContainerRef.current.getBoundingClientRect();
+
+    const startX = drawRect.left + (drawRect.width - 84) / 2;
+    const startY = drawRect.top + (drawRect.height - 122) / 2;
+
+    const targetCenterX = handRect.left + handRect.width / 2 - 42;
+    const targetCenterY = handRect.top + 16;
+
+    const newCards: Array<{
+      id: string;
+      startX: number;
+      startY: number;
+      endX: number;
+      endY: number;
+      delay: number;
+      rotate: number;
+    }> = [];
+    const now = Date.now();
+    for (let i = 0; i < count; i++) {
+      const spreadOffset = (i - (count - 1) / 2) * 36;
+      const endX = targetCenterX + spreadOffset;
+      const endY = targetCenterY;
+      const rotate = (i - (count - 1) / 2) * 9;
+
+      newCards.push({
+        id: `fly-${now}-${i}-${Math.random()}`,
+        startX,
+        startY,
+        endX,
+        endY,
+        delay: i * 0.15,
+        rotate,
+      });
+    }
+
+    isAnimatingDrawRef.current = true;
+    setFlyingCards((prev) => [...prev, ...newCards]);
+  };
+
+  // Watch for hand draws (e.g. Turn start, Pass Go, empty hand draw 5)
+  useEffect(() => {
+    const currentHandCount = you?.hand?.length || 0;
+    const prevCount = prevHandCountRef.current;
+    prevHandCountRef.current = currentHandCount;
+
+    if (prevCount > 0 && currentHandCount > prevCount && isYourTurn) {
+      const drawnCount = currentHandCount - prevCount;
+      if (!isAnimatingDrawRef.current) {
+        triggerDrawAnimation(Math.min(drawnCount, 5));
+      }
+    }
+  }, [you?.hand?.length, isYourTurn]);
+
   // Actions
   const handleDraw = () => {
     if (!isYourTurn || gameState.turn.phase !== "draw") return;
+    triggerDrawAnimation(2);
     sendCommand({ type: "draw_cards", playerId: actualPlayerId });
   };
 
@@ -505,6 +579,7 @@ export default function GamePage(props: {
             <div className="game-piles-wrapper">
               {/* 3D Stacked Draw Pile */}
               <div
+                ref={drawPileRef}
                 className="game-draw-pile"
                 onClick={handleDraw}
                 title={isYourTurn && gameState.turn.phase === "draw" ? "Click to Draw 2 Cards" : "Draw Pile"}
@@ -720,7 +795,7 @@ export default function GamePage(props: {
             </div>
 
             {/* Fanned Player Hand */}
-            <div className="game-hand-fanned-container">
+            <div ref={handContainerRef} className="game-hand-fanned-container">
               <div className="game-hand-cards-row">
                 {you?.hand?.map((card, idx) => {
                   const isSelected = selectedCard?.instanceId === card.instanceId;
@@ -2267,6 +2342,57 @@ export default function GamePage(props: {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Flying Drawn Cards Overlay (Draw Flight Animation) */}
+      <AnimatePresence>
+        {flyingCards.map((item) => (
+          <motion.div
+            key={item.id}
+            className="game-flying-draw-card"
+            initial={{
+              left: item.startX,
+              top: item.startY,
+              scale: 0.82,
+              rotate: -12,
+              opacity: 0,
+            }}
+            animate={{
+              left: [item.startX, item.startX + (item.endX - item.startX) * 0.35, item.endX],
+              top: [item.startY, item.startY - 75, item.endY],
+              scale: [0.82, 1.18, 1.0],
+              rotate: [-12, 6, item.rotate],
+              opacity: [0, 1, 1, 0.95],
+            }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{
+              duration: 0.72,
+              delay: item.delay,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            onAnimationComplete={() => {
+              setFlyingCards((prev) => {
+                const remaining = prev.filter((c) => c.id !== item.id);
+                if (remaining.length === 0) {
+                  isAnimatingDrawRef.current = false;
+                }
+                return remaining;
+              });
+            }}
+          >
+            <div className="game-flying-card-inner">
+              <div className="game-flying-card-sheen" />
+              <div className="game-flying-card-border-pattern" />
+              <div className="game-flying-card-brand">
+                <span className="material-symbols-outlined" style={{ fontSize: "28px", color: "#a8c8ff" }}>
+                  playing_cards
+                </span>
+                <span className="game-flying-card-logo">DEALOPOLY</span>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+
       {/* Opponent Table View Modal */}
       {viewingOpponentId && (() => {
         const opp = opponents.find(o => o.id === viewingOpponentId);
