@@ -300,6 +300,127 @@ export function GameOverSummary({
 
           <div className="victory-winner-card">
             <div className="victory-avatar-wrapper">
+              {/* Dealopoly Championship Crown */}
+              <div className="victory-champion-crown" aria-label="Dealopoly Champion Crown">
+                <svg
+                  className="victory-crown-svg"
+                  viewBox="0 0 120 76"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <defs>
+                    <linearGradient id="crown-gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#FFF2A8" />
+                      <stop offset="28%" stopColor="#F59E0B" />
+                      <stop offset="70%" stopColor="#D97706" />
+                      <stop offset="100%" stopColor="#FBBF24" />
+                    </linearGradient>
+                    <linearGradient id="crown-gold-bright" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#FFFBEB" />
+                      <stop offset="50%" stopColor="#FCD34D" />
+                      <stop offset="100%" stopColor="#D97706" />
+                    </linearGradient>
+                    <linearGradient id="crown-brand-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#0055a4" />
+                      <stop offset="100%" stopColor="#002d5c" />
+                    </linearGradient>
+                    <filter id="crown-glow-filter" x="-20%" y="-20%" width="140%" height="140%">
+                      <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="#F59E0B" floodOpacity="0.55" />
+                    </filter>
+                  </defs>
+
+                  {/* Back Crown Rim */}
+                  <path
+                    d="M16 46 C16 46 60 54 104 46 L100 38 C60 44 20 38 20 38 Z"
+                    fill="#B45309"
+                    opacity="0.6"
+                  />
+
+                  {/* Main Crown Body */}
+                  <path
+                    d="M12 40 L24 14 L44 30 L60 4 L76 30 L96 14 L108 40 C108 50 12 50 12 40 Z"
+                    fill="url(#crown-gold-grad)"
+                    stroke="#B45309"
+                    strokeWidth="1.5"
+                    strokeLinejoin="round"
+                    filter="url(#crown-glow-filter)"
+                  />
+
+                  {/* Inner Crown Highlights */}
+                  <path
+                    d="M16 38 L26 18 L42 30 L60 10 L78 30 L94 18 L104 38"
+                    fill="none"
+                    stroke="url(#crown-gold-bright)"
+                    strokeWidth="1.5"
+                    opacity="0.85"
+                  />
+
+                  {/* Crown Jewels on Peaks */}
+                  <circle cx="24" cy="13" r="4.5" fill="#EF4444" stroke="#FFF" strokeWidth="1" />
+                  <circle cx="44" cy="29" r="3.5" fill="#3B82F6" stroke="#FFF" strokeWidth="1" />
+                  <circle cx="60" cy="4" r="6" fill="#FCD34D" stroke="#FFF" strokeWidth="1.5" />
+                  <polygon points="60,1 62,4 60,7 58,4" fill="#FFF" />
+                  <circle cx="76" cy="29" r="3.5" fill="#10B981" stroke="#FFF" strokeWidth="1" />
+                  <circle cx="96" cy="13" r="4.5" fill="#EF4444" stroke="#FFF" strokeWidth="1" />
+
+                  {/* Crown Base Band */}
+                  <rect
+                    x="16"
+                    y="40"
+                    width="88"
+                    height="12"
+                    rx="6"
+                    fill="url(#crown-gold-bright)"
+                    stroke="#B45309"
+                    strokeWidth="1.5"
+                  />
+
+                  {/* Dealopoly Brand Medallion in Center */}
+                  <g transform="translate(46, 32)">
+                    <circle cx="14" cy="14" r="14" fill="url(#crown-gold-grad)" stroke="#FFF" strokeWidth="1.5" />
+                    <circle cx="14" cy="14" r="11" fill="url(#crown-brand-blue)" />
+                    {/* Dealopoly Signature "D" */}
+                    <text
+                      x="14"
+                      y="19"
+                      textAnchor="middle"
+                      fill="#FFF"
+                      fontSize="14"
+                      fontWeight="900"
+                      fontFamily="var(--display), system-ui, sans-serif"
+                      letterSpacing="-0.5"
+                    >
+                      D
+                    </text>
+                  </g>
+
+                  {/* Dealopoly Golden Ribbon Label */}
+                  <g transform="translate(30, 54)">
+                    <rect x="0" y="0" width="60" height="13" rx="3" fill="#002d5c" stroke="#F59E0B" strokeWidth="1" />
+                    <text
+                      x="30"
+                      y="9.5"
+                      textAnchor="middle"
+                      fill="#FCD34D"
+                      fontSize="7.5"
+                      fontWeight="900"
+                      fontFamily="var(--display), system-ui, sans-serif"
+                      letterSpacing="0.8"
+                    >
+                      DEALOPOLY
+                    </text>
+                  </g>
+
+                  {/* Sparkle Glints */}
+                  <g transform="translate(14, 2)">
+                    <path d="M6 0 L7 4 L11 5 L7 6 L6 10 L5 6 L1 5 L5 4 Z" fill="#FFF" opacity="0.95" />
+                  </g>
+                  <g transform="translate(94, 26)">
+                    <path d="M4 0 L5 3 L8 4 L5 5 L4 8 L3 5 L0 4 L3 3 Z" fill="#FFF" opacity="0.9" />
+                  </g>
+                </svg>
+              </div>
+
               <div className="victory-avatar-circle">
                 <span className={`avatar ${winnerRanked?.isYou ? "avatar--you" : winnerRanked?.isBot ? "avatar--pink" : "avatar--blue"}`} style={{ width: "100%", height: "100%", fontSize: "2.4rem" }}>
                   {winnerRanked?.name[0]?.toUpperCase() || "W"}

@@ -4626,7 +4626,37 @@ p {
 
 .victory-avatar-wrapper {
   position: relative;
-  margin-bottom: 14px;
+  margin-top: 36px;
+  margin-bottom: 16px;
+}
+
+.victory-champion-crown {
+  position: absolute;
+  top: -46px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-3deg);
+  width: 112px;
+  height: 72px;
+  z-index: 10;
+  pointer-events: none;
+  animation: victory-crown-float 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes victory-crown-float {
+  0% {
+    transform: translateX(-50%) translateY(0px) rotate(-3deg) scale(1);
+    filter: drop-shadow(0 4px 12px rgba(245, 158, 11, 0.45));
+  }
+  100% {
+    transform: translateX(-50%) translateY(-6px) rotate(-1deg) scale(1.04);
+    filter: drop-shadow(0 8px 22px rgba(245, 158, 11, 0.75));
+  }
+}
+
+.victory-crown-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
 .victory-avatar-circle {
