@@ -1,4 +1,7 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ||
+  process.env.NEXT_PUBLIC_GAME_SERVER_URL ||
+  "http://localhost:4000";
 
 export interface CreateRoomResponse {
   roomCode: string;
