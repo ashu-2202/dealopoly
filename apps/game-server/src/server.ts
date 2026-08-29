@@ -174,6 +174,10 @@ export function createGameServer() {
         socket.send(JSON.stringify({ type: "PONG" }));
         break;
 
+      case "LEAVE_GAME":
+        roomManager.explicitLeave(roomCode, playerId);
+        break;
+
       case "START_GAME":
         try {
           await roomManager.startGame(roomCode, playerId);

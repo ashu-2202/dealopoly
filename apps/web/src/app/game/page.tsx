@@ -51,6 +51,7 @@ export default function GamePage(props: {
   const [unreadActivityCount, setUnreadActivityCount] = useState(0);
   const [isDiscardInspectorOpen, setIsDiscardInspectorOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isExitDialogOpen, setIsExitDialogOpen] = useState(false);
   const [liveReelEvent, setLiveReelEvent] = useState<{
     id: string;
     icon: string;
@@ -90,6 +91,7 @@ export default function GamePage(props: {
     isLocal,
     isConnected,
     gameState,
+    roomInfo,
     lastError,
     sendCommand,
     switchToLocalBotMode,
@@ -273,6 +275,13 @@ export default function GamePage(props: {
     } else {
       window.location.href = "/lobby";
     }
+  };
+
+  const handleExitGame = () => {
+    if (!isBotMode) {
+      sendCommand({ type: "LEAVE_GAME", playerId: actualPlayerId } as any);
+    }
+    window.location.href = "/lobby";
   };
 
   if (gameState.status === "completed") {
@@ -465,11 +474,17 @@ export default function GamePage(props: {
             </span>
           </Link>
 
-          <Link href="/lobby" className="game-icon-btn game-desktop-only" title="Lobby">
+          <button
+            type="button"
+            className="game-icon-btn game-desktop-only"
+            title="Leave Game"
+            onClick={() => setIsExitDialogOpen(true)}
+            style={{ color: "#ef4444" }}
+          >
             <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
-              meeting_room
+              exit_to_app
             </span>
-          </Link>
+          </button>
 
           {/* Mobile Menu Toggle */}
           <button
@@ -534,26 +549,34 @@ export default function GamePage(props: {
           {/* Opponents Seating Area */}
           <div className="game-opponents-strip">
             {opponents.map((opp, oppIdx) => {
-              const completedCount = opp.propertySets.filter((s) => s.isComplete).length;
-              const isOppActive = gameState.turn.activePlayerId === opp.id;
               const palette = OPPONENT_PALETTES[oppIdx % OPPONENT_PALETTES.length] || OPPONENT_PALETTES[0]!;
+              const isOppActive = gameState.turn.activePlayerId === opp.id;
+              const completedCount = opp.propertySets.filter((s) => s.isComplete).length;
+              const oppSeat = roomInfo?.seats?.find((s: any) => s.playerId === opp.id);
+              const isOffline = !opp.isBot && oppSeat && oppSeat.isConnected === false;
 
               return (
                 <div
                   key={opp.id}
-                  className={`game-opponent-seat ${isOppActive ? "game-opponent-seat--active" : ""}`}
+                  className={`game-opponent-seat ${isOppActive ? "game-opponent-seat--active" : ""} ${isOffline ? "game-opponent-seat--offline" : ""}`}
                   onClick={() => setViewingOpponentId(opp.id)}
                   title={`View ${opp.name}'s Table`}
                 >
                   <div className={`game-opponent-avatar-wrap ${palette.class}`}>
                     <span>{opp.name[0]?.toUpperCase()}</span>
                     <span className="game-opponent-hand-badge">🃏 {opp.handCount}</span>
+                    {isOffline && (
+                       <div style={{ position: "absolute", top: -2, right: -2, background: "#ef4444", borderRadius: "50%", width: 12, height: 12, border: "2px solid var(--surface)" }} title="Offline" />
+                    )}
                   </div>
 
                   <div className="game-opponent-info">
                     <div className="game-opponent-name-row">
-                      <span className="game-opponent-name">{opp.name} {opp.isBot && "(Bot)"}</span>
-                      {isOppActive && (
+                      <span className="game-opponent-name">
+                        {opp.name} {opp.isBot && "(Bot)"}
+                        {isOffline && <span style={{ color: "#ef4444", fontSize: "0.7rem", marginLeft: "6px", fontWeight: "bold" }}>OFFLINE</span>}
+                      </span>
+                      {isOppActive && !isOffline && (
                         <span className="game-opponent-turn-tag">
                           THINKING...
                         </span>
@@ -1805,6 +1828,50 @@ export default function GamePage(props: {
         </div>
       )}
 
+      {/* Exit Game Confirmation Dialog */}
+      {isExitDialogOpen && (
+        <div className="game-card-mobile-modal" onClick={() => setIsExitDialogOpen(false)}>
+          <div
+            className="game-card-mobile-sheet"
+            onClick={(e) => e.stopPropagation()}
+            style={{ padding: "24px", minHeight: "auto", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "90%", maxWidth: "400px", borderRadius: "16px" }}
+          >
+            <h3 style={{ margin: "0 0 12px 0", fontSize: "1.2rem", fontWeight: "bold" }}>
+              Leave Game?
+            </h3>
+            <p style={{ margin: "0 0 24px 0", fontSize: "0.9rem", color: "var(--on-surface-variant)", lineHeight: 1.5 }}>
+              {isLocal
+                ? "Are you sure you want to exit? Your solo game progress will be lost."
+                : (roomInfo?.hostPlayerId === actualPlayerId 
+                  ? "Are you sure you want to leave? Because you are the Host, this will instantly end the game for everyone."
+                  : "Are you sure you want to leave? A bot will take over your seat for the remainder of the game."
+                )}
+            </p>
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button
+                type="button"
+                className="button button--secondary"
+                style={{ flex: 1 }}
+                onClick={() => setIsExitDialogOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="button button--primary"
+                style={{ flex: 1, backgroundColor: "#ef4444", color: "#fff", border: "none" }}
+                onClick={() => {
+                  setIsExitDialogOpen(false);
+                  handleExitGame();
+                }}
+              >
+                Confirm Leave
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Navigation & Settings Drawer */}
       {isMobileMenuOpen && (
         <div className="game-activity-sheet" onClick={() => setIsMobileMenuOpen(false)}>
@@ -1872,14 +1939,18 @@ export default function GamePage(props: {
                 Room Lobby
               </Link>
 
-              <Link
-                href="/"
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsExitDialogOpen(true);
+                }}
                 className="button button--secondary button--full"
-                style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "10px", fontSize: "0.82rem" }}
+                style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "10px", fontSize: "0.82rem", color: "#ef4444" }}
               >
-                <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>home</span>
-                Exit to Home
-              </Link>
+                <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>exit_to_app</span>
+                Leave Game
+              </button>
 
               <button
                 type="button"

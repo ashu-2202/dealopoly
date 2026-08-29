@@ -190,7 +190,7 @@ export const games = pgTable(
     completedAt: timestamp("completed_at", { withTimezone: true }),
   },
   (t) => [
-    check("games_status_check", sql`${t.status} IN ('in_progress','completed')`),
+    check("games_status_check", sql`${t.status} IN ('in_progress','completed','abandoned')`),
   ]
 );
 

@@ -87,6 +87,7 @@ export default async function MatchHistoryPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
               {pastGames.map((match) => {
                 const isCompleted = match.status === "completed";
+                const isAbandoned = match.status === "abandoned";
                 const dateStr = new Date(match.startedAt).toLocaleDateString(undefined, {
                   month: "short",
                   day: "numeric",
@@ -116,15 +117,15 @@ export default async function MatchHistoryPage() {
                           width: "42px",
                           height: "42px",
                           borderRadius: "12px",
-                          background: isCompleted ? "rgba(102, 223, 117, 0.15)" : "rgba(168, 200, 255, 0.15)",
-                          color: isCompleted ? "var(--green)" : "var(--primary)",
+                          background: isCompleted ? "rgba(102, 223, 117, 0.15)" : (isAbandoned ? "rgba(156, 163, 175, 0.15)" : "rgba(168, 200, 255, 0.15)"),
+                          color: isCompleted ? "var(--green)" : (isAbandoned ? "var(--subtle)" : "var(--primary)"),
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
                         <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>
-                          {isCompleted ? "emoji_events" : "pending"}
+                          {isCompleted ? "emoji_events" : (isAbandoned ? "cancel" : "pending")}
                         </span>
                       </div>
                       <div>
@@ -138,12 +139,12 @@ export default async function MatchHistoryPage() {
                               fontSize: "0.68rem",
                               padding: "2px 6px",
                               borderRadius: "4px",
-                              background: isCompleted ? "rgba(102, 223, 117, 0.2)" : "rgba(255, 183, 125, 0.2)",
-                              color: isCompleted ? "var(--green)" : "var(--tertiary)",
+                              background: isCompleted ? "rgba(102, 223, 117, 0.2)" : (isAbandoned ? "rgba(156, 163, 175, 0.2)" : "rgba(255, 183, 125, 0.2)"),
+                              color: isCompleted ? "var(--green)" : (isAbandoned ? "var(--subtle)" : "var(--tertiary)"),
                               fontWeight: 600,
                             }}
                           >
-                            {isCompleted ? "COMPLETED" : "IN PROGRESS"}
+                            {isCompleted ? "COMPLETED" : (isAbandoned ? "ABANDONED" : "IN PROGRESS")}
                           </span>
                         </div>
                         <div style={{ fontSize: "0.78rem", color: "var(--muted)", fontFamily: "var(--mono)" }}>

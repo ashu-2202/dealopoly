@@ -195,17 +195,25 @@ export default function LobbyPage(props: {
       </header>
 
       {initError && (
-        <div
-          style={{
-            margin: "16px clamp(16px, 4vw, 32px)",
-            padding: "12px 16px",
-            background: "rgba(239, 68, 68, 0.15)",
-            border: "1px solid #ef4444",
-            borderRadius: "8px",
-            color: "#fca5a5",
-          }}
-        >
-          {initError}
+        <div style={{ padding: "clamp(16px, 4vw, 32px)", textAlign: "center" }}>
+          {initError.includes("not found") || initError.includes("already started") ? (
+            <div style={{ background: "var(--surface)", padding: "32px 24px", borderRadius: "16px", border: "1px solid var(--outline-variant)", maxWidth: "400px", margin: "40px auto" }}>
+              <span className="material-symbols-outlined" style={{ fontSize: "48px", color: "var(--error)", marginBottom: "16px" }}>
+                sentiment_dissatisfied
+              </span>
+              <h2 style={{ margin: "0 0 12px 0", fontSize: "1.2rem", fontWeight: "bold" }}>Room Not Available</h2>
+              <p style={{ margin: "0 0 24px 0", color: "var(--on-surface-variant)", lineHeight: 1.5, fontSize: "0.95rem" }}>
+                {initError.includes("not found") ? "This room has been closed by the host or is no longer available." : "This game has already started and cannot accept new players."}
+              </p>
+              <button onClick={() => router.push("/")} className="button button--primary" style={{ width: "100%" }}>
+                Return to Home
+              </button>
+            </div>
+          ) : (
+            <div style={{ padding: "12px 16px", background: "rgba(239, 68, 68, 0.15)", border: "1px solid #ef4444", borderRadius: "8px", color: "#fca5a5" }}>
+              {initError}
+            </div>
+          )}
         </div>
       )}
 

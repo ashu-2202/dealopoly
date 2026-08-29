@@ -45,6 +45,7 @@ export function useGameClient({
   const [isLocal, setIsLocal] = useState(isLocalMode || !roomCode || roomCode === "solo");
   const [isConnected, setIsConnected] = useState(isLocal);
   const [gameState, setGameState] = useState<MaskedGameState | null>(null);
+  const [roomInfo, setRoomInfo] = useState<any>(null);
   const [lastError, setLastError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -215,11 +216,16 @@ export function useGameClient({
         const msg = JSON.parse(event.data);
         if (msg.type === "GAME_STATE") {
           setGameState(msg.state);
-        } else if (msg.type === "GAME_EVENT") {
-          // You could accumulate events here if needed, but state update handles the UI mostly.
-          // Optional: handle toasts or specific event notifications.
+        } else if (msg.type === "ROOM_STATE") {
+          setRoomInfo(msg.room);
         } else if (msg.type === "ERROR") {
-          setLastError(msg.message);
+          if (msg.code === "ROOM_DESTROYED") {
+             if (typeof window !== "undefined") {
+               window.location.href = `/?error=${encodeURIComponent(msg.message)}`;
+             }
+          } else {
+             setLastError(msg.message);
+          }
         }
       } catch {
         // Ignore parse error
@@ -245,6 +251,7 @@ export function useGameClient({
     isLocal,
     isConnected,
     gameState,
+    roomInfo,
     lastError,
     sendCommand,
     switchToLocalBotMode: initLocalGame,

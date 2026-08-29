@@ -26,7 +26,32 @@ import type { Room, RoomSeat, PublicRoomInfo, RoomStatus } from "./types.js";
 
 export class RoomManager {
   private rooms = new Map<string, Room>();
+  private disconnectTimers = new Map<string, NodeJS.Timeout>();
   private hasAttemptedHydration = false;
+
+  constructor() {
+    // 2-hour periodic sweep for abandoned/idle rooms
+    setInterval(() => {
+      this.sweepIdleRooms();
+    }, 30 * 60 * 1000); // Check every 30 minutes
+  }
+
+  private sweepIdleRooms() {
+    const now = Date.now();
+    const TWO_HOURS = 2 * 60 * 60 * 1000;
+    
+    for (const [code, room] of this.rooms.entries()) {
+      if (now - room.lastActivityAt > TWO_HOURS) {
+        console.log(`[Room Sweeper] Room ${code} has been idle for 2+ hours. Abandoning...`);
+        // Abandon game in memory and DB
+        if (room.status === "in_progress" || room.status === "lobby") {
+          this.abandonRoom(code, "idle_timeout");
+        } else {
+          this.rooms.delete(code);
+        }
+      }
+    }
+  }
 
   /**
    * Generates a 6-digit numeric room code
@@ -539,7 +564,32 @@ export class RoomManager {
 
     seat.socket = socket;
     seat.isConnected = true;
+    if (seat.isBot) {
+      seat.isBot = false;
+      if (room.gameState && room.gameState.players[playerId]) {
+        room.gameState.players[playerId]!.isBot = false;
+      }
+      void this.safeDb(async () => {
+         await db.update(players).set({ isBot: false }).where(eq(players.id, playerId));
+      }, `revertBotToPlayer (${playerId})`);
+      
+      if (room.gameState) {
+        this.broadcastGameState(room, [{
+          id: `bot-reverted-${Date.now()}`,
+          type: "player_joined",
+          playerId,
+          timestamp: Date.now(),
+          message: `${seat.name} reconnected and took back their seat.`
+        } as any]);
+      }
+    }
     room.lastActivityAt = Date.now();
+
+    const timerKey = `${code}_${playerId}`;
+    if (this.disconnectTimers.has(timerKey)) {
+      clearTimeout(this.disconnectTimers.get(timerKey)!);
+      this.disconnectTimers.delete(timerKey);
+    }
 
     // Send initial sync to this connecting player
     this.sendToSeat(seat, {
@@ -568,6 +618,100 @@ export class RoomManager {
     return seat;
   }
 
+  public abandonRoom(code: string, reason: "idle_timeout" | "host_disconnected" | "host_left"): void {
+    const room = this.rooms.get(code);
+    if (!room) return;
+    
+    room.status = "completed"; // or "abandoned" depending on logic
+    // Actually, we use 'abandoned' for rooms and games
+    // But room status is strictly "lobby" | "in_progress" | "completed" | "abandoned" (wait, room_status check doesn't have abandoned in old db, oh yes we just added it to games_status_check, what about rooms_status_check?)
+    // In schema.ts: rooms_status_check is IN ('lobby','in_progress','completed','abandoned')!
+    room.status = "abandoned" as any; 
+    
+    // Broadcast ROOM_DESTROYED event
+    this.broadcastToRoom(room, {
+      type: "ERROR",
+      code: "ROOM_DESTROYED",
+      message: reason === "host_left" ? "The host has ended the game." : "The game was abandoned due to host inactivity.",
+    });
+
+    this.rooms.delete(code);
+
+    // Update DB
+    void this.safeDb(async () => {
+      if (room.id) {
+        await db.update(rooms).set({ status: "abandoned" }).where(eq(rooms.id, room.id));
+      }
+      if (room.dbGameId) {
+        await db.update(games).set({ status: "abandoned" }).where(eq(games.id, room.dbGameId));
+      }
+    }, `abandonRoom (${code})`);
+  }
+
+  private handleDisconnectTimeout(code: string, playerId: string): void {
+    this.disconnectTimers.delete(`${code}_${playerId}`);
+    const room = this.rooms.get(code);
+    if (!room) return;
+
+    if (room.hostPlayerId === playerId) {
+      this.abandonRoom(code, "host_disconnected");
+    } else {
+      this.convertPlayerToBot(code, playerId);
+    }
+  }
+
+  public convertPlayerToBot(code: string, playerId: string): void {
+    const room = this.rooms.get(code);
+    if (!room) return;
+    
+    const seat = room.seats.find(s => s.playerId === playerId);
+    if (seat) {
+      seat.isBot = true;
+      seat.isConnected = false;
+      seat.socket = undefined;
+      if (room.gameState && room.gameState.players[playerId]) {
+         room.gameState.players[playerId]!.isBot = true;
+      }
+      this.broadcastRoomInfo(room);
+      if (room.gameState) {
+        this.broadcastGameState(room, [{
+          id: `bot-converted-${Date.now()}`,
+          type: "player_left",
+          playerId,
+          timestamp: Date.now(),
+          message: `${seat.name} left the game and was replaced by a bot.`
+        } as any]);
+      }
+      
+      void this.safeDb(async () => {
+         await db.update(players).set({ isBot: true }).where(eq(players.id, playerId));
+      }, `convertPlayerToBot (${playerId})`);
+    }
+  }
+
+  public explicitLeave(code: string, playerId: string): void {
+    const room = this.rooms.get(code);
+    if (!room) return;
+    
+    if (room.hostPlayerId === playerId) {
+      this.abandonRoom(code, "host_left");
+    } else {
+      if (room.status === "lobby") {
+        this.removePlayer(code, playerId, playerId).catch(console.error);
+      } else {
+        this.convertPlayerToBot(code, playerId);
+      }
+    }
+  }
+
+  private broadcastToRoom(room: Room, message: any): void {
+    for (const seat of room.seats) {
+      if (seat.socket && seat.socket.readyState === 1 /* OPEN */) {
+        seat.socket.send(JSON.stringify(message));
+      }
+    }
+  }
+
   public detachSocket(code: string, playerId: string, socket: WebSocket): void {
     const room = this.rooms.get(code);
     if (!room) return;
@@ -578,6 +722,13 @@ export class RoomManager {
       seat.socket = undefined;
       room.lastActivityAt = Date.now();
       this.broadcastRoomInfo(room);
+      
+      const timerKey = `${code}_${playerId}`;
+      const timer = setTimeout(() => {
+        this.handleDisconnectTimeout(code, playerId);
+      }, 5 * 60 * 1000);
+      this.disconnectTimers.set(timerKey, timer);
+
     }
   }
 
