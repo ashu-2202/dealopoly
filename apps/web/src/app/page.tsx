@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { JoinRoomDialog } from "./_components/join-room-dialog";
+import { HeroCardShowcase } from "./_components/hero-card-showcase";
 
 const features = [
   {
@@ -139,47 +140,8 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Hero Interactive 3D Card Stack */}
-          <div className="hero-cards-stage" aria-hidden="true">
-            {/* Background Card: Debt Collector */}
-            <article className="hero-card-item hero-card--debt card-3d">
-              <div className="hero-card-header">
-                <span className="hero-card-value">$5M</span>
-                <span className="material-symbols-outlined">payments</span>
-              </div>
-              <div className="hero-card-tag">
-                <strong>DEBT COLLECTOR</strong>
-                <small>Force $5M payment</small>
-              </div>
-            </article>
-
-            {/* Middle Card: Sly Deal */}
-            <article className="hero-card-item hero-card--sly card-3d">
-              <div className="hero-card-header">
-                <span className="kicker" style={{ color: "var(--tertiary)" }}>ACTION</span>
-                <span className="material-symbols-outlined">swap_horiz</span>
-              </div>
-              <div className="hero-card-tag">
-                <strong>SLY DEAL</strong>
-                <small>Steal 1 property card</small>
-              </div>
-            </article>
-
-            {/* Foreground Card: Park Place */}
-            <article className="hero-card-item hero-card--park card-3d">
-              <div className="hero-card-header">
-                <span className="hero-card-value">$4M</span>
-                <div style={{ display: "flex", gap: "4px" }}>
-                  <span className="badge-dot" style={{ background: "var(--primary)" }} />
-                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "var(--outline-variant)" }} />
-                </div>
-              </div>
-              <div className="hero-card-tag">
-                <strong style={{ color: "var(--on-primary-container)" }}>Park Place</strong>
-                <small style={{ color: "var(--primary)" }}>Rent: $3M • Set of 2</small>
-              </div>
-            </article>
-          </div>
+          {/* Hero Interactive 3D Card Showcase */}
+          <HeroCardShowcase />
         </section>
 
         {/* Features Section */}
