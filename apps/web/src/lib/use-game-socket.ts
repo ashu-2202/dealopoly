@@ -39,6 +39,12 @@ export function useGameSocket({
   const [events, setEvents] = useState<GameEvent[]>([]);
   const [lastError, setLastError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!lastError) return;
+    const timer = setTimeout(() => setLastError(null), 4000);
+    return () => clearTimeout(timer);
+  }, [lastError]);
+
   const socketRef = useRef<WebSocket | null>(null);
   const pingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 

@@ -354,7 +354,6 @@ export function GameOverSummary({
                     animationDuration: `${c.dur}s`,
                     animationDelay: `${c.delay}s`,
                     borderRadius: c.isRound ? "50%" : "2px",
-                    transform: `rotate(${c.rotate}deg)`,
                   }}
                 />
               ))}

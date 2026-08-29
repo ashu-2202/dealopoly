@@ -47,6 +47,12 @@ export function useGameClient({
   const [gameState, setGameState] = useState<MaskedGameState | null>(null);
   const [lastError, setLastError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!lastError) return;
+    const timer = setTimeout(() => setLastError(null), 4000);
+    return () => clearTimeout(timer);
+  }, [lastError]);
+
   // Local State Machine
   const localGameRef = useRef<GameState | null>(null);
   const botTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
