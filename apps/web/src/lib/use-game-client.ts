@@ -191,9 +191,17 @@ export function useGameClient({
     const ws = new WebSocket(url);
     socketRef.current = ws;
 
+    let pingInterval: ReturnType<typeof setInterval>;
+
     ws.onopen = () => {
       setIsConnected(true);
       setLastError(null);
+
+      pingInterval = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: "PING" }));
+        }
+      }, 15000);
     };
 
     ws.onmessage = (event) => {
@@ -201,6 +209,9 @@ export function useGameClient({
         const msg = JSON.parse(event.data);
         if (msg.type === "GAME_STATE") {
           setGameState(msg.state);
+        } else if (msg.type === "GAME_EVENT") {
+          // You could accumulate events here if needed, but state update handles the UI mostly.
+          // Optional: handle toasts or specific event notifications.
         } else if (msg.type === "ERROR") {
           setLastError(msg.message);
         }
@@ -210,14 +221,16 @@ export function useGameClient({
     };
 
     ws.onerror = () => {
-      setLastError("Cannot reach game server on port 4000. You can switch to Instant Bot Mode.");
+      setLastError("Connection error. Ensure the game server is running.");
     };
 
     ws.onclose = () => {
       setIsConnected(false);
+      if (pingInterval) clearInterval(pingInterval);
     };
 
     return () => {
+      if (pingInterval) clearInterval(pingInterval);
       ws.close();
     };
   }, [roomCode, playerId, sessionToken, isLocalMode, initLocalGame]);
