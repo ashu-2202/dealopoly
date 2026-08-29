@@ -169,62 +169,9 @@ export default function GamePage(props: {
     return () => clearTimeout(timer);
   }, [liveReelEvent]);
 
-  if (!gameState) {
-    return (
-      <div className="game-table-shell" style={{ alignItems: "center", justifyContent: "center" }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px", textAlign: "center" }}>
-          <div
-            className="badge-dot"
-            style={{ width: "22px", height: "22px", background: "var(--primary)", animation: "pulse 1.5s infinite" }}
-          />
-          <h2 style={{ fontSize: "1.4rem", fontWeight: 700 }}>Connecting to Game Table...</h2>
-          <p style={{ color: "var(--outline)", fontSize: "0.9rem" }}>
-            Room: <b>{urlRoomCode || "Local Arena"}</b>
-          </p>
-          <button
-            type="button"
-            className="button button--primary"
-            onClick={switchToLocalBotMode}
-            style={{ marginTop: "12px" }}
-          >
-            🤖 Play Instant Bot Match
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const you = gameState.players[playerId] || Object.values(gameState.players).find((p) => !p.isBot) || Object.values(gameState.players)[0];
+  const you = gameState?.players?.[playerId] || (gameState?.players ? Object.values(gameState.players).find((p) => !p.isBot) || Object.values(gameState.players)[0] : undefined);
   const actualPlayerId = you?.id || playerId;
-
-  const handlePlayAgain = () => {
-    if (isBotMode) {
-      window.location.href = "/game?mode=bot";
-    } else if (urlRoomCode) {
-      window.location.href = `/lobby?room=${urlRoomCode}`;
-    } else {
-      window.location.href = "/lobby";
-    }
-  };
-
-  if (gameState.status === "completed") {
-    return (
-      <GameOverSummary
-        gameState={gameState}
-        currentPlayerId={actualPlayerId}
-        onPlayAgain={handlePlayAgain}
-        roomCode={urlRoomCode}
-      />
-    );
-  }
-
-  const isYourTurn = gameState.turn.activePlayerId === actualPlayerId;
-  const activePlayer = gameState.players[gameState.turn.activePlayerId];
-  const pending = gameState.pendingResolution;
-
-  const opponents = gameState.playerOrder
-    .filter((id) => id !== actualPlayerId)
-    .map((id) => gameState.players[id]!);
+  const isYourTurn = gameState?.turn?.activePlayerId === actualPlayerId;
 
   const triggerDrawAnimation = (count: number = 2) => {
     if (!drawPileRef.current || !handContainerRef.current) return;
@@ -268,7 +215,7 @@ export default function GamePage(props: {
     setFlyingCards((prev) => [...prev, ...newCards]);
   };
 
-  // Watch for hand draws (e.g. Turn start, Pass Go, empty hand draw 5)
+  // Watch for hand draws (e.g. Turn start, Pass Go, empty hand draw 5) - MUST BE BEFORE ANY EARLY RETURNS
   useEffect(() => {
     const currentHandCount = you?.hand?.length || 0;
     const prevCount = prevHandCountRef.current;
@@ -281,6 +228,59 @@ export default function GamePage(props: {
       }
     }
   }, [you?.hand?.length, isYourTurn]);
+
+  if (!gameState) {
+    return (
+      <div className="game-table-shell" style={{ alignItems: "center", justifyContent: "center" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px", textAlign: "center" }}>
+          <div
+            className="badge-dot"
+            style={{ width: "22px", height: "22px", background: "var(--primary)", animation: "pulse 1.5s infinite" }}
+          />
+          <h2 style={{ fontSize: "1.4rem", fontWeight: 700 }}>Connecting to Game Table...</h2>
+          <p style={{ color: "var(--outline)", fontSize: "0.9rem" }}>
+            Room: <b>{urlRoomCode || "Local Arena"}</b>
+          </p>
+          <button
+            type="button"
+            className="button button--primary"
+            onClick={switchToLocalBotMode}
+            style={{ marginTop: "12px" }}
+          >
+            🤖 Play Instant Bot Match
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const handlePlayAgain = () => {
+    if (isBotMode) {
+      window.location.href = "/game?mode=bot";
+    } else if (urlRoomCode) {
+      window.location.href = `/lobby?room=${urlRoomCode}`;
+    } else {
+      window.location.href = "/lobby";
+    }
+  };
+
+  if (gameState.status === "completed") {
+    return (
+      <GameOverSummary
+        gameState={gameState}
+        currentPlayerId={actualPlayerId}
+        onPlayAgain={handlePlayAgain}
+        roomCode={urlRoomCode}
+      />
+    );
+  }
+
+  const activePlayer = gameState.players[gameState.turn.activePlayerId];
+  const pending = gameState.pendingResolution;
+
+  const opponents = gameState.playerOrder
+    .filter((id) => id !== actualPlayerId)
+    .map((id) => gameState.players[id]!);
 
   // Actions
   const handleDraw = () => {
