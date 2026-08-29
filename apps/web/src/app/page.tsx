@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { JoinRoomDialog } from "./_components/join-room-dialog";
+import { PlayBotsDialog } from "./_components/play-bots-dialog";
 import { HeroCardShowcase } from "./_components/hero-card-showcase";
 
 const features = [
@@ -52,6 +53,7 @@ const howToPlaySteps = [
 
 export default function HomePage() {
   const [isJoinOpen, setIsJoinOpen] = useState(false);
+  const [isBotsOpen, setIsBotsOpen] = useState(false);
 
   return (
     <div className="marketing-page">
@@ -127,12 +129,16 @@ export default function HomePage() {
               </button>
 
               {/* Action 3: Play with Bots */}
-              <Link className="button button--ghost" href="/game">
+              <button
+                type="button"
+                onClick={() => setIsBotsOpen(true)}
+                className="button button--ghost"
+              >
                 <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>
                   smart_toy
                 </span>
                 Play with Bots
-              </Link>
+              </button>
             </div>
 
             <p className="availability">
@@ -232,6 +238,12 @@ export default function HomePage() {
       <JoinRoomDialog
         isOpen={isJoinOpen}
         onClose={() => setIsJoinOpen(false)}
+      />
+
+      {/* Play with Bots Setup Dialog */}
+      <PlayBotsDialog
+        isOpen={isBotsOpen}
+        onClose={() => setIsBotsOpen(false)}
       />
     </div>
   );

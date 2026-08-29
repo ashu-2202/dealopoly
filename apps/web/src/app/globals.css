@@ -1006,6 +1006,143 @@ p {
   color: var(--muted);
 }
 
+/* ==========================================================================
+   Play with Bots Dialog Setup Controls
+   ========================================================================== */
+.bot-count-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.bot-count-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 6px;
+  background: var(--surface-lowest);
+  border: 1px solid rgba(66, 71, 81, 0.4);
+  border-radius: 10px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bot-count-btn:hover {
+  background: var(--surface-variant);
+  border-color: rgba(168, 200, 255, 0.4);
+}
+
+.bot-count-btn--active {
+  background: rgba(0, 85, 164, 0.2) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  box-shadow: 0 0 16px rgba(0, 85, 164, 0.35);
+}
+
+.bot-count-number {
+  font-family: var(--display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.bot-count-label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+.bot-count-btn--active .bot-count-label {
+  color: var(--primary);
+}
+
+.bot-lineup-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.bot-lineup-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--surface-highest);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.bot-lineup-chip--player {
+  background: rgba(0, 85, 164, 0.3);
+  border: 1px solid rgba(168, 200, 255, 0.4);
+  color: #a8c8ff;
+}
+
+.bot-difficulty-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bot-difficulty-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--surface-lowest);
+  border: 1.5px solid rgba(66, 71, 81, 0.4);
+  border-radius: 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bot-difficulty-card:hover {
+  background: var(--surface-variant);
+  border-color: rgba(168, 200, 255, 0.35);
+}
+
+.bot-difficulty-card--selected {
+  background: rgba(0, 85, 164, 0.18) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 16px rgba(0, 85, 164, 0.3);
+}
+
+.bot-diff-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bot-diff-badge {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+
+.bot-diff-desc {
+  font-size: 0.76rem;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.35;
+}
+
 /* Responsive Overrides */
 @media (max-width: 900px) {
   .hero-section {

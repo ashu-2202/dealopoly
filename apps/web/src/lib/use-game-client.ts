@@ -17,16 +17,30 @@ export interface UseGameClientOptions {
   playerId?: string;
   sessionToken?: string;
   isLocalMode?: boolean;
+  botCount?: number;
+  botDifficulty?: "easy" | "medium" | "hard";
+  playerName?: string;
 }
+
+const DEFAULT_BOT_ROSTER = [
+  { id: "bot-atlas", name: "Bot Atlas" },
+  { id: "bot-nova", name: "Bot Nova" },
+  { id: "bot-orion", name: "Bot Orion" },
+  { id: "bot-luna", name: "Bot Luna" },
+];
 
 export function useGameClient({
   roomCode,
   playerId: initialPlayerId,
   sessionToken,
   isLocalMode = false,
+  botCount = 2,
+  botDifficulty = "medium",
+  playerName,
 }: UseGameClientOptions) {
   const profile = getStoredProfile();
   const playerId = initialPlayerId || profile.id;
+  const activePlayerName = playerName?.trim() || profile.name;
 
   const [isLocal, setIsLocal] = useState(isLocalMode || !roomCode || roomCode === "solo");
   const [isConnected, setIsConnected] = useState(isLocal);
@@ -46,10 +60,16 @@ export function useGameClient({
     setIsConnected(true);
     setLastError(null);
 
+    const safeCount = Math.min(Math.max(botCount, 1), 4);
+    const chosenBots = DEFAULT_BOT_ROSTER.slice(0, safeCount).map((b) => ({
+      id: b.id,
+      name: b.name,
+      isBot: true,
+    }));
+
     const players = [
-      { id: playerId, name: profile.name, isBot: false },
-      { id: "bot-atlas", name: "Bot Atlas", isBot: true },
-      { id: "bot-nova", name: "Bot Nova", isBot: true },
+      { id: playerId, name: activePlayerName, isBot: false },
+      ...chosenBots,
     ];
 
     const rawGame = createGame({
@@ -59,13 +79,15 @@ export function useGameClient({
 
     localGameRef.current = rawGame;
     setGameState(getMaskedView(rawGame, playerId));
-  }, [playerId, profile.name]);
+  }, [playerId, activePlayerName, botCount]);
 
   // Local Bot Execution Loop
   const triggerLocalBotStep = useCallback(() => {
     if (botTimerRef.current) {
       clearTimeout(botTimerRef.current);
     }
+
+    const delay = botDifficulty === "easy" ? 1100 : botDifficulty === "hard" ? 450 : 750;
 
     botTimerRef.current = setTimeout(() => {
       const raw = localGameRef.current;
@@ -108,8 +130,8 @@ export function useGameClient({
           // Bot command error
         }
       }
-    }, 600);
-  }, [playerId]);
+    }, delay);
+  }, [playerId, botDifficulty]);
 
   // Apply Command (Local or Remote)
   const sendCommand = useCallback(

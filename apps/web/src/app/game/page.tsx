@@ -22,11 +22,20 @@ const OPPONENT_PALETTES = [
 ];
 
 export default function GamePage(props: {
-  searchParams?: Promise<{ room?: string; mode?: string }>;
+  searchParams?: Promise<{
+    room?: string;
+    mode?: string;
+    bots?: string;
+    difficulty?: "easy" | "medium" | "hard";
+    player?: string;
+  }>;
 }) {
   const searchParams = props.searchParams ? use(props.searchParams) : undefined;
   const urlRoomCode = searchParams?.room;
   const isBotMode = searchParams?.mode === "bot" || !urlRoomCode || urlRoomCode === "solo";
+  const botCount = searchParams?.bots ? parseInt(searchParams.bots, 10) : undefined;
+  const botDifficulty = searchParams?.difficulty;
+  const customPlayerName = searchParams?.player;
 
   const profile = getStoredProfile();
   const session = urlRoomCode ? getRoomSession(urlRoomCode) : null;
@@ -86,6 +95,9 @@ export default function GamePage(props: {
     playerId,
     sessionToken,
     isLocalMode: isBotMode,
+    botCount,
+    botDifficulty,
+    playerName: customPlayerName,
   });
 
   useEffect(() => {
