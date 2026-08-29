@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { AppShell } from "../_components/app-shell";
+import { CardLoader } from "../_components/card-loader";
 import {
   getStoredProfile,
   saveRoomSession,
@@ -28,66 +29,70 @@ export default function LobbyPage(props: {
   const [copyFeedback, setCopyFeedback] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
 
+  const [isPromptingName, setIsPromptingName] = useState(false);
+  const [invitePlayerName, setInvitePlayerName] = useState("");
+
   // Prevent double-initialization in React Strict Mode
   const initAttempted = useRef(false);
 
+  const doInitRoom = async (forcedPlayerName?: string) => {
+    const profile = getStoredProfile();
+    const playerName = forcedPlayerName || urlPlayerName || session?.user?.name || profile.name;
+    const userId = session?.user?.id;
+
+    if (urlRoomCode) {
+      const existingSession = getRoomSession(urlRoomCode);
+      if (existingSession) {
+        setRoomCode(urlRoomCode);
+        setPlayerId(existingSession.playerId);
+        setSessionToken(existingSession.token);
+      } else {
+        try {
+          const joinRes = await joinRoomApi({
+            roomCode: urlRoomCode,
+            playerName,
+            userId,
+          });
+          saveRoomSession(urlRoomCode, joinRes.playerId, joinRes.sessionToken);
+          setRoomCode(joinRes.roomCode);
+          setPlayerId(joinRes.playerId);
+          setSessionToken(joinRes.sessionToken);
+        } catch (err: unknown) {
+          setInitError(err instanceof Error ? err.message : "Failed to join room");
+        }
+      }
+    } else {
+      try {
+        const createRes = await createRoomApi({
+          hostName: playerName,
+          botCount: 0,
+          userId,
+        });
+        saveRoomSession(createRes.roomCode, createRes.hostPlayerId, createRes.sessionToken);
+        setRoomCode(createRes.roomCode);
+        setPlayerId(createRes.hostPlayerId);
+        setSessionToken(createRes.sessionToken);
+        router.replace(`/lobby?room=${createRes.roomCode}`);
+      } catch (err: unknown) {
+        setInitError(err instanceof Error ? err.message : "Failed to create room");
+      }
+    }
+  };
+
   // Initialize room session
   useEffect(() => {
-    // Wait for auth to initialize so we don't accidentally join anonymously if logged in
     if (status === "loading") return;
     if (initAttempted.current) return;
     initAttempted.current = true;
 
-    async function initRoom() {
+    if (urlRoomCode && !getRoomSession(urlRoomCode) && !urlPlayerName) {
       const profile = getStoredProfile();
-      const playerName = urlPlayerName || session?.user?.name || profile.name;
-      const userId = session?.user?.id;
-
-      if (urlRoomCode) {
-        // Check for existing session token
-        const existingSession = getRoomSession(urlRoomCode);
-        if (existingSession) {
-          setRoomCode(urlRoomCode);
-          setPlayerId(existingSession.playerId);
-          setSessionToken(existingSession.token);
-        } else {
-          // Join room via API
-          try {
-            const joinRes = await joinRoomApi({
-              roomCode: urlRoomCode,
-              playerName,
-              userId,
-            });
-            saveRoomSession(urlRoomCode, joinRes.playerId, joinRes.sessionToken);
-            setRoomCode(joinRes.roomCode);
-            setPlayerId(joinRes.playerId);
-            setSessionToken(joinRes.sessionToken);
-          } catch (err: unknown) {
-            setInitError(err instanceof Error ? err.message : "Failed to join room");
-          }
-        }
-      } else {
-        // Create a new room
-        try {
-          const createRes = await createRoomApi({
-            hostName: playerName,
-            botCount: 0,
-            userId,
-          });
-          saveRoomSession(createRes.roomCode, createRes.hostPlayerId, createRes.sessionToken);
-          setRoomCode(createRes.roomCode);
-          setPlayerId(createRes.hostPlayerId);
-          setSessionToken(createRes.sessionToken);
-
-          // Update URL
-          router.replace(`/lobby?room=${createRes.roomCode}`);
-        } catch (err: unknown) {
-          setInitError(err instanceof Error ? err.message : "Failed to create room");
-        }
-      }
+      setInvitePlayerName(session?.user?.name || profile.name || "");
+      setIsPromptingName(true);
+      return;
     }
 
-    initRoom();
+    doInitRoom();
   }, [urlRoomCode, urlPlayerName, session, status, router]);
 
   const { isConnected, roomInfo, lastError, addBot, removePlayer, startGame } =
@@ -113,6 +118,56 @@ export default function LobbyPage(props: {
   const seats = roomInfo?.seats || [];
   const maxSeats = roomInfo?.maxSeats || 5;
   const emptySeatCount = Math.max(0, maxSeats - seats.length);
+
+  if (isPromptingName) {
+    return (
+      <AppShell active="lobby">
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", minHeight: "60vh", gap: "24px" }}>
+          <h2 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>Joining Room {urlRoomCode}</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%", maxWidth: "320px" }}>
+            <div>
+              <label style={{ fontSize: "0.9rem", color: "var(--on-surface-variant)", display: "block", marginBottom: "6px" }}>
+                Your Display Name
+              </label>
+              <input
+                type="text"
+                value={invitePlayerName}
+                onChange={(e) => setInvitePlayerName(e.target.value)}
+                className="dialog-input"
+                placeholder="Guest Player"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    setIsPromptingName(false);
+                    doInitRoom(invitePlayerName.trim() || "Guest");
+                  }
+                }}
+              />
+            </div>
+            <button
+              className="button button--primary button--full"
+              onClick={() => {
+                setIsPromptingName(false);
+                doInitRoom(invitePlayerName.trim() || "Guest");
+              }}
+            >
+              Join Game
+            </button>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
+
+  if ((!isConnected || !roomCode) && !initError) {
+    return (
+      <AppShell active="lobby">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", minHeight: "60vh" }}>
+          <CardLoader size="sm" text="Entering lobby..." />
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell active="lobby">
