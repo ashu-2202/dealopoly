@@ -172,8 +172,14 @@ export function useGameClient({
     setIsLocal(false);
     setIsConnected(false);
 
-    const wsBase =
+    const serverUrl =
       process.env.NEXT_PUBLIC_WS_BASE ||
+      (process.env.NEXT_PUBLIC_GAME_SERVER_URL
+        ? process.env.NEXT_PUBLIC_GAME_SERVER_URL.replace(/^http/, "ws") + "/ws"
+        : null);
+
+    const wsBase =
+      serverUrl ||
       (typeof window !== "undefined" && window.location.hostname === "localhost"
         ? "ws://localhost:4000/ws"
         : `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/ws`);

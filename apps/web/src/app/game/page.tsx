@@ -4,6 +4,7 @@ import { useState, use, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "../_components/card";
+import { CardLoader } from "../_components/card-loader";
 import { GameOverSummary } from "../_components/game-over-summary";
 import {
   getStoredProfile,
@@ -245,11 +246,7 @@ export default function GamePage(props: {
     return (
       <div className="game-table-shell" style={{ alignItems: "center", justifyContent: "center" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px", textAlign: "center" }}>
-          <div
-            className="badge-dot"
-            style={{ width: "22px", height: "22px", background: "var(--primary)", animation: "pulse 1.5s infinite" }}
-          />
-          <h2 style={{ fontSize: "1.4rem", fontWeight: 700 }}>Connecting to Game Table...</h2>
+          <CardLoader size="lg" text="Connecting to Game Table..." />
           <p style={{ color: "var(--outline)", fontSize: "0.9rem" }}>
             Room: <b>{urlRoomCode || "Local Arena"}</b>
           </p>

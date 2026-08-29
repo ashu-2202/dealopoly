@@ -365,6 +365,7 @@ export class RoomManager {
     room.nextSequenceNum = 1;
     room.lastActivityAt = Date.now();
 
+    this.broadcastRoomInfo(room);
     this.broadcastGameState(room);
 
     // Persist to Neon Postgres
