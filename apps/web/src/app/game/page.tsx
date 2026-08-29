@@ -1445,83 +1445,220 @@ export default function GamePage(props: {
       )}
 
       {/* Payment Resolution Modal */}
-      {pending?.type === "payment" && pending.debtorPlayerId === actualPlayerId && (
-        <div className="join-dialog-overlay" role="dialog" aria-modal="true">
-          <div className="dialog-scrim" />
-          <div className="dialog-panel dialog-panel--wide">
-            <div className="texture-overlay" />
-            <div className="sheet-handle" />
+      {pending?.type === "payment" && pending.debtorPlayerId === actualPlayerId && (() => {
+        const payableCards = [
+          ...(you?.bank || []),
+          ...(you?.propertySets.flatMap((s) => {
+            const items = [...s.cards];
+            if (s.houseCard) items.push(s.houseCard);
+            if (s.hotelCard) items.push(s.hotelCard);
+            return items;
+          }) || []),
+        ].filter((c) => c.value > 0);
 
-            <div className="dialog-header">
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span className="material-symbols-outlined" style={{ color: "#f59e0b", fontSize: "24px" }}>
-                  payments
-                </span>
-                <h2 style={{ color: "#f59e0b", fontSize: "1.15rem", margin: 0 }}>Payment Required</h2>
+        const totalTableValue = payableCards.reduce((sum, c) => sum + c.value, 0);
+
+        const selectedCards = payableCards.filter((c) =>
+          paymentSelectedIds.includes(c.instanceId),
+        );
+        const totalSelected = selectedCards.reduce((sum, c) => sum + c.value, 0);
+        const remainingDue = Math.max(0, pending.amountDue - totalSelected);
+        const isGoalReached = totalSelected >= pending.amountDue;
+        const isInsufficientTotal = totalTableValue < pending.amountDue;
+        const isAllSelected = selectedCards.length === payableCards.length;
+        const canSubmit = isGoalReached || (isInsufficientTotal && isAllSelected);
+
+        return (
+          <div className="join-dialog-overlay" role="dialog" aria-modal="true">
+            <div className="dialog-scrim" />
+            <div className="dialog-panel dialog-panel--wide">
+              <div className="texture-overlay" />
+              <div className="sheet-handle" />
+
+              {/* Header */}
+              <div className="dialog-header">
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <span className="material-symbols-outlined" style={{ color: "#f59e0b", fontSize: "24px" }}>
+                    payments
+                  </span>
+                  <div>
+                    <h2 style={{ color: "#f59e0b", fontSize: "1.15rem", margin: 0 }}>Payment Required</h2>
+                    <p style={{ color: "var(--muted)", fontSize: "0.74rem", margin: "2px 0 0" }}>
+                      Settle debt owed to {gameState.players[pending.creditorPlayerId]?.name || "opponent"}
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div className="dialog-body">
-              <p style={{ margin: 0, fontSize: "0.88rem" }}>
-                {pending.reason} — You owe <b>${pending.amountDue}M</b> to {gameState.players[pending.creditorPlayerId]?.name}.
-              </p>
+              {/* Body */}
+              <div className="dialog-body" style={{ gap: "14px" }}>
+                {/* Reason Banner */}
+                <div style={{ padding: "10px 14px", background: "rgba(245, 158, 11, 0.12)", border: "1px solid rgba(245, 158, 11, 0.3)", borderRadius: "10px" }}>
+                  <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--text)" }}>
+                    {pending.reason} — Total Owed: <b style={{ color: "#f59e0b" }}>${pending.amountDue}M</b>
+                  </p>
+                </div>
 
-              <p style={{ fontSize: "0.76rem", color: "var(--outline)", margin: 0 }}>
-                Select table cards (Bank cash or Properties) to settle the bill:
-              </p>
+                {/* Live Amount Breakdown Cards */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, 1fr)",
+                    gap: "8px",
+                    background: "var(--surface-lowest)",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    border: "1px solid rgba(66, 71, 81, 0.4)",
+                  }}
+                >
+                  <div style={{ textAlign: "center" }}>
+                    <span style={{ fontSize: "0.66rem", color: "var(--muted)", textTransform: "uppercase", fontFamily: "var(--mono)", fontWeight: 700, display: "block" }}>
+                      Total Due
+                    </span>
+                    <strong style={{ fontSize: "1.1rem", color: "#f59e0b", fontFamily: "var(--display)" }}>
+                      ${pending.amountDue}M
+                    </strong>
+                  </div>
 
-              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                {[...(you?.bank || []), ...(you?.propertySets.flatMap((s) => {
-                    const items = [...s.cards];
-                    if (s.houseCard) items.push(s.houseCard);
-                    if (s.hotelCard) items.push(s.hotelCard);
-                    return items;
-                  }) || [])]
-                  .filter(c => c.value > 0)
-                  .map((card) => {
-                  const isSelected = paymentSelectedIds.includes(card.instanceId);
+                  <div style={{ textAlign: "center", borderLeft: "1px solid rgba(255, 255, 255, 0.1)", borderRight: "1px solid rgba(255, 255, 255, 0.1)" }}>
+                    <span style={{ fontSize: "0.66rem", color: "var(--muted)", textTransform: "uppercase", fontFamily: "var(--mono)", fontWeight: 700, display: "block" }}>
+                      Selected
+                    </span>
+                    <strong style={{ fontSize: "1.1rem", color: isGoalReached ? "#66df75" : "var(--primary)", fontFamily: "var(--display)" }}>
+                      ${totalSelected}M
+                    </strong>
+                  </div>
 
-                  return (
-                    <button
-                      key={card.instanceId}
-                      type="button"
-                      onClick={() => {
-                        setPaymentSelectedIds((prev) =>
-                          isSelected
-                            ? prev.filter((id) => id !== card.instanceId)
-                            : [...prev, card.instanceId],
+                  <div style={{ textAlign: "center" }}>
+                    <span style={{ fontSize: "0.66rem", color: "var(--muted)", textTransform: "uppercase", fontFamily: "var(--mono)", fontWeight: 700, display: "block" }}>
+                      Remaining
+                    </span>
+                    <strong style={{ fontSize: "1.1rem", color: remainingDue === 0 ? "#66df75" : "#ff7d7d", fontFamily: "var(--display)" }}>
+                      {remainingDue === 0 ? "$0M ✓" : `$${remainingDue}M`}
+                    </strong>
+                  </div>
+                </div>
+
+                {/* Status Indicator Notice */}
+                {isGoalReached ? (
+                  <div style={{ padding: "8px 12px", background: "rgba(102, 223, 117, 0.15)", border: "1px solid #66df75", borderRadius: "8px", color: "#86efac", fontSize: "0.78rem", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>check_circle</span>
+                    <span><b>Debt Covered (${totalSelected}M of ${pending.amountDue}M)</b> — Remaining cards locked to prevent overpayment.</span>
+                  </div>
+                ) : isInsufficientTotal ? (
+                  <div style={{ padding: "8px 12px", background: "rgba(239, 68, 68, 0.15)", border: "1px solid #ef4444", borderRadius: "8px", color: "#fca5a5", fontSize: "0.78rem", display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>info</span>
+                    <span>Total assets (${totalTableValue}M) are less than debt. You must surrender all {payableCards.length} cards.</span>
+                  </div>
+                ) : (
+                  <div style={{ padding: "8px 12px", background: "rgba(168, 200, 255, 0.08)", border: "1px solid rgba(168, 200, 255, 0.2)", borderRadius: "8px", color: "#a8c8ff", fontSize: "0.78rem" }}>
+                    Select cards totaling at least <b>${remainingDue}M</b> more to pay the debt.
+                  </div>
+                )}
+
+                {/* Cards List */}
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                    <span style={{ fontSize: "0.72rem", color: "var(--muted)", textTransform: "uppercase", fontFamily: "var(--mono)", fontWeight: 700 }}>
+                      Available Table Cards ({payableCards.length})
+                    </span>
+                    {isInsufficientTotal && !isAllSelected && (
+                      <button
+                        type="button"
+                        onClick={() => setPaymentSelectedIds(payableCards.map(c => c.instanceId))}
+                        style={{ background: "none", border: "none", color: "var(--primary)", fontSize: "0.72rem", fontWeight: 700, cursor: "pointer", textDecoration: "underline" }}
+                      >
+                        Select All Assets
+                      </button>
+                    )}
+                  </div>
+
+                  {payableCards.length === 0 ? (
+                    <div style={{ padding: "16px", textAlign: "center", color: "var(--muted)", fontSize: "0.82rem" }}>
+                      You have no cards or cash on your table to pay this debt.
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                      {payableCards.map((card) => {
+                        const isSelected = paymentSelectedIds.includes(card.instanceId);
+                        // When debt is covered, disable other unselected cards to prevent accidental overpayment
+                        const isDisabled = !isSelected && isGoalReached;
+
+                        return (
+                          <button
+                            key={card.instanceId}
+                            type="button"
+                            disabled={isDisabled}
+                            onClick={() => {
+                              setPaymentSelectedIds((prev) =>
+                                isSelected
+                                  ? prev.filter((id) => id !== card.instanceId)
+                                  : [...prev, card.instanceId],
+                              );
+                            }}
+                            style={{
+                              padding: "8px 12px",
+                              borderRadius: "8px",
+                              background: isSelected
+                                ? "var(--primary)"
+                                : isDisabled
+                                ? "rgba(255, 255, 255, 0.03)"
+                                : "var(--surface)",
+                              color: isSelected
+                                ? "var(--on-primary)"
+                                : isDisabled
+                                ? "var(--outline)"
+                                : "inherit",
+                              border: `1.5px solid ${isSelected ? "var(--primary)" : isDisabled ? "rgba(255, 255, 255, 0.06)" : "var(--outline)"}`,
+                              cursor: isDisabled ? "not-allowed" : "pointer",
+                              fontSize: "0.78rem",
+                              fontWeight: 700,
+                              opacity: isDisabled ? 0.45 : 1,
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "6px",
+                              transition: "all 0.15s ease",
+                            }}
+                          >
+                            <span>{card.name}</span>
+                            <span style={{ fontFamily: "var(--mono)", fontSize: "0.72rem" }}>(${card.value}M)</span>
+                            {isSelected && (
+                              <span className="material-symbols-outlined" style={{ fontSize: "15px", fontWeight: 900 }}>
+                                check
+                              </span>
+                            )}
+                          </button>
                         );
-                      }}
-                      style={{
-                        padding: "8px 12px",
-                        borderRadius: "8px",
-                        background: isSelected ? "var(--primary)" : "var(--surface)",
-                        color: isSelected ? "var(--on-primary)" : "inherit",
-                        border: "1px solid var(--outline)",
-                        cursor: "pointer",
-                        fontSize: "0.78rem",
-                        fontWeight: 700,
-                      }}
-                    >
-                      {card.name} (${card.value}M) {isSelected && "✓"}
-                    </button>
-                  );
-                })}
+                      })}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
 
-            <div className="dialog-footer">
-              <button
-                type="button"
-                className="button button--primary button--full"
-                onClick={handlePaymentSubmit}
-              >
-                Submit Payment
-              </button>
+              {/* Footer */}
+              <div className="dialog-footer">
+                <button
+                  type="button"
+                  className="button button--primary button--full"
+                  disabled={!canSubmit}
+                  onClick={handlePaymentSubmit}
+                  style={{
+                    opacity: !canSubmit ? 0.5 : 1,
+                    cursor: !canSubmit ? "not-allowed" : "pointer",
+                  }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>
+                    {canSubmit ? "check_circle" : "lock"}
+                  </span>
+                  {canSubmit
+                    ? `Submit Payment ($${totalSelected}M)`
+                    : `Select $${remainingDue}M more to submit`}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Discard Resolution Modal */}
       {pending?.type === "discard" && pending.playerId === actualPlayerId && (
