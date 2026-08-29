@@ -17,20 +17,20 @@ describe("Mobile Card Action Bottom Sheet Verification", () => {
     expect(cssContent).toMatch(/\.game-card-mobile-modal\s*\{[^}]*position:\s*fixed;/);
     expect(cssContent).toMatch(/\.game-card-mobile-modal\s*\{[^}]*inset:\s*0;/);
     expect(cssContent).toMatch(/\.game-card-mobile-modal\s*\{[^}]*z-index:\s*200;/);
-    expect(cssContent).toMatch(/\.game-card-mobile-modal\s*\{[^}]*background:\s*rgba\(0,\s*0,\s*0,\s*0\.7\);/);
-    expect(cssContent).toMatch(/\.game-card-mobile-modal\s*\{[^}]*backdrop-filter:\s*blur\(6px\);/);
+    expect(cssContent).toMatch(/\.game-card-mobile-modal\s*\{[^}]*background:\s*rgba\(0,\s*0,\s*0,\s*0\.75\);/);
+    expect(cssContent).toMatch(/\.game-card-mobile-modal\s*\{[^}]*backdrop-filter:\s*blur\(8px\);/);
     expect(cssContent).toMatch(/\.game-card-mobile-modal\s*\{[^}]*align-items:\s*flex-end;/);
     expect(cssContent).toMatch(/\.game-card-mobile-modal\s*\{[^}]*justify-content:\s*center;/);
 
-    // 3. Check .game-card-mobile-sheet has max-height, rounded top corners, slide-up animation
+    // 3. Check .game-card-mobile-sheet has max-height, rounded top corners, slide-in animation
     expect(cssContent).toContain(".game-card-mobile-sheet {");
-    expect(cssContent).toMatch(/\.game-card-mobile-sheet\s*\{[^}]*max-height:\s*82vh;/);
-    expect(cssContent).toMatch(/\.game-card-mobile-sheet\s*\{[^}]*border-radius:\s*20px 20px 0 0;/);
-    expect(cssContent).toMatch(/\.game-card-mobile-sheet\s*\{[^}]*box-shadow:\s*0 -10px 30px rgba\(0,\s*0,\s*0,\s*0\.8\);/);
-    expect(cssContent).toMatch(/\.game-card-mobile-sheet\s*\{[^}]*animation:\s*slide-up 0\.2s/);
+    expect(cssContent).toMatch(/\.game-card-mobile-sheet\s*\{[^}]*max-height:\s*88vh;/);
+    expect(cssContent).toMatch(/\.game-card-mobile-sheet\s*\{[^}]*border-radius:\s*24px 24px 0 0;/);
+    expect(cssContent).toMatch(/\.game-card-mobile-sheet\s*\{[^}]*box-shadow:\s*0 -12px 40px rgba\(0,\s*0,\s*0,\s*0\.85\);/);
+    expect(cssContent).toMatch(/\.game-card-mobile-sheet\s*\{[^}]*animation:\s*mobile-sheet-slide-in/);
 
-    // 4. Verify slide-up keyframes
-    expect(cssContent).toContain("@keyframes slide-up {");
+    // 4. Verify mobile-sheet-slide-in keyframes
+    expect(cssContent).toContain("@keyframes mobile-sheet-slide-in {");
     expect(cssContent).toMatch(/transform:\s*translateY\(100%\);/);
     expect(cssContent).toMatch(/transform:\s*translateY\(0\);/);
   });

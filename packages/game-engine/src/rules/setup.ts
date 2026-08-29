@@ -22,7 +22,7 @@ export function createGame(options: CreateGameOptions): GameState {
   if (players.length < 2 || players.length > 5) {
     throw new GameEngineError(
       "UNKNOWN_ERROR",
-      `Monopoly Deal requires 2 to 5 players (provided: ${players.length})`,
+      `Dealopoly requires 2 to 5 players (provided: ${players.length})`,
     );
   }
 

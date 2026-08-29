@@ -50,8 +50,8 @@ describe("Property Sets and Wilds", () => {
 
     const card1: CardInstance = {
       instanceId: "test-brown-1",
-      defId: "prop-old-kent-road",
-      name: "Old Kent Road",
+      defId: "prop-mediterranean-avenue",
+      name: "Mediterranean Avenue",
       type: "property",
       primaryColor: "brown",
       value: 1,
@@ -59,8 +59,8 @@ describe("Property Sets and Wilds", () => {
     };
     const card2: CardInstance = {
       instanceId: "test-brown-2",
-      defId: "prop-whitechapel-road",
-      name: "Whitechapel Road",
+      defId: "prop-baltic-avenue",
+      name: "Baltic Avenue",
       type: "property",
       primaryColor: "brown",
       value: 1,

@@ -3,15 +3,10 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { BackButton } from "./back-button";
 
-export function Brand() {
-  return (
-    <Link className="brand brand--app" href="/">
-      <span className="brand-mark">D</span>
-      <span>dealopoly</span>
-    </Link>
-  );
-}
+import { Brand } from "./brand";
 
 export function AppShell({
   active,
@@ -21,19 +16,26 @@ export function AppShell({
   children: ReactNode;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: session } = useSession();
 
   return (
     <div className="app-shell">
       {/* Mobile Top Bar */}
       <header className="app-mobile-topbar">
-        <Brand />
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Brand className="brand brand--app" />
+        </div>
         <button
           type="button"
-          className="app-mobile-menu-btn"
+          className={`app-mobile-menu-btn ${mobileMenuOpen ? "open" : ""}`}
           onClick={() => setMobileMenuOpen((v) => !v)}
           aria-label="Toggle menu"
         >
-          {mobileMenuOpen ? "✕" : "☰"}
+          <div className="hamburger-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
         </button>
       </header>
 
@@ -46,19 +48,48 @@ export function AppShell({
       )}
 
       <aside className={`app-sidebar ${mobileMenuOpen ? "app-sidebar--open" : ""}`}>
-        <Brand />
-        <div className="profile">
-          <span className="avatar avatar--you">Y</span>
-          <div>
-            <strong>You</strong>
-            <small>Guest player</small>
-          </div>
-          <span className="status-dot" />
-        </div>
+        <Brand className="brand brand--app" />
+        {session?.user ? (
+          <Link href="/profile" className="profile" style={{ textDecoration: "none" }} onClick={() => setMobileMenuOpen(false)}>
+            {session.user.image ? (
+              <img
+                src={session.user.image}
+                alt=""
+                referrerPolicy="no-referrer"
+                style={{ width: "32px", height: "32px", borderRadius: "50%", objectFit: "cover", border: "1.5px solid var(--primary)" }}
+              />
+            ) : (
+              <span className="avatar avatar--you">
+                {(session.user.name || session.user.email || "U")[0]?.toUpperCase()}
+              </span>
+            )}
+            <div style={{ overflow: "hidden" }}>
+              <strong style={{ display: "block", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+                {session.user.name || "Player"}
+              </strong>
+              <small style={{ color: "var(--muted)", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap", display: "block" }}>
+                {session.user.email || "Signed In"}
+              </small>
+            </div>
+            <span className="status-dot" style={{ background: "#10b981" }} />
+          </Link>
+        ) : (
+          <Link href="/login" className="profile" style={{ textDecoration: "none" }} title="Sign in to your account" onClick={() => setMobileMenuOpen(false)}>
+            <span className="avatar avatar--you">GP</span>
+            <div>
+              <strong>Guest</strong>
+              <small style={{ color: "var(--primary)" }}>Sign In →</small>
+            </div>
+            <span className="status-dot" />
+          </Link>
+        )}
         <Link className="new-game" href="/lobby" onClick={() => setMobileMenuOpen(false)}>
           ＋ New game
         </Link>
         <nav className="app-nav" aria-label="Game navigation">
+          <Link href="/" onClick={() => setMobileMenuOpen(false)}>
+            <span>⌂</span> Home
+          </Link>
           <Link
             className={active === "lobby" ? "active" : ""}
             href="/lobby"
@@ -76,16 +107,13 @@ export function AppShell({
           <Link href="/cards" onClick={() => setMobileMenuOpen(false)}>
             <span>🂠</span> Cards
           </Link>
-          <a href="#friends">
-            <span>♧</span> Friends
-          </a>
-          <a href="#history">
+          <Link href="/history" onClick={() => setMobileMenuOpen(false)}>
             <span>◷</span> History
-          </a>
+          </Link>
         </nav>
-        <a className="settings-link" href="#settings">
-          ⚙ Settings
-        </a>
+        <Link className="settings-link" href="/profile" onClick={() => setMobileMenuOpen(false)}>
+          ⚙ Profile & Settings
+        </Link>
       </aside>
 
       <section className="app-stage">{children}</section>

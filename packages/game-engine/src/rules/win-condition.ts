@@ -14,7 +14,7 @@ export function checkWinCondition(
   const completedSets = player.propertySets.filter((s) => s.isComplete);
   const completedColors = completedSets.map((s) => s.color);
 
-  // In Monopoly Deal, having 3 completed property sets wins the game
+  // In Dealopoly, having 3 completed property sets wins the game
   const isWon = completedSets.length >= 3;
   return { isWon, completedColors, completedSetsCount: completedSets.length };
 }

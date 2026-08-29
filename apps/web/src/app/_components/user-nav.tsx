@@ -12,12 +12,12 @@ export function UserNav() {
     return (
       <div
         style={{
-          width: "36px",
-          height: "36px",
-          borderRadius: "50%",
+          width: "82px",
+          height: "34px",
+          borderRadius: "8px",
           background: "var(--surface)",
           border: "1px solid var(--outline-variant)",
-          opacity: 0.6,
+          opacity: 0.4,
         }}
       />
     );
@@ -25,25 +25,16 @@ export function UserNav() {
 
   if (!session?.user) {
     return (
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <Link
-          href="/login"
-          className="button button--secondary"
-          style={{ padding: "6px 12px", fontSize: "0.8rem", height: "34px" }}
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
-            login
-          </span>
-          Sign In
-        </Link>
-        <div
-          className="user-avatar-badge"
-          title="Guest Player (Not signed in)"
-          style={{ cursor: "default" }}
-        >
-          GP
-        </div>
-      </div>
+      <Link
+        href="/login"
+        className="button button--secondary"
+        style={{ padding: "6px 14px", fontSize: "0.82rem", height: "34px", display: "inline-flex", alignItems: "center", gap: "6px" }}
+      >
+        <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+          login
+        </span>
+        Sign In
+      </Link>
     );
   }
 
@@ -72,6 +63,7 @@ export function UserNav() {
           <img
             src={user.image}
             alt={user.name || "User Avatar"}
+            referrerPolicy="no-referrer"
             style={{
               width: "36px",
               height: "36px",

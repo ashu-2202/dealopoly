@@ -13,6 +13,8 @@ import {
 import { createRoomApi, joinRoomApi } from "../../lib/api";
 import { useGameSocket } from "../../lib/use-game-socket";
 
+import { BackButton } from "../_components/back-button";
+
 export default function LobbyPage(props: {
   searchParams?: Promise<{ room?: string; player?: string; code?: string }>;
 }) {
@@ -234,6 +236,9 @@ export default function LobbyPage(props: {
 
       <main className="lobby-layout">
         <section className="lobby-main">
+          <div style={{ marginBottom: "12px" }}>
+            <BackButton fallbackUrl="/" label="Back to Home" variant="subtle" />
+          </div>
           <div className="room-intro">
             <div>
               <h2>Waiting for players to join...</h2>
@@ -314,7 +319,7 @@ export default function LobbyPage(props: {
             </div>
             <div className="setting-row">
               <div>
-                <h3>Standard Monopoly Deal Rules</h3>
+                <h3>Standard Dealopoly Rules</h3>
                 <p>First player to complete 3 full property sets of different colors wins.</p>
               </div>
               <span style={{ color: "var(--primary)", fontWeight: 600 }}>Active</span>

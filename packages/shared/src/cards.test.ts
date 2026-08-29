@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CARD_CATALOGUE, TOTAL_CARDS_IN_DECK, type CardDefinition } from "./cards.js";
 
-describe("Monopoly Deal Card Catalogue", () => {
+describe("Dealopoly Card Catalogue", () => {
   it("should contain exactly 110 cards in total deck", () => {
     expect(TOTAL_CARDS_IN_DECK).toBe(110);
   });

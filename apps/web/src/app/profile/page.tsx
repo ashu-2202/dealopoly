@@ -1,9 +1,11 @@
 import React from "react";
 import Link from "next/link";
+import { MarketingNav } from "../_components/marketing-nav";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db, users, eq } from "@dealopoly/db";
 import { UserNav } from "../_components/user-nav";
+import { BackButton } from "../_components/back-button";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -28,108 +30,66 @@ export default async function ProfilePage() {
   const winRate = gamesPlayed > 0 ? Math.round((gamesWon / gamesPlayed) * 100) : 0;
   const customTag: string = dbUser?.customTag ?? `@${name}`;
 
+  const memberSince = dbUser?.createdAt
+    ? new Date(dbUser.createdAt).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    : null;
+
   return (
     <div className="marketing-page" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Navigation */}
-      <header className="marketing-nav">
-        <Link className="brand" href="/" aria-label="Dealopoly home">
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-            playing_cards
-          </span>
-          <span>dealopoly</span>
-        </Link>
-        <nav className="marketing-nav-center" aria-label="Main navigation">
-          <Link href="/cards">Card Catalogue</Link>
-          <Link href="/history">Match History</Link>
-          <Link href="/lobby">Play Game</Link>
-        </nav>
-        <div className="marketing-nav-actions">
-          <UserNav />
-        </div>
-      </header>
+      <MarketingNav activeTab="profile" />
 
       {/* Main Content */}
-      <main style={{ flex: 1, padding: "48px 16px" }}>
+      <main className="profile-page-main">
         <div className="shell" style={{ maxWidth: "880px", margin: "0 auto" }}>
+          <BackButton fallbackUrl="/" label="Back to Home" variant="subtle" style={{ marginBottom: "16px" }} />
           {/* Profile Header Card */}
-          <div
-            className="glass-panel"
-            style={{
-              padding: "36px",
-              borderRadius: "24px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "24px",
-              flexWrap: "wrap",
-              marginBottom: "32px",
-              background: "linear-gradient(135deg, rgba(29, 32, 33, 0.9) 0%, rgba(0, 48, 97, 0.4) 100%)",
-              border: "1px solid rgba(168, 200, 255, 0.2)",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          <div className="glass-panel profile-hero-card">
+            <div className="profile-user-info">
               {image ? (
                 <img
                   src={image}
                   alt={name}
-                  style={{
-                    width: "84px",
-                    height: "84px",
-                    borderRadius: "50%",
-                    border: "3px solid var(--primary)",
-                    objectFit: "cover",
-                    boxShadow: "0 8px 24px rgba(0, 85, 164, 0.4)",
-                  }}
+                  referrerPolicy="no-referrer"
+                  className="profile-avatar-img"
+                  style={{ objectFit: "cover" }}
                 />
               ) : (
-                <div
-                  className="user-avatar-badge"
-                  style={{
-                    width: "84px",
-                    height: "84px",
-                    borderRadius: "50%",
-                    fontSize: "2rem",
-                    fontWeight: 800,
-                    background: "linear-gradient(135deg, #0055A4 0%, #27A644 100%)",
-                    color: "#fff",
-                    border: "3px solid var(--primary)",
-                    boxShadow: "0 8px 24px rgba(0, 85, 164, 0.4)",
-                  }}
-                >
+                <div className="user-avatar-badge profile-avatar-badge">
                   {name.slice(0, 2).toUpperCase()}
                 </div>
               )}
 
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
-                  <h1 style={{ fontFamily: "var(--display)", fontSize: "1.85rem", fontWeight: 800, margin: 0 }}>
-                    {name}
-                  </h1>
+              <div className="profile-user-details">
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "4px" }}>
+                  <h1>{name}</h1>
                   <span
                     style={{
                       fontFamily: "var(--mono)",
-                      fontSize: "0.72rem",
+                      fontSize: "0.7rem",
                       background: "rgba(102, 223, 117, 0.15)",
                       color: "var(--green)",
                       border: "1px solid rgba(102, 223, 117, 0.3)",
                       padding: "2px 8px",
                       borderRadius: "6px",
                       fontWeight: 600,
+                      whiteSpace: "nowrap",
                     }}
                   >
                     PRO PLAYER
                   </span>
                 </div>
-                <p style={{ fontFamily: "var(--mono)", fontSize: "0.85rem", color: "var(--primary)", margin: "0 0 6px" }}>
+                <p style={{ fontFamily: "var(--mono)", fontSize: "0.84rem", color: "var(--primary)", margin: "0 0 4px", overflowWrap: "break-word" }}>
                   {customTag}
                 </p>
-                <p style={{ fontSize: "0.82rem", color: "var(--muted)", margin: 0 }}>
-                  {email}
-                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", fontSize: "0.8rem", color: "var(--muted)" }}>
+                  <span style={{ overflowWrap: "break-word", wordBreak: "break-all" }}>{email}</span>
+                  {memberSince && <span>• Member since {memberSince}</span>}
+                </div>
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: "12px" }}>
+            <div className="profile-actions">
               <Link href="/lobby" className="button button--primary" style={{ padding: "10px 20px" }}>
                 <span className="material-symbols-outlined" style={{ fontSize: "20px", fontVariationSettings: "'FILL' 1" }}>
                   play_arrow
@@ -140,113 +100,71 @@ export default async function ProfilePage() {
           </div>
 
           {/* Stats Grid */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-              gap: "20px",
-              marginBottom: "36px",
-            }}
-          >
+          <div className="profile-stats-grid">
             {/* Games Played */}
-            <div
-              className="glass-panel"
-              style={{
-                padding: "24px",
-                borderRadius: "18px",
-                border: "1px solid var(--outline-variant)",
-                background: "var(--surface)",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-                <span style={{ fontSize: "0.8rem", fontFamily: "var(--mono)", color: "var(--muted)", fontWeight: 600 }}>
+            <div className="glass-panel profile-stat-card">
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+                <span style={{ fontSize: "0.78rem", fontFamily: "var(--mono)", color: "var(--muted)", fontWeight: 600 }}>
                   MATCHES PLAYED
                 </span>
                 <span className="material-symbols-outlined" style={{ color: "var(--primary)", fontSize: "22px" }}>
                   sports_esports
                 </span>
               </div>
-              <div style={{ fontSize: "2.4rem", fontWeight: 800, fontFamily: "var(--display)" }}>
+              <div className="profile-stat-value">
                 {gamesPlayed}
               </div>
-              <div style={{ fontSize: "0.78rem", color: "var(--subtle)", marginTop: "4px" }}>
+              <div style={{ fontSize: "0.76rem", color: "var(--subtle)", marginTop: "6px" }}>
                 Lifetime matches recorded
               </div>
             </div>
 
             {/* Games Won */}
-            <div
-              className="glass-panel"
-              style={{
-                padding: "24px",
-                borderRadius: "18px",
-                border: "1px solid var(--outline-variant)",
-                background: "var(--surface)",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-                <span style={{ fontSize: "0.8rem", fontFamily: "var(--mono)", color: "var(--muted)", fontWeight: 600 }}>
+            <div className="glass-panel profile-stat-card">
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+                <span style={{ fontSize: "0.78rem", fontFamily: "var(--mono)", color: "var(--muted)", fontWeight: 600 }}>
                   VICTORIES
                 </span>
                 <span className="material-symbols-outlined" style={{ color: "var(--green)", fontSize: "22px", fontVariationSettings: "'FILL' 1" }}>
                   emoji_events
                 </span>
               </div>
-              <div style={{ fontSize: "2.4rem", fontWeight: 800, fontFamily: "var(--display)", color: "var(--green)" }}>
+              <div className="profile-stat-value" style={{ color: "var(--green)" }}>
                 {gamesWon}
               </div>
-              <div style={{ fontSize: "0.78rem", color: "var(--subtle)", marginTop: "4px" }}>
-                Total 3-set monopoly wins
+              <div style={{ fontSize: "0.76rem", color: "var(--subtle)", marginTop: "6px" }}>
+                Total 3-set Dealopoly wins
               </div>
             </div>
 
             {/* Win Rate */}
-            <div
-              className="glass-panel"
-              style={{
-                padding: "24px",
-                borderRadius: "18px",
-                border: "1px solid var(--outline-variant)",
-                background: "var(--surface)",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
-                <span style={{ fontSize: "0.8rem", fontFamily: "var(--mono)", color: "var(--muted)", fontWeight: 600 }}>
+            <div className="glass-panel profile-stat-card">
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+                <span style={{ fontSize: "0.78rem", fontFamily: "var(--mono)", color: "var(--muted)", fontWeight: 600 }}>
                   WIN RATE
                 </span>
                 <span className="material-symbols-outlined" style={{ color: "var(--tertiary)", fontSize: "22px" }}>
                   percent
                 </span>
               </div>
-              <div style={{ fontSize: "2.4rem", fontWeight: 800, fontFamily: "var(--display)", color: "var(--tertiary)" }}>
+              <div className="profile-stat-value" style={{ color: "var(--tertiary)" }}>
                 {winRate}%
               </div>
-              <div style={{ fontSize: "0.78rem", color: "var(--subtle)", marginTop: "4px" }}>
+              <div style={{ fontSize: "0.76rem", color: "var(--subtle)", marginTop: "6px" }}>
                 Performance across all rooms
               </div>
             </div>
           </div>
 
           {/* Quick Links Section */}
-          <div
-            className="glass-panel"
-            style={{
-              padding: "28px 32px",
-              borderRadius: "20px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              background: "rgba(29, 32, 33, 0.8)",
-              border: "1px solid var(--line)",
-            }}
-          >
+          <div className="glass-panel profile-banner-card">
             <div>
-              <h3 style={{ margin: "0 0 4px", fontSize: "1.1rem" }}>Looking for past match logs?</h3>
-              <p style={{ margin: 0, fontSize: "0.86rem", color: "var(--muted)" }}>
+              <h3 style={{ margin: "0 0 4px", fontSize: "1.05rem", fontWeight: 700 }}>Looking for past match logs?</h3>
+              <p style={{ margin: 0, fontSize: "0.84rem", color: "var(--muted)", lineHeight: 1.4 }}>
                 View complete move-by-move histories and stats from previous games.
               </p>
             </div>
-            <Link href="/history" className="button button--secondary">
+            <Link href="/history" className="button button--secondary" style={{ whiteSpace: "nowrap" }}>
               View Match History →
             </Link>
           </div>

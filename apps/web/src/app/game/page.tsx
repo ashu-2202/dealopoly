@@ -3,7 +3,7 @@
 import { useState, use, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card } from "../_components/card";
+import { Card, CardBack } from "../_components/card";
 import { CardLoader } from "../_components/card-loader";
 import { GameOverSummary } from "../_components/game-over-summary";
 import {
@@ -11,7 +11,7 @@ import {
   getRoomSession,
 } from "../../lib/session";
 import { useGameClient } from "../../lib/use-game-client";
-import type { CardColor } from "@dealopoly/shared";
+import type { CardColor, CardDefinition } from "@dealopoly/shared";
 import { COLOR_CONFIG } from "@dealopoly/shared";
 import { type CardInstance, type PropertySet, calculateSetRent } from "@dealopoly/game-engine";
 
@@ -69,6 +69,7 @@ export default function GamePage(props: {
   const [paymentSelectedIds, setPaymentSelectedIds] = useState<string[]>([]);
   const [discardSelectedIds, setDiscardSelectedIds] = useState<string[]>([]);
   const [viewingOpponentId, setViewingOpponentId] = useState<string | null>(null);
+  const [viewingBankPlayerId, setViewingBankPlayerId] = useState<string | null>(null);
 
   // Card Draw Flight Animation State
   const [flyingCards, setFlyingCards] = useState<
@@ -716,8 +717,15 @@ export default function GamePage(props: {
           <div className="game-player-table-stage">
             {/* Player Assets Row */}
             <div className="game-player-assets-row">
-              {/* Bank Panel */}
-              <div className="game-bank-panel">
+              {/* Bank Panel (Fixed Size & Clickable) */}
+              <div
+                className="game-bank-panel"
+                onClick={() => setViewingBankPlayerId(actualPlayerId)}
+                role="button"
+                tabIndex={0}
+                aria-label="View banked cash cards"
+                title="Click to view bank vault"
+              >
                 <div className="game-bank-header">
                   <span className="game-bank-title">YOUR BANK</span>
                   <span className="game-bank-count-pill">{you?.bank?.length || 0} cards</span>
@@ -727,18 +735,11 @@ export default function GamePage(props: {
                   <span className="game-bank-total">${you?.bankTotal || 0}M</span>
                 </div>
 
-                <div className="game-bank-cards-fan">
-                  {you?.bank?.length === 0 ? (
-                    <span style={{ fontSize: "0.68rem", color: "var(--outline)", padding: "2px 0" }}>
-                      No banked cash
-                    </span>
-                  ) : (
-                    you?.bank.map((card) => (
-                      <span key={card.instanceId} className="game-bank-card-mini">
-                        {card.name} (${card.value}M)
-                      </span>
-                    ))
-                  )}
+                <div className="game-bank-view-btn">
+                  <span>View cards</span>
+                  <span className="material-symbols-outlined" style={{ fontSize: "13px" }}>
+                    open_in_new
+                  </span>
                 </div>
               </div>
 
@@ -1830,28 +1831,47 @@ export default function GamePage(props: {
 
       {/* Exit Game Confirmation Dialog */}
       {isExitDialogOpen && (
-        <div className="game-card-mobile-modal" onClick={() => setIsExitDialogOpen(false)}>
-          <div
-            className="game-card-mobile-sheet"
-            onClick={(e) => e.stopPropagation()}
-            style={{ padding: "24px", minHeight: "auto", position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "90%", maxWidth: "400px", borderRadius: "16px" }}
-          >
-            <h3 style={{ margin: "0 0 12px 0", fontSize: "1.2rem", fontWeight: "bold" }}>
-              Leave Game?
-            </h3>
-            <p style={{ margin: "0 0 24px 0", fontSize: "0.9rem", color: "var(--on-surface-variant)", lineHeight: 1.5 }}>
-              {isLocal
-                ? "Are you sure you want to exit? Your solo game progress will be lost."
-                : (roomInfo?.hostPlayerId === actualPlayerId 
-                  ? "Are you sure you want to leave? Because you are the Host, this will instantly end the game for everyone."
-                  : "Are you sure you want to leave? A bot will take over your seat for the remainder of the game."
-                )}
-            </p>
-            <div style={{ display: "flex", gap: "12px" }}>
+        <div className="join-dialog-overlay" role="dialog" aria-modal="true" style={{ zIndex: 300 }}>
+          <div className="dialog-scrim" onClick={() => setIsExitDialogOpen(false)} />
+          <div className="dialog-panel" style={{ maxWidth: "420px" }}>
+            <div className="texture-overlay" />
+            <div className="sheet-handle" />
+
+            <div className="dialog-header">
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span className="material-symbols-outlined" style={{ color: "#ef4444", fontSize: "24px" }}>
+                  logout
+                </span>
+                <h2 style={{ fontSize: "1.15rem", margin: 0 }}>Leave Game?</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsExitDialogOpen(false)}
+                aria-label="Close dialog"
+                className="dialog-close-btn"
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>
+                  close
+                </span>
+              </button>
+            </div>
+
+            <div className="dialog-body" style={{ padding: "20px" }}>
+              <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--on-surface-variant)", lineHeight: 1.5 }}>
+                {isLocal
+                  ? "Are you sure you want to exit? Your solo game progress will be lost."
+                  : (roomInfo?.hostPlayerId === actualPlayerId 
+                    ? "Are you sure you want to leave? Because you are the Host, this will instantly end the game for everyone."
+                    : "Are you sure you want to leave? A bot will take over your seat for the remainder of the game."
+                  )}
+              </p>
+            </div>
+
+            <div className="dialog-footer" style={{ gap: "10px" }}>
               <button
                 type="button"
                 className="button button--secondary"
-                style={{ flex: 1 }}
+                style={{ flex: 1, justifyContent: "center" }}
                 onClick={() => setIsExitDialogOpen(false)}
               >
                 Cancel
@@ -1859,7 +1879,7 @@ export default function GamePage(props: {
               <button
                 type="button"
                 className="button button--primary"
-                style={{ flex: 1, backgroundColor: "#ef4444", color: "#fff", border: "none" }}
+                style={{ flex: 1, justifyContent: "center", backgroundColor: "#ef4444", color: "#fff", border: "none" }}
                 onClick={() => {
                   setIsExitDialogOpen(false);
                   handleExitGame();
@@ -2764,14 +2784,8 @@ export default function GamePage(props: {
             }}
           >
             <div className="game-flying-card-inner">
+              <CardBack size="sm" isInteractive={false} />
               <div className="game-flying-card-sheen" />
-              <div className="game-flying-card-border-pattern" />
-              <div className="game-flying-card-brand">
-                <span className="material-symbols-outlined" style={{ fontSize: "28px", color: "#a8c8ff" }}>
-                  playing_cards
-                </span>
-                <span className="game-flying-card-logo">DEALOPOLY</span>
-              </div>
             </div>
           </motion.div>
         ))}
@@ -2810,9 +2824,16 @@ export default function GamePage(props: {
 
               {/* Exact replica of bottom table layout but for opponent */}
               <div className="dialog-body">
-                <div className="game-player-assets-row" style={{ minHeight: "220px" }}>
-                  {/* Bank Panel */}
-                  <div className="game-bank-panel">
+                <div className="game-player-assets-row" style={{ minHeight: "auto", alignItems: "flex-start" }}>
+                  {/* Bank Panel (Fixed Size & Clickable) */}
+                  <div
+                    className="game-bank-panel"
+                    onClick={() => setViewingBankPlayerId(opp.id)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`View ${opp.name}'s banked cash cards`}
+                    title={`Click to view ${opp.name}'s bank vault`}
+                  >
                     <div className="game-bank-header">
                       <span className="game-bank-title">BANK</span>
                       <span className="game-bank-count-pill">{opp.bank.length} cards</span>
@@ -2822,18 +2843,11 @@ export default function GamePage(props: {
                       <span className="game-bank-total">${opp.bankTotal}M</span>
                     </div>
 
-                    <div className="game-bank-cards-fan" style={{ flexWrap: "wrap", justifyContent: "center" }}>
-                      {opp.bank.length === 0 ? (
-                        <span style={{ fontSize: "0.68rem", color: "var(--outline)", padding: "2px 0" }}>
-                          No banked cash
-                        </span>
-                      ) : (
-                        opp.bank.map((card) => (
-                          <span key={card.instanceId} className="game-bank-card-mini">
-                            {card.name} (${card.value}M)
-                          </span>
-                        ))
-                      )}
+                    <div className="game-bank-view-btn">
+                      <span>View cards</span>
+                      <span className="material-symbols-outlined" style={{ fontSize: "13px" }}>
+                        open_in_new
+                      </span>
                     </div>
                   </div>
 
@@ -2850,7 +2864,8 @@ export default function GamePage(props: {
                       </div>
                     </div>
 
-                    <div className="game-properties-sets-grid">
+                    {/* horizontal scroll so stacked fan columns sit side by side */}
+                    <div className="game-properties-sets-grid opp-sets-grid--dialog">
                       {opp.propertySets.length === 0 ? (
                         <span style={{ fontSize: "0.7rem", color: "var(--outline)", padding: "4px 0" }}>
                           No property sets laid down yet.
@@ -2858,29 +2873,80 @@ export default function GamePage(props: {
                       ) : (
                         opp.propertySets.map((set) => {
                           const colorHex = COLOR_CONFIG[set.color as CardColor]?.hex || "#0055A4";
+                          // Count visible cards (properties + house/hotel chips)
+                          const totalCardCount = set.cards.length + (set.hasHouse ? 1 : 0) + (set.hasHotel ? 1 : 0);
+                          // Height of stacked fan: first card full height + offsets for remaining cards
+                          const CARD_H = 160; // px at xs font-size
+                          const OFFSET = 28; // px per card stacked below
+                          const stackH = CARD_H + (totalCardCount - 1) * OFFSET;
 
                           return (
                             <div
                               key={set.setId}
-                              className={`game-property-set-box ${set.isComplete ? "game-property-set-box--complete" : ""}`}
+                              className={`opp-property-set-stack ${set.isComplete ? "opp-property-set-stack--complete" : ""}`}
+                              style={{
+                                borderColor: colorHex,
+                                minHeight: stackH + 24,
+                              }}
                             >
-                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `2px solid ${colorHex}`, paddingBottom: "2px" }}>
-                                <span style={{ fontSize: "0.68rem", fontWeight: 800, color: colorHex, textTransform: "uppercase" }}>
+                              {/* Color label + count badge */}
+                              <div className="opp-property-set-label" style={{ color: colorHex }}>
+                                <span style={{ textTransform: "uppercase", fontWeight: 800, fontSize: "0.62rem" }}>
                                   {set.color}
                                 </span>
-                                <span style={{ fontFamily: "var(--mono)", fontSize: "0.68rem", fontWeight: 700 }}>
-                                  {set.cards.length}/{set.setSize} {set.isComplete && "★"}
+                                <span style={{ fontFamily: "var(--mono)", fontSize: "0.6rem", opacity: 0.8 }}>
+                                  {set.cards.length}/{set.setSize}{set.isComplete && " ★"}
                                 </span>
                               </div>
 
-                              <div style={{ display: "flex", flexDirection: "column", gap: "2px", fontSize: "0.64rem", color: "var(--muted)" }}>
-                                {set.cards.map((c) => (
-                                  <span key={c.instanceId} style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "120px" }}>
-                                    • {c.name}
-                                  </span>
+                              {/* Stacked card fan */}
+                              <div className="opp-property-set-fan" style={{ height: stackH }}>
+                                {set.cards.map((c, idx) => (
+                                  <div
+                                    key={c.instanceId}
+                                    className="opp-fan-card"
+                                    style={{
+                                      top: idx * OFFSET,
+                                      zIndex: idx,
+                                    }}
+                                  >
+                                    <Card
+                                      card={c as unknown as CardDefinition}
+                                      size="xs"
+                                      isInteractive={false}
+                                    />
+                                  </div>
                                 ))}
-                                {set.hasHouse && <span style={{ color: "#66df75", fontWeight: 700 }}>🏠 House (+$3M)</span>}
-                                {set.hasHotel && <span style={{ color: "#ffb77d", fontWeight: 700 }}>🏨 Hotel (+$4M)</span>}
+                                {/* House chip */}
+                                {set.hasHouse && (
+                                  <div
+                                    className="opp-fan-card opp-fan-upgrade"
+                                    style={{
+                                      top: set.cards.length * OFFSET,
+                                      zIndex: set.cards.length,
+                                      background: "#16a34a",
+                                      borderColor: "#4ade80",
+                                    }}
+                                  >
+                                    <span style={{ fontSize: "1.1rem" }}>🏠</span>
+                                    <span style={{ fontSize: "0.58rem", fontWeight: 800, color: "#86efac", marginTop: "2px" }}>+$3M</span>
+                                  </div>
+                                )}
+                                {/* Hotel chip */}
+                                {set.hasHotel && (
+                                  <div
+                                    className="opp-fan-card opp-fan-upgrade"
+                                    style={{
+                                      top: (set.cards.length + (set.hasHouse ? 1 : 0)) * OFFSET,
+                                      zIndex: set.cards.length + (set.hasHouse ? 1 : 0),
+                                      background: "#b45309",
+                                      borderColor: "#fbbf24",
+                                    }}
+                                  >
+                                    <span style={{ fontSize: "1.1rem" }}>🏨</span>
+                                    <span style={{ fontSize: "0.58rem", fontWeight: 800, color: "#fde68a", marginTop: "2px" }}>+$4M</span>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           );
@@ -2956,6 +3022,7 @@ export default function GamePage(props: {
       {isDiscardInspectorOpen && (
         <div className="discard-inspector-modal" onClick={() => setIsDiscardInspectorOpen(false)}>
           <div className="discard-inspector-box" onClick={(e) => e.stopPropagation()}>
+            <div className="sheet-handle" />
             <div className="discard-inspector-header">
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <span className="material-symbols-outlined" style={{ color: "var(--primary)", fontSize: "22px" }}>
@@ -3033,6 +3100,98 @@ export default function GamePage(props: {
           </div>
         </div>
       )}
+
+      {/* Bank Cards Vault Modal / Mobile Bottom Sheet Drawer */}
+      {viewingBankPlayerId && (() => {
+        const bankPlayer =
+          viewingBankPlayerId === "self" || viewingBankPlayerId === you?.id || viewingBankPlayerId === actualPlayerId
+            ? you
+            : (gameState.players[viewingBankPlayerId] ||
+               Object.values(gameState.players).find((p) => p.id === viewingBankPlayerId));
+
+        if (!bankPlayer) return null;
+        const isSelf = bankPlayer.id === you?.id || bankPlayer.id === actualPlayerId;
+
+        return (
+          <div
+            className="game-bank-modal-overlay"
+            onClick={() => setViewingBankPlayerId(null)}
+          >
+            <div
+              className="game-bank-modal-container"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sheet-handle game-mobile-only" />
+              <div className="game-bank-modal-header">
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div className="game-bank-modal-icon-wrap">
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ fontSize: "22px", fontVariationSettings: "'FILL' 1", color: "#66df75" }}
+                    >
+                      account_balance
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="game-bank-modal-title">
+                      {isSelf ? "Your Bank Vault" : `${bankPlayer.name}'s Bank Vault`}
+                    </h3>
+                    <div className="game-bank-modal-subtitle">
+                      <span style={{ color: "#66df75", fontWeight: 800 }}>${bankPlayer.bankTotal}M Total Cash</span>
+                      <span>•</span>
+                      <span>{bankPlayer.bank.length} {bankPlayer.bank.length === 1 ? "Card" : "Cards"}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="game-icon-btn"
+                  onClick={() => setViewingBankPlayerId(null)}
+                  title="Close Vault"
+                  aria-label="Close"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+                    close
+                  </span>
+                </button>
+              </div>
+
+              <div className="game-bank-modal-body">
+                {bankPlayer.bank.length === 0 ? (
+                  <div className="game-bank-modal-empty">
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ fontSize: "44px", color: "var(--outline)", opacity: 0.5 }}
+                    >
+                      savings
+                    </span>
+                    <p style={{ margin: "8px 0 0", color: "var(--muted)", fontSize: "0.9rem", fontWeight: 600 }}>
+                      No cash or action cards deposited in this bank vault yet.
+                    </p>
+                    <span style={{ fontSize: "0.76rem", color: "var(--outline)", marginTop: "4px" }}>
+                      Bank money cards on your turn to protect your assets and pay rents!
+                    </span>
+                  </div>
+                ) : (
+                  <div className="game-bank-modal-grid">
+                    {bankPlayer.bank.map((c, i) => (
+                      <div key={`${c.instanceId}-${i}`} className="game-bank-modal-card-item">
+                        <Card
+                          card={c as unknown as CardDefinition}
+                          size="sm"
+                          isInteractive={false}
+                        />
+                        <span className="game-bank-modal-card-val">${c.value}M Cash</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

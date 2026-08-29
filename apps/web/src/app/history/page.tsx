@@ -1,9 +1,11 @@
 import React from "react";
 import Link from "next/link";
+import { MarketingNav } from "../_components/marketing-nav";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db, games, rooms, players, eq, desc, sql } from "@dealopoly/db";
 import { UserNav } from "../_components/user-nav";
+import { BackButton } from "../_components/back-button";
 
 export default async function MatchHistoryPage() {
   const session = await auth();
@@ -32,27 +34,13 @@ export default async function MatchHistoryPage() {
   return (
     <div className="marketing-page" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Navigation */}
-      <header className="marketing-nav">
-        <Link className="brand" href="/" aria-label="Dealopoly home">
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-            playing_cards
-          </span>
-          <span>dealopoly</span>
-        </Link>
-        <nav className="marketing-nav-center" aria-label="Main navigation">
-          <Link href="/cards">Card Catalogue</Link>
-          <Link href="/profile">My Profile</Link>
-          <Link href="/lobby">Play Game</Link>
-        </nav>
-        <div className="marketing-nav-actions">
-          <UserNav />
-        </div>
-      </header>
+      <MarketingNav activeTab="history" />
 
       {/* Main Content */}
       <main style={{ flex: 1, padding: "48px 16px" }}>
         <div className="shell" style={{ maxWidth: "880px", margin: "0 auto" }}>
           <div style={{ marginBottom: "28px" }}>
+            <BackButton fallbackUrl="/profile" label="Back to Profile" variant="subtle" style={{ marginBottom: "12px" }} />
             <h1 style={{ fontFamily: "var(--display)", fontSize: "2rem", fontWeight: 800, margin: "0 0 6px" }}>
               Match History
             </h1>

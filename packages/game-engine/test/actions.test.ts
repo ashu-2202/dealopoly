@@ -204,8 +204,8 @@ describe("Action Cards & Banking", () => {
         setId: "bob-set-brown",
         color: "brown",
         cards: [
-          { instanceId: "b1", defId: "prop-old-kent-road", name: "Old Kent Road", type: "property", value: 1 },
-          { instanceId: "b2", defId: "prop-whitechapel-road", name: "Whitechapel Road", type: "property", value: 1 },
+          { instanceId: "b1", defId: "prop-mediterranean-avenue", name: "Mediterranean Avenue", type: "property", value: 1 },
+          { instanceId: "b2", defId: "prop-baltic-avenue", name: "Baltic Avenue", type: "property", value: 1 },
         ],
         hasHouse: false,
         hasHotel: false,

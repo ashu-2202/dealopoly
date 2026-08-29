@@ -171,17 +171,6 @@ export function HeroCardShowcase() {
           );
         })}
       </div>
-
-      {/* Floating Status Pill */}
-      <motion.div
-        className="hero-showcase-badge"
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-      >
-        <span className="hero-showcase-badge-dot" />
-        <span>Hover cards to inspect mechanics • 3 Sets to Win</span>
-      </motion.div>
     </div>
   );
 }

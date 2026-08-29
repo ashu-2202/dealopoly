@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { fetchStatsApi, type ServerStats } from "../lib/api";
+import { MarketingNav } from "./_components/marketing-nav";
 import { JoinRoomDialog } from "./_components/join-room-dialog";
 import { PlayBotsDialog } from "./_components/play-bots-dialog";
 import { HeroCardShowcase } from "./_components/hero-card-showcase";
-import { UserNav } from "./_components/user-nav";
 
 const features = [
   {
@@ -55,35 +56,27 @@ const howToPlaySteps = [
 export default function HomePage() {
   const [isJoinOpen, setIsJoinOpen] = useState(false);
   const [isBotsOpen, setIsBotsOpen] = useState(false);
+  const [stats, setStats] = useState<ServerStats | null>(null);
+
+  useEffect(() => {
+    fetchStatsApi().then(setStats).catch(() => {});
+    const interval = setInterval(() => {
+      fetchStatsApi().then(setStats).catch(() => {});
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const serversOnline = stats ? stats.serversOnline : true;
+  const playerLabel = stats
+    ? stats.onlinePlayers > 0
+      ? `${stats.onlinePlayers.toLocaleString()} ${stats.onlinePlayers === 1 ? "Player" : "Players"} Online`
+      : `${Math.max(stats.totalPlayers, 1).toLocaleString()} ${Math.max(stats.totalPlayers, 1) === 1 ? "Player" : "Players"}`
+    : "Checking Players...";
 
   return (
     <div className="marketing-page">
       {/* TopAppBar */}
-      <header className="marketing-nav">
-        <Link className="brand" href="/" aria-label="Dealopoly home">
-          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-            playing_cards
-          </span>
-          <span>dealopoly</span>
-        </Link>
-
-        <nav className="marketing-nav-center" aria-label="Main navigation">
-          <Link href="/cards">Card Catalogue</Link>
-          <a href="#how-to-play">How to play</a>
-          <a href="#rules">Rules</a>
-          <a href="#features">About</a>
-        </nav>
-
-        <div className="marketing-nav-actions">
-          <button type="button" className="nav-action-btn" aria-label="Help">
-            <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>help</span>
-          </button>
-          <button type="button" className="nav-action-btn" aria-label="Settings">
-            <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>settings</span>
-          </button>
-          <UserNav />
-        </div>
-      </header>
+      <MarketingNav activeTab="home" />
 
       {/* Main Content */}
       <main>
@@ -92,8 +85,15 @@ export default function HomePage() {
           {/* Hero Copy & 3 Actions */}
           <div className="hero-copy">
             <div className="hero-badge">
-              <span className="badge-dot" />
-              <span className="badge-text">Servers Online • 1,204 Players</span>
+              <span
+                className="badge-dot"
+                style={{
+                  background: serversOnline ? "#10b981" : "#f59e0b",
+                }}
+              />
+              <span className="badge-text">
+                {serversOnline ? "Servers Online" : "Connecting..."} • {playerLabel}
+              </span>
             </div>
 
             <h1 id="page-title" className="text-glow">
@@ -215,9 +215,9 @@ export default function HomePage() {
           <p>© 2026 Dealopoly. Deal your way to victory.</p>
 
           <div className="footer-links">
-            <a href="#how-to-play">How to play</a>
-            <a href="#rules">Rules</a>
-            <a href="#features">Support</a>
+            <Link href="/how-to-play">How to play</Link>
+            <Link href="/how-to-play#rules">Rules</Link>
+            <a href="#features">About</a>
             <a
               href="https://github.com"
               target="_blank"

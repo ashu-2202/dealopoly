@@ -10,6 +10,33 @@ export interface CardProps {
   onClick?: () => void;
 }
 
+export interface CardBackProps {
+  size?: "xs" | "sm" | "md" | "lg";
+  isInteractive?: boolean;
+  className?: string;
+  onClick?: () => void;
+}
+
+export function CardBack({
+  size = "md",
+  isInteractive = false,
+  className = "",
+  onClick,
+}: CardBackProps) {
+  return (
+    <div
+      onClick={onClick}
+      className={`monopoly-card monopoly-card--${size} dealopoly-card-back ${
+        isInteractive ? "monopoly-card--interactive" : ""
+      } ${className}`}
+      role="img"
+      aria-label="Dealopoly Card Back"
+    >
+      <div className="card-back-image-fill" />
+    </div>
+  );
+}
+
 export function Card({
   card,
   size = "md",
@@ -24,12 +51,47 @@ export function Card({
     ? COLOR_CONFIG[card.secondaryColor]
     : undefined;
 
-  const primaryHex = primaryConfig?.hex ?? "#0055A4";
+  const primaryHex = primaryConfig?.hex ?? (card.type === "money" ? "#1F8A4C" : "#0055A4");
+  const darkHex = primaryConfig?.darkHex ?? (card.type === "money" ? "#0E522B" : "#002F5E");
   const secondaryHex = secondaryConfig?.hex;
   const isDarkText =
     primaryConfig?.textHex === "#111415" ||
     card.primaryColor === "yellow" ||
     card.primaryColor === "light-blue";
+
+  // Category label for the header
+  const categoryLabel =
+    card.tagline ||
+    (card.type === "property"
+      ? "PROPERTY"
+      : card.type === "property-wild"
+      ? "WILD PROPERTY"
+      : card.type === "action"
+      ? "ACTION"
+      : card.type === "rent"
+      ? "RENT"
+      : card.type === "money"
+      ? "MONEY"
+      : "RULES");
+
+  // Default icons for top-left coin
+  const coinIcon =
+    card.icon ||
+    (card.type === "property"
+      ? card.primaryColor === "railroad"
+        ? "train"
+        : card.primaryColor === "utility"
+        ? "bolt"
+        : "location_city"
+      : card.type === "property-wild"
+      ? "auto_awesome"
+      : card.type === "action"
+      ? "bolt"
+      : card.type === "rent"
+      ? "payments"
+      : card.type === "money"
+      ? "attach_money"
+      : "help");
 
   return (
     <div
@@ -37,476 +99,239 @@ export function Card({
       style={
         {
           "--card-color": primaryHex,
+          "--card-color-dark": darkHex,
           "--card-color-secondary": secondaryHex,
+          "--card-text-color": isDarkText ? "#111415" : "#FFFFFF",
         } as React.CSSProperties
       }
-      className={`monopoly-card monopoly-card--${size} ${
+      className={`monopoly-card monopoly-card--${size} monopoly-card--${card.type} ${
         isInteractive ? "monopoly-card--interactive" : ""
       } ${className}`}
+      role="img"
+      aria-label={card.name}
     >
       {/* Texture Noise Overlay */}
-      <div
-        className="texture-overlay"
-        style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}
-      />
+      <div className="texture-overlay" />
 
-      {/* Top Right Value Badge */}
-      {card.value > 0 && (
-        <div className="card-value-badge">
-          <span>${card.value}M</span>
-        </div>
-      )}
-
-      {/* ============================================================ */}
-      {/* 1. PROPERTY CARD DESIGN (Matches uploaded reference photo)   */}
-      {/* ============================================================ */}
-      {card.type === "property" && (
-        <>
-          {/* Header Color Banner */}
-          <div
-            className={`card-header-banner ${
-              isDarkText
-                ? "card-header-banner--dark-text"
-                : "card-header-banner--light-text"
-            }`}
-          >
-            {/* Top Left Icon Circle */}
-            <div className="card-icon-badge">
-              <span
-                className="material-symbols-outlined"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                {card.icon || "location_city"}
-              </span>
-            </div>
-
-            {/* Category Tag */}
-            <div className="card-category-tag">
-              <span>{card.tagline || "PROPERTY"}</span>
-            </div>
-
-            {/* Card Main Title */}
-            <h3 className="card-title-text">{card.name}</h3>
-
-            {/* Bottom Chevron Star Point Cutout */}
-            <div className="card-header-star">
-              <span
-                className="material-symbols-outlined"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                star
-              </span>
-            </div>
-          </div>
-
-          {/* Center Rent Section */}
-          <div className="card-rent-section">
-            <div className="card-rent-title">
-              <span>RENT</span>
-            </div>
-            <p className="card-rent-subtitle">
-              Collect rent from the player who has this card in their hand.
-            </p>
-
-            {/* Rent Breakdown Table */}
-            <div className="card-rent-table">
-              {card.rentTiers?.map((tier) => (
-                <div key={tier.setCount} className="rent-table-row">
-                  <div className="rent-row-label">
-                    <span>
-                      {tier.setCount} {tier.setCount === 1 ? "SET" : "SETS"}
-                    </span>
-                    {tier.isComplete && (
-                      <span className="rent-row-complete">(COMPLETE)</span>
-                    )}
-                  </div>
-                  <div className="rent-row-icon">
-                    <span
-                      className="material-symbols-outlined"
-                      style={{ fontVariationSettings: "'FILL' 1" }}
-                    >
-                      payments
-                    </span>
-                  </div>
-                  <span className="rent-row-val">M{tier.rent}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Accent Divider */}
-          <div className="card-center-divider">
-            <span>◆</span>
-          </div>
-
-          {/* Bottom Set Size Bar & Cityscape Watermark */}
-          <div className="card-bottom-bar">
-            {/* Detailed City Skyline Silhouette */}
-            <div
-              className="card-skyline-watermark"
-              style={{
-                backgroundImage:
-                  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 50' fill='%239E9689'%3E%3Cpath d='M0,50 L0,36 L12,36 L12,24 L18,24 L18,14 L24,14 L24,50 L34,50 L34,18 L40,8 L46,18 L46,50 L64,50 L64,30 L74,30 L74,50 L92,50 L92,20 L102,20 L102,50 L118,50 L118,28 L128,28 L128,50 L144,50 L144,15 L150,5 L156,15 L156,50 Z'/%3E%3C/svg%3E\")",
-              }}
-            />
-
-            <div className="card-set-size-wrap">
-              <div className="card-set-size-circle">
-                <span className="card-set-size-number">{card.setSize ?? 2}</span>
-              </div>
-              <div className="card-set-size-text">
-                <strong>PROPERTY</strong>
-                <small>SET SIZE</small>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* ============================================================ */}
-      {/* 2. PROPERTY WILD CARD DESIGN                                 */}
-      {/* ============================================================ */}
-      {card.type === "property-wild" && (
-        <>
-          <div
-            className="card-header-banner"
-            style={
-              card.primaryColor === "all"
-                ? {
-                    background:
-                      "linear-gradient(135deg, #8B4513 0%, #87CEEB 15%, #D83A8F 30%, #F28C28 45%, #ED1B24 60%, #FFDE00 75%, #008000 90%, #0055A4 100%)",
-                    color: "#FFFFFF",
-                  }
-                : secondaryHex
-                  ? {
-                      background: `linear-gradient(135deg, ${primaryHex} 50%, ${secondaryHex} 50%)`,
-                      color: "#FFFFFF",
-                    }
-                  : {
-                      backgroundColor: primaryHex,
-                      color: "#FFFFFF",
-                    }
-            }
-          >
-            <div className="card-category-tag">
-              <span>{card.tagline || "PROPERTY WILD CARD"}</span>
-            </div>
-            <h3 className="card-title-text" style={{ color: "#FFFFFF" }}>
-              {card.name}
-            </h3>
-          </div>
-
-          <div className="card-rent-section">
-            <div
-              className="card-icon-badge"
-              style={{
-                position: "static",
-                width: "48px",
-                height: "48px",
-                marginBottom: "8px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
-              }}
-            >
-              <span
-                className="material-symbols-outlined"
-                style={{
-                  fontSize: "26px",
-                  color: primaryHex,
-                  fontVariationSettings: "'FILL' 1",
-                }}
-              >
-                {card.icon || "auto_awesome"}
-              </span>
-            </div>
-            <p
-              className="card-rent-subtitle"
-              style={{ fontSize: "0.72rem", color: "#222", fontWeight: 500 }}
-            >
-              {card.description}
-            </p>
-          </div>
-
-          <div
-            className="card-bottom-bar"
-            style={{ justifyContent: "center", textAlign: "center" }}
-          >
-            <span
-              style={{
-                fontFamily: "var(--mono)",
-                fontSize: "0.62rem",
-                fontWeight: 700,
-                color: "#555",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-              }}
-            >
-              Part of any matching set
-            </span>
-          </div>
-        </>
-      )}
-
-      {/* ============================================================ */}
-      {/* 3. ACTION CARD DESIGN                                        */}
-      {/* ============================================================ */}
-      {card.type === "action" && (
-        <div className="card-action-frame">
-          <div className="card-action-badge">{card.tagline || "ACTION"}</div>
-
-          <div className="card-action-center">
-            <div className="card-action-icon-circle">
-              <span className="material-symbols-outlined">
-                {card.icon || "handshake"}
-              </span>
-            </div>
-            <h3 className="card-action-title">{card.name}</h3>
-            <div className="card-action-desc-box">
-              <p>{card.description}</p>
-            </div>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              borderTop: "1px solid rgba(0, 85, 164, 0.25)",
-              paddingTop: "4px",
-              fontFamily: "var(--mono)",
-              fontSize: "0.65rem",
-              color: "#555",
-            }}
-          >
-            <span>BANK: ${card.value}M</span>
-            <strong style={{ color: "#0055A4" }}>ACTION</strong>
-          </div>
-        </div>
-      )}
-
-      {/* ============================================================ */}
-      {/* 4. RENT CARD DESIGN                                          */}
-      {/* ============================================================ */}
-      {card.type === "rent" && (
-        <div className="card-rent-frame">
-          <div
-            className="card-header-banner"
-            style={
-              card.primaryColor === "all"
-                ? {
-                    background:
-                      "linear-gradient(135deg, #8B4513 0%, #87CEEB 15%, #D83A8F 30%, #F28C28 45%, #ED1B24 60%, #FFDE00 75%, #008000 90%, #0055A4 100%)",
-                    color: "#FFFFFF",
-                  }
-                : secondaryHex
-                  ? {
-                      background: `linear-gradient(135deg, ${primaryHex} 50%, ${secondaryHex} 50%)`,
-                      color: "#FFFFFF",
-                    }
-                  : {
-                      backgroundColor: primaryHex,
-                      color: "#FFFFFF",
-                    }
-            }
-          >
-            <div className="card-category-tag">
-              <span>RENT</span>
-            </div>
-            <h3 className="card-title-text" style={{ color: "#FFFFFF" }}>
-              {card.name}
-            </h3>
-          </div>
-
-          <div className="card-action-center">
-            <div
-              className="card-icon-badge"
-              style={{
-                position: "static",
-                width: "46px",
-                height: "46px",
-                marginBottom: "8px",
-                background: "rgba(39, 166, 68, 0.15)",
-                color: "#27A644",
-              }}
-            >
-              <span
-                className="material-symbols-outlined"
-                style={{ fontSize: "24px", fontVariationSettings: "'FILL' 1" }}
-              >
-                payments
-              </span>
-            </div>
-            <div className="card-action-desc-box" style={{ borderColor: "#27A644" }}>
-              <p>{card.description}</p>
-            </div>
-          </div>
-
-          <div
-            className="card-bottom-bar"
-            style={{ justifyContent: "center", textAlign: "center" }}
-          >
-            <span
-              style={{
-                fontFamily: "var(--mono)",
-                fontSize: "0.62rem",
-                fontWeight: 700,
-                color: "#555",
-              }}
-            >
-              Charge rent to players
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* ============================================================ */}
-      {/* 5. MONEY CARD DESIGN                                         */}
-      {/* ============================================================ */}
-      {card.type === "money" && (
-        <div className="card-money-frame">
-          {/* Background Currency Pattern */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              opacity: 0.18,
-              pointerEvents: "none",
-              backgroundImage:
-                "radial-gradient(#fff 1.5px, transparent 1.5px), radial-gradient(#fff 1.5px, transparent 1.5px)",
-              backgroundSize: "14px 14px",
-              backgroundPosition: "0 0, 7px 7px",
-            }}
-          />
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              position: "relative",
-              zIndex: 3,
-            }}
-          >
-            <span className="card-money-corner-val">${card.value}M</span>
-            <span className="card-money-corner-val">${card.value}M</span>
-          </div>
-
-          <div className="card-money-center-seal">
+      {/* Inner Card Frame */}
+      <div className="card-inner-frame">
+        {/* ============================================================ */}
+        {/* 1. TOP ARCHED HEADER BANNER                                  */}
+        {/* ============================================================ */}
+        <div
+          className={`card-arched-header ${
+            isDarkText ? "card-arched-header--dark-text" : "card-arched-header--light-text"
+          }`}
+          style={
+            card.primaryColor === "all"
+              ? {
+                  background:
+                    "linear-gradient(135deg, #8B4513 0%, #87CEEB 15%, #D83A8F 30%, #F28C28 45%, #ED1B24 60%, #FFDE00 75%, #008000 90%, #0055A4 100%)",
+                  color: "#FFFFFF",
+                }
+              : secondaryHex
+              ? {
+                  background: `linear-gradient(135deg, ${primaryHex} 50%, ${secondaryHex} 50%)`,
+                  color: "#FFFFFF",
+                }
+              : undefined
+          }
+        >
+          {/* Top-Left Circular Building / Category Coin Badge */}
+          <div className="card-header-coin card-header-coin--left">
             <span
               className="material-symbols-outlined"
               style={{ fontVariationSettings: "'FILL' 1" }}
             >
-              attach_money
+              {coinIcon}
             </span>
-            <strong>${card.value}M</strong>
           </div>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              transform: "rotate(180deg)",
-              position: "relative",
-              zIndex: 3,
-            }}
-          >
-            <span className="card-money-corner-val">${card.value}M</span>
-            <span className="card-money-corner-val">${card.value}M</span>
-          </div>
-        </div>
-      )}
+          {/* Top-Right Money Value Badge (Symmetrically Aligned) */}
+          {card.value > 0 && (
+            <div className="card-header-coin card-header-coin--right">
+              <span>${card.value}M</span>
+            </div>
+          )}
 
-      {/* ============================================================ */}
-      {/* 6. RULE CARD DESIGN                                          */}
-      {/* ============================================================ */}
-      {card.type === "rule" && (
-        <div
-          style={{
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            border: "2px solid #8C919D",
-            borderRadius: "12px",
-            padding: "10px",
-            background: "rgba(255,255,255,0.85)",
-            zIndex: 2,
-          }}
-        >
-          <div
-            style={{
-              background: "#323536",
-              color: "#FFFFFF",
-              borderRadius: "8px",
-              padding: "6px 8px",
-              textAlign: "center",
-            }}
-          >
+          {/* Category Tag */}
+          <span className="card-header-category">{categoryLabel}</span>
+
+          {/* Main Card Title */}
+          <h3 className="card-header-title">{card.name}</h3>
+
+          {/* Overlapping Gold Star Emblem at Bottom of Header */}
+          <div className="card-header-star-emblem">
             <span
-              style={{
-                fontFamily: "var(--mono)",
-                fontSize: "0.62rem",
-                color: "#A8C8FF",
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                fontWeight: 700,
-              }}
+              className="material-symbols-outlined card-star-icon"
+              style={{ fontVariationSettings: "'FILL' 1" }}
             >
-              QUICK REFERENCE
+              star
             </span>
-            <h3
-              style={{
-                fontFamily: "var(--display)",
-                fontSize: "0.85rem",
-                fontWeight: 900,
-                textTransform: "uppercase",
-                marginTop: "2px",
-              }}
-            >
-              Rules of Play
-            </h3>
-          </div>
-
-          <div
-            style={{
-              margin: "auto 0",
-              padding: "8px 0",
-              fontSize: "0.68rem",
-              lineHeight: 1.4,
-              color: "#222",
-              display: "flex",
-              flexDirection: "column",
-              gap: "4px",
-            }}
-          >
-            <p>
-              <strong>1. Draw:</strong> Take 2 cards from deck.
-            </p>
-            <p>
-              <strong>2. Play:</strong> Up to 3 cards per turn.
-            </p>
-            <p>
-              <strong>3. Bank:</strong> Action and Money cards go to bank.
-            </p>
-            <p>
-              <strong>4. Win:</strong> 3 complete property sets!
-            </p>
-          </div>
-
-          <div
-            style={{
-              textAlign: "center",
-              fontFamily: "var(--mono)",
-              fontSize: "0.58rem",
-              color: "#666",
-              borderTop: "1px solid #CCC",
-              paddingTop: "4px",
-            }}
-          >
-            Monopoly Deal Official Deck
           </div>
         </div>
-      )}
+
+        {/* ============================================================ */}
+        {/* 2. CARD BODY SECTION                                         */}
+        {/* ============================================================ */}
+        <div className="card-body-section">
+          {/* Property Card Body */}
+          {card.type === "property" && (
+            <>
+              <div className="card-body-heading">RENT</div>
+              <p className="card-body-subtitle">
+                Collect rent from the player who has this card in their hand.
+              </p>
+              <div className="card-rent-table-box">
+                <div className="card-rent-table-title">Rent Value Table</div>
+                <div className="card-rent-table-rows">
+                  {card.rentTiers?.map((tier) => (
+                    <div key={tier.setCount} className="card-rent-row">
+                      <span className="card-rent-set-label">
+                        {tier.setCount} {tier.setCount === 1 ? "SET" : "SETS"}
+                        {tier.isComplete && (
+                          <span className="card-rent-complete-badge"> (COMPLETE)</span>
+                        )}
+                      </span>
+                      <span className="card-rent-amount">M{tier.rent}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Property Wild Card Body */}
+          {card.type === "property-wild" && (
+            <>
+              <div className="card-body-heading">WILD PROPERTY</div>
+              <p className="card-body-subtitle">
+                {card.description || "Can be part of either matching color set. Swap colors freely on your turn."}
+              </p>
+              <div className="card-wild-indicator-box">
+                {card.primaryColor === "all" ? (
+                  <div className="card-wild-rainbow-text">★ 10-COLOR MULTI-WILD ★</div>
+                ) : (
+                  <div className="card-wild-dual-tags">
+                    <span
+                      className="card-wild-dual-pill"
+                      style={{ background: primaryHex, color: isDarkText ? "#111" : "#FFF" }}
+                    >
+                      {primaryConfig?.name || "Color 1"}
+                    </span>
+                    <span className="card-wild-dual-divider">⇄</span>
+                    <span
+                      className="card-wild-dual-pill"
+                      style={{ background: secondaryHex || primaryHex, color: "#FFF" }}
+                    >
+                      {secondaryConfig?.name || "Color 2"}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Action Card Body */}
+          {card.type === "action" && (
+            <>
+              <div className="card-action-icon-badge">
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  {coinIcon}
+                </span>
+              </div>
+              <div className="card-action-desc-box">
+                <p className="card-action-description-text">{card.description}</p>
+              </div>
+              <div className="card-action-bank-val">
+                <span>BANK VALUE: ${card.value}M</span>
+              </div>
+            </>
+          )}
+
+          {/* Rent Card Body */}
+          {card.type === "rent" && (
+            <>
+              <div className="card-body-heading">RENT ACTION</div>
+              <div className="card-rent-icon-badge">
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  payments
+                </span>
+              </div>
+              <div className="card-action-desc-box">
+                <p className="card-action-description-text">{card.description}</p>
+              </div>
+            </>
+          )}
+
+          {/* Money Card Body */}
+          {card.type === "money" && (
+            <div className="card-money-banknote">
+              <div className="card-money-banknote-inner">
+                <div className="card-money-banknote-corner-tl">${card.value}M</div>
+                <div className="card-money-banknote-corner-tr">${card.value}M</div>
+                <div className="card-money-banknote-center">
+                  <span
+                    className="material-symbols-outlined"
+                    style={{ fontSize: "1.4em", fontVariationSettings: "'FILL' 1" }}
+                  >
+                    attach_money
+                  </span>
+                  <span className="card-money-banknote-amount">${card.value}M</span>
+                  <span className="card-money-banknote-label">DEALOPOLY CASH</span>
+                </div>
+                <div className="card-money-banknote-corner-bl">${card.value}M</div>
+                <div className="card-money-banknote-corner-br">${card.value}M</div>
+              </div>
+            </div>
+          )}
+
+          {/* Rule Card Body */}
+          {card.type === "rule" && (
+            <div className="card-rule-body">
+              <div className="card-body-heading">RULES OF PLAY</div>
+              <ul className="card-rule-list">
+                <li><strong>1. Draw:</strong> 2 cards from deck.</li>
+                <li><strong>2. Play:</strong> Up to 3 cards per turn.</li>
+                <li><strong>3. Bank:</strong> Action & Money go to bank.</li>
+                <li><strong>4. Win:</strong> 3 full property sets!</li>
+              </ul>
+            </div>
+          )}
+        </div>
+
+        {/* ============================================================ */}
+        {/* 3. CARD FOOTER WITH SKYLINE & PLINTH & BRAND TAB             */}
+        {/* ============================================================ */}
+        <div className="card-footer-zone">
+          {/* Skyline Silhouette Watermark */}
+          <div
+            className="card-skyline-vector"
+            style={{
+              backgroundImage:
+                "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 50' fill='%23B8ACA0'%3E%3Cpath d='M0,50 L0,36 L12,36 L12,24 L18,24 L18,14 L24,14 L24,50 L34,50 L34,18 L40,8 L46,18 L46,50 L64,50 L64,30 L74,30 L74,50 L92,50 L92,20 L102,20 L102,50 L118,50 L118,28 L128,28 L128,50 L144,50 L144,15 L150,5 L156,15 L156,50 Z'/%3E%3C/svg%3E\")",
+            }}
+          />
+
+          {/* Center Plinth / Emblem */}
+          <div className="card-bottom-plinth">
+            <div className="card-plinth-circle">
+              <span>{card.setSize ?? (card.value > 0 ? card.value : "★")}</span>
+            </div>
+          </div>
+
+          {/* Bottom Brand Pill Tab */}
+          <div className="card-bottom-brand-pill">
+            DEALOPOLY
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useMemo, useEffect, useState } from "react";
 import Link from "next/link";
+import { Brand } from "./brand";
 import type { GameState, MaskedGameState, CardInstance, PropertySet } from "@dealopoly/game-engine";
 import { COLOR_CONFIG } from "@dealopoly/shared";
 
@@ -315,10 +316,7 @@ export function GameOverSummary({
       {/* Top App Bar Header */}
       <header className="victory-top-bar">
         <div className="victory-top-brand">
-          <Link href="/" className="brand brand--app">
-            <span className="brand-mark">D</span>
-            <span>dealopoly</span>
-          </Link>
+          <Brand className="brand brand--app" />
         </div>
         <div className="victory-top-actions">
           <Link href="/lobby" className="victory-icon-btn" title="Back to Lobby">

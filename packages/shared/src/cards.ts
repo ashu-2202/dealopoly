@@ -40,6 +40,7 @@ export interface CardDefinition {
   icon?: string;
   isWild?: boolean;
   colors?: CardColor[];
+  imageUrl?: string;
 }
 
 export const COLOR_CONFIG: Record<
@@ -149,8 +150,8 @@ export const CARD_CATALOGUE: CardDefinition[] = [
   // ==========================================
   // Brown (2)
   {
-    id: "prop-old-kent-road",
-    name: "Old Kent Road",
+    id: "prop-mediterranean-avenue",
+    name: "Mediterranean Avenue",
     type: "property",
     primaryColor: "brown",
     value: 1,
@@ -164,8 +165,8 @@ export const CARD_CATALOGUE: CardDefinition[] = [
     icon: "location_city",
   },
   {
-    id: "prop-whitechapel-road",
-    name: "Whitechapel Road",
+    id: "prop-baltic-avenue",
+    name: "Baltic Avenue",
     type: "property",
     primaryColor: "brown",
     value: 1,

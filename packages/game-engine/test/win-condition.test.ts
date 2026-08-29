@@ -17,8 +17,8 @@ describe("Win Condition Validation", () => {
         setId: "set-brown",
         color: "brown",
         cards: [
-          { instanceId: "c1", defId: "prop-old-kent-road", name: "Old Kent Road", type: "property", value: 1 },
-          { instanceId: "c2", defId: "prop-whitechapel-road", name: "Whitechapel Road", type: "property", value: 1 },
+          { instanceId: "c1", defId: "prop-mediterranean-avenue", name: "Mediterranean Avenue", type: "property", value: 1 },
+          { instanceId: "c2", defId: "prop-baltic-avenue", name: "Baltic Avenue", type: "property", value: 1 },
         ],
         hasHouse: false,
         hasHotel: false,

@@ -53,6 +53,22 @@ export class RoomManager {
     }
   }
 
+  public getStats(): { activeRooms: number; onlinePlayers: number; totalRooms: number } {
+    let onlinePlayers = 0;
+    let activeRooms = 0;
+    for (const room of this.rooms.values()) {
+      if (room.status === "in_progress" || room.status === "lobby") {
+        activeRooms++;
+        onlinePlayers += room.seats.filter((s) => s.isConnected && !s.isBot).length;
+      }
+    }
+    return {
+      activeRooms,
+      onlinePlayers,
+      totalRooms: this.rooms.size,
+    };
+  }
+
   /**
    * Generates a 6-digit numeric room code
    */
@@ -145,8 +161,8 @@ export class RoomManager {
 
     this.rooms.set(code, room);
 
-    // Persist to Neon Postgres
-    await this.safeDb(async () => {
+    // Persist to Neon Postgres asynchronously
+    void this.safeDb(async () => {
       // 1. Insert host player & bot players
       await db.insert(players).values([
         {
@@ -223,8 +239,8 @@ export class RoomManager {
 
     this.broadcastRoomInfo(room);
 
-    // Persist to Neon Postgres
-    await this.safeDb(async () => {
+    // Persist to Neon Postgres asynchronously
+    void this.safeDb(async () => {
       await db.insert(players).values({
         id: playerId,
         userId: options?.userId ?? null,
@@ -279,8 +295,8 @@ export class RoomManager {
     room.lastActivityAt = Date.now();
     this.broadcastRoomInfo(room);
 
-    // Persist to Neon Postgres
-    await this.safeDb(async () => {
+    // Persist to Neon Postgres asynchronously
+    void this.safeDb(async () => {
       await db.insert(players).values({
         id: botPlayerId,
         displayName: botName,
@@ -331,8 +347,8 @@ export class RoomManager {
     room.lastActivityAt = Date.now();
     this.broadcastRoomInfo(room);
 
-    // Persist to Neon Postgres
-    await this.safeDb(async () => {
+    // Persist to Neon Postgres asynchronously
+    void this.safeDb(async () => {
       if (room.id) {
         await db
           .delete(roomSeats)
@@ -393,8 +409,8 @@ export class RoomManager {
     this.broadcastRoomInfo(room);
     this.broadcastGameState(room);
 
-    // Persist to Neon Postgres
-    await this.safeDb(async () => {
+    // Persist to Neon Postgres asynchronously
+    void this.safeDb(async () => {
       if (room.id) {
         // 1. Create games record
         await db.insert(games).values({
@@ -459,8 +475,8 @@ export class RoomManager {
     room.lastActivityAt = Date.now();
     this.broadcastGameState(room, result.events);
 
-    // Persist to Neon Postgres
-    await this.safeDb(async () => {
+    // Persist to Neon Postgres asynchronously
+    void this.safeDb(async () => {
       const dbGameId = room.dbGameId;
       if (!dbGameId) return;
 

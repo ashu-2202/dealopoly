@@ -38,6 +38,19 @@ export function createGameServer() {
     timestamp: Date.now(),
   }));
 
+  // Stats endpoint
+  server.get("/api/stats", async () => {
+    const stats = roomManager.getStats();
+    return {
+      service: "dealopoly-game-server",
+      status: "ok",
+      onlinePlayers: stats.onlinePlayers,
+      activeRooms: stats.activeRooms,
+      totalRooms: stats.totalRooms,
+      timestamp: Date.now(),
+    };
+  });
+
   // REST: Create Room
   server.post<{
     Body: { hostName?: string; botCount?: number; userId?: string };

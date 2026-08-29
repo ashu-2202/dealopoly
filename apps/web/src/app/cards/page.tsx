@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { MarketingNav } from "../_components/marketing-nav";
 import { useState, useMemo } from "react";
 import {
   CARD_CATALOGUE,
@@ -70,6 +71,9 @@ const COLOR_FILTERS: { label: string; color: CardColor | "all" }[] = [
   { label: "Utility", color: "utility" },
 ];
 
+import { UserNav } from "../_components/user-nav";
+import { BackButton } from "../_components/back-button";
+
 export default function CardCataloguePage() {
   const [selectedType, setSelectedType] = useState<CardType | "all">("all");
   const [selectedColor, setSelectedColor] = useState<CardColor | "all">("all");
@@ -112,46 +116,14 @@ export default function CardCataloguePage() {
   return (
     <div className="catalogue-page">
       {/* Top Header Navigation */}
-      <header className="marketing-nav">
-        <Link className="brand" href="/" aria-label="Dealopoly home">
-          <span
-            className="material-symbols-outlined"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            playing_cards
-          </span>
-          <span>dealopoly</span>
-        </Link>
-
-        <nav className="marketing-nav-center" aria-label="Main navigation">
-          <Link href="/cards" className="active" style={{ color: "var(--primary)" }}>
-            Card Catalogue
-          </Link>
-          <Link href="/lobby">Game Lobby</Link>
-          <Link href="/#how-to-play">How to play</Link>
-          <Link href="/#rules">Rules</Link>
-        </nav>
-
-        <div className="marketing-nav-actions">
-          <Link
-            href="/lobby"
-            className="button button--primary"
-            style={{ minHeight: "36px", padding: "0 18px", fontSize: "0.85rem" }}
-          >
-            Play Now →
-          </Link>
-        </div>
-      </header>
+      <MarketingNav activeTab="cards" />
 
       {/* Main Container */}
       <main className="catalogue-container">
         {/* Page Title & Stats */}
         <section className="catalogue-header">
           <div className="catalogue-header-copy">
-            <span className="live-pill">
-              <span className="live-pill-dot" />
-              Standard 110-Card Deck
-            </span>
+            <BackButton fallbackUrl="/" label="Back to Home" variant="subtle" style={{ marginBottom: "10px" }} />
             <h1>Card Catalogue</h1>
             <p>
               Explore the complete 110-card deck with authentic color schemes,
@@ -273,7 +245,7 @@ export default function CardCataloguePage() {
           <div className="catalogue-grid">
             {filteredCards.map((card) => (
               <article key={card.id} className="catalogue-card-container">
-                {/* Visual Monopoly Card */}
+                {/* Visual Dealopoly Card */}
                 <Card
                   card={card}
                   size="md"
@@ -308,6 +280,7 @@ export default function CardCataloguePage() {
             className="card-modal-box"
             onClick={(e) => e.stopPropagation()}
           >
+            <div className="sheet-handle" />
             <button
               onClick={() => setActiveCard(null)}
               className="card-modal-close"

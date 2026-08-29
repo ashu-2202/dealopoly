@@ -30,6 +30,7 @@ export {
   and,
   or,
   not,
+  count,
 } from "drizzle-orm";
 
 export type {

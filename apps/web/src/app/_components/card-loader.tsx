@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Card } from "./card";
+import { Card, CardBack } from "./card";
 import type { CardDefinition } from "@dealopoly/shared";
 
 export interface CardLoaderProps {
@@ -84,16 +84,9 @@ export function CardLoader({ size = "md", text, className = "" }: CardLoaderProp
               <div className="card-loader__face card-loader__face--front">
                 <Card card={card} size="sm" isInteractive={false} />
               </div>
-              {/* Back: stylised card back */}
+              {/* Back: Official Dealopoly card back */}
               <div className="card-loader__face card-loader__face--back">
-                <div className="card-loader__card-back">
-                  <div className="card-loader__card-back-inner">
-                    <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      playing_cards
-                    </span>
-                    <span className="card-loader__card-back-text">DEAL</span>
-                  </div>
-                </div>
+                <CardBack size="sm" isInteractive={false} />
               </div>
             </div>
           </div>

@@ -86,3 +86,46 @@ export async function fetchRoomApi(roomCode: string) {
   }
   return res.json();
 }
+
+export interface ServerStats {
+  serversOnline: boolean;
+  onlinePlayers: number;
+  activeRooms: number;
+  totalPlayers: number;
+  totalGames: number;
+}
+
+export async function fetchStatsApi(): Promise<ServerStats> {
+  try {
+    const res = await fetch("/api/stats", { cache: "no-store" });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {
+    // Fallback to direct game server
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/stats`, { cache: "no-store" });
+    if (res.ok) {
+      const data = await res.json();
+      return {
+        serversOnline: true,
+        onlinePlayers: data.onlinePlayers ?? 0,
+        activeRooms: data.activeRooms ?? 0,
+        totalPlayers: data.onlinePlayers ?? 0,
+        totalGames: data.totalRooms ?? 0,
+      };
+    }
+  } catch {
+    // Both failed
+  }
+
+  return {
+    serversOnline: false,
+    onlinePlayers: 0,
+    activeRooms: 0,
+    totalPlayers: 0,
+    totalGames: 0,
+  };
+}

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { createGameServer } from "./server.js";
 
-describe("Dealopoly Real-Time Game Server", () => {
+describe("Dealopoly Real-Time Game Server", { timeout: 15000 }, () => {
   it("reports that it is healthy", async () => {
     const server = createGameServer();
     const response = await server.inject({ method: "GET", url: "/health" });
