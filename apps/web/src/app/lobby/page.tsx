@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { AppShell } from "../_components/app-shell";
@@ -17,7 +17,7 @@ export default function LobbyPage(props: {
 }) {
   const searchParams = props.searchParams ? use(props.searchParams) : undefined;
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   const urlRoomCode = searchParams?.room || searchParams?.code;
   const urlPlayerName = searchParams?.player;
@@ -28,8 +28,16 @@ export default function LobbyPage(props: {
   const [copyFeedback, setCopyFeedback] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
 
+  // Prevent double-initialization in React Strict Mode
+  const initAttempted = useRef(false);
+
   // Initialize room session
   useEffect(() => {
+    // Wait for auth to initialize so we don't accidentally join anonymously if logged in
+    if (status === "loading") return;
+    if (initAttempted.current) return;
+    initAttempted.current = true;
+
     async function initRoom() {
       const profile = getStoredProfile();
       const playerName = urlPlayerName || session?.user?.name || profile.name;
@@ -80,7 +88,7 @@ export default function LobbyPage(props: {
     }
 
     initRoom();
-  }, [urlRoomCode, urlPlayerName, session, router]);
+  }, [urlRoomCode, urlPlayerName, session, status, router]);
 
   const { isConnected, roomInfo, lastError, addBot, removePlayer, startGame } =
     useGameSocket({
@@ -297,6 +305,25 @@ export default function LobbyPage(props: {
               Waiting for host to start the game...
             </div>
           )}
+
+          <button
+            className="button button--full"
+            type="button"
+            style={{
+              marginTop: "8px",
+              background: "transparent",
+              border: "1px solid var(--outline)",
+              color: "var(--on-surface-variant)",
+            }}
+            onClick={() => {
+              if (window.confirm("Are you sure you want to leave the room?")) {
+                removePlayer(playerId);
+                router.push("/");
+              }
+            }}
+          >
+            Leave room
+          </button>
 
           {seats.length < 2 && (
             <p className="start-hint">Add at least one more player or bot to begin.</p>
