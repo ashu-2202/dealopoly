@@ -10,8 +10,16 @@ export function createGameServer() {
   const server = Fastify({ logger: true });
   const roomManager = new RoomManager();
 
-  // Register plugins
-  server.register(cors, { origin: true });
+  // Register plugins with permissive CORS for all origins
+  server.register(cors, {
+    origin: (origin, cb) => {
+      // Allow any origin (Vercel frontend, local dev, custom domains)
+      cb(null, true);
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    credentials: true,
+  });
   server.register(fastifyWebsocket);
 
   // Hook to hydrate active rooms from Postgres when server is ready
