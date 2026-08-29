@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dealopoly - Card Catalogue</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#111415",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed": "#2f1500",
+                        "on-secondary-fixed-variant": "#00531a",
+                        "on-primary-fixed-variant": "#004689",
+                        "on-surface-variant": "#c2c6d3",
+                        "primary": "#a8c8ff",
+                        "surface-bright": "#373a3b",
+                        "tertiary": "#ffb77d",
+                        "on-background": "#e1e3e4",
+                        "on-primary-container": "#afccff",
+                        "surface-container-highest": "#323536",
+                        "primary-container": "#0055a4",
+                        "primary-fixed": "#d5e3ff",
+                        "outline": "#8c919d",
+                        "on-secondary-fixed": "#002106",
+                        "primary-fixed-dim": "#a8c8ff",
+                        "on-error-container": "#ffdad6",
+                        "secondary-container": "#27a644",
+                        "surface-variant": "#323536",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "on-primary": "#003061",
+                        "inverse-surface": "#e1e3e4",
+                        "on-tertiary-container": "#ffbc87",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "background": "#111415",
+                        "secondary": "#66df75",
+                        "secondary-fixed-dim": "#66df75",
+                        "outline-variant": "#424751",
+                        "on-surface": "#e1e3e4",
+                        "tertiary-fixed": "#ffdcc3",
+                        "surface-container-low": "#191c1d",
+                        "surface-container-high": "#282a2b",
+                        "inverse-on-surface": "#2e3132",
+                        "on-error": "#690005",
+                        "surface-tint": "#a8c8ff",
+                        "secondary-fixed": "#83fc8e",
+                        "surface-container-lowest": "#0c0f10",
+                        "surface-container": "#1d2021",
+                        "on-tertiary": "#4d2600",
+                        "surface-dim": "#111415",
+                        "on-secondary-container": "#00320c",
+                        "on-secondary": "#00390f",
+                        "tertiary-container": "#834500",
+                        "error": "#ffb4ab",
+                        "inverse-primary": "#175ead",
+                        "on-primary-fixed": "#001b3c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "sm": "8px",
+                        "xl": "48px",
+                        "lg": "24px",
+                        "card-overlap": "-32px",
+                        "container-max": "1440px",
+                        "xs": "4px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "title-md": ["Montserrat"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "label-sm": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .texture-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        
+        .card-inner-shadow {
+            box-shadow: inset 0 0 0 8px rgba(255,255,255,0.9), 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .card-bg-light {
+            background-color: #f4f1ea;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-md overflow-x-hidden">
+<!-- Top Navigation from Shared Components -->
+<nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-lg py-md md:px-xl bg-surface dark:bg-surface shadow-sm">
+<div class="flex items-center gap-lg">
+<h1 class="text-title-md font-title-md font-bold text-primary dark:text-primary tracking-tight">Dealopoly</h1>
+</div>
+<div class="flex items-center gap-md">
+<button aria-label="Settings" class="text-on-surface-variant hover:text-primary transition-colors duration-200">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button aria-label="Help" class="text-on-surface-variant hover:text-primary transition-colors duration-200">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-outline">
+<img alt="Current player avatar" class="w-full h-full object-cover" data-alt="A small avatar icon of a high-end competitive card game player, minimalist modern vector style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDSfTabpeVQvmdrUwFaHRnV-szw2ScJkDjfaKE8gACSXkpo9vJT9W-cVcEEHseMAic5qLKEuHNOLBs95668KuIW7liapTNoOFc0ZEDmXUxEoHO8JcvH_3BLwbidvK1amH--qBqHRH8fh5GORh8UGbstrtHEYFQ6PRPHOY-LZf0fHwxhi9zg2ZBGSwy7gly8cv7Y2nBY9T7rZXDx2XL9yawpXt-2ngdL2txDX6sY-IRu6hailpMHEDRoA"/>
+</div>
+</div>
+</nav>
+<!-- Side Navigation / Layout Wrapper -->
+<div class="flex flex-1 pt-[72px]">
+<!-- Side Navigation -->
+<aside class="hidden lg:flex flex-col h-full p-md gap-md docked full-height left-0 w-64 bg-surface-container-low border-r border-outline-variant fixed top-[72px] bottom-0 z-40">
+<div class="mb-lg">
+<h2 class="text-title-md font-title-md font-bold text-on-surface">Player 1</h2>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Rank: Pro Dealer</p>
+</div>
+<nav class="flex-1 space-y-sm">
+<a class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant rounded-lg px-md py-sm transition-all" href="#">
+<span class="material-symbols-outlined">casino</span>
+<span class="text-label-sm font-label-sm">Play</span>
+</a>
+<a class="flex items-center gap-md bg-primary-container text-on-primary-container rounded-lg px-md py-sm transition-transform active:scale-95 translate-x-1" href="#">
+<span class="material-symbols-outlined">meeting_room</span>
+<span class="text-label-sm font-label-sm">Rooms</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant rounded-lg px-md py-sm transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-label-sm font-label-sm">Friends</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant rounded-lg px-md py-sm transition-all" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="text-label-sm font-label-sm">History</span>
+</a>
+</nav>
+<div class="mt-auto pt-md border-t border-outline-variant">
+<a class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant rounded-lg px-md py-sm transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-label-sm font-label-sm">Settings</span>
+</a>
+<button class="w-full mt-md bg-primary text-on-primary py-sm rounded-lg font-title-md text-sm font-bold shadow-[0_2px_0_0_#003061] active:translate-y-[2px] active:shadow-none transition-all">
+                    New Game
+                </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 lg:ml-64 p-md lg:p-xl flex flex-col gap-xl w-full max-w-container-max mx-auto overflow-y-auto">
+<!-- Header & Controls -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-md">
+<div>
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg font-bold text-on-surface tracking-tight mb-sm">Card Catalogue</h1>
+<p class="text-body-md text-on-surface-variant max-w-2xl">Browse the complete 110-card deck. Master the properties, actions, and currency to dominate the table.</p>
+</div>
+<div class="flex w-full md:w-auto gap-sm">
+<div class="relative flex-1 md:w-64">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-high border border-outline-variant text-on-surface rounded-lg pl-xl pr-sm py-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-label-sm font-label-sm placeholder:text-on-surface-variant" placeholder="Search cards..." type="text"/>
+</div>
+<button class="bg-surface-container-high border border-outline-variant hover:bg-surface-variant text-on-surface rounded-lg px-md py-sm flex items-center gap-xs transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+<span class="text-label-sm font-label-sm hidden sm:inline">Filter</span>
+</button>
+</div>
+</header>
+<!-- Card Grid Layout (Bento-style mixed sizes for visual interest) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-lg pb-xl">
+<!-- Property Card: New York Avenue (Orange) -->
+<div class="relative aspect-[2.5/3.5] rounded-xl overflow-hidden card-inner-shadow card-bg-light text-surface group hover:-translate-y-2 transition-transform duration-300">
+<div class="absolute inset-0 texture-overlay"></div>
+<!-- Header Color Bar -->
+<div class="h-[35%] bg-[#F28C28] rounded-t-lg mx-sm mt-sm flex flex-col items-center justify-center p-sm relative clip-property">
+<div class="absolute top-sm left-sm w-8 h-8 bg-white rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[#F28C28]">location_city</span>
+</div>
+<div class="text-[10px] tracking-widest font-bold uppercase text-white mb-1 flex items-center gap-2">
+<span class="w-4 h-px bg-white"></span>
+                            Property
+                            <span class="w-4 h-px bg-white"></span>
+</div>
+<h3 class="text-title-md font-title-md font-black text-[#111] text-center leading-tight uppercase">New York<br/>Avenue</h3>
+<!-- Decorative Star Point -->
+<div class="absolute -bottom-3 left-1/2 -translate-x-1/2 w-8 h-6 bg-white clip-star-point flex items-start justify-center pt-1">
+<span class="material-symbols-outlined text-[#F28C28] text-[14px]">star</span>
+</div>
+</div>
+<!-- Rent Info -->
+<div class="pt-6 px-lg flex flex-col items-center flex-1">
+<h4 class="text-title-md font-title-md font-bold text-[#111] tracking-wider mb-2">RENT</h4>
+<p class="text-label-sm text-center text-[#444] mb-4">Collect rent from the player who has this card in their hand.</p>
+<div class="w-full border border-[#ddd] rounded-lg p-sm mb-4"><div class="flex justify-between items-center py-1 border-b border-dashed border-[#ddd]"><span class="font-bold text-sm">1 SET</span><span class="material-symbols-outlined text-[#F28C28] text-[16px]">payments</span><span class="font-bold text-title-md">$1M</span></div><div class="flex justify-between items-center py-1 border-b border-dashed border-[#ddd]"><span class="font-bold text-sm">2 SETS</span><span class="material-symbols-outlined text-[#F28C28] text-[16px]">payments</span><span class="font-bold text-title-md">$2M</span></div><div class="flex justify-between items-center py-1"><span class="font-bold text-sm flex flex-col leading-none">3 SETS <span class="text-[8px] font-normal">(COMPLETE)</span></span><span class="material-symbols-outlined text-[#F28C28] text-[16px]">payments</span><span class="font-bold text-title-md">$3M</span></div></div>
+</div>
+<!-- Bottom Indicator -->
+<div class="absolute bottom-4 left-4 right-4 bg-[#e8e4db] rounded-lg p-2 flex items-center border border-[#d0cbbb]">
+<div class="w-10 h-10 rounded-full border-[3px] border-[#111] flex items-center justify-center relative overflow-hidden bg-white">
+<div class="absolute inset-1 rounded-full border border-dashed border-[#F28C28]"></div>
+<span class="font-title-md font-bold text-xl text-[#F28C28]">3</span>
+</div>
+<div class="ml-3 flex flex-col leading-tight">
+<span class="font-bold text-sm tracking-wide">PROPERTY</span>
+<span class="text-xs">SET SIZE</span>
+</div>
+</div>
+<div class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full border-2 border-[#F28C28] flex items-center justify-center z-10 shadow-sm"><span class="text-[10px] font-bold text-[#F28C28]">$3M</span></div></div>
+<!-- Action Card: Deal Breaker -->
+<div class="relative aspect-[2.5/3.5] rounded-xl overflow-hidden card-inner-shadow card-bg-light text-surface group hover:-translate-y-2 transition-transform duration-300">
+<div class="absolute inset-0 texture-overlay"></div>
+<div class="h-full m-sm border-2 border-primary-container rounded-lg p-md flex flex-col items-center justify-center relative">
+<div class="absolute top-4 left-1/2 -translate-x-1/2 bg-primary-container text-white px-4 py-1 rounded-full text-xs font-bold tracking-widest uppercase">
+                            Action
+                        </div>
+<div class="w-20 h-20 bg-primary-container rounded-full flex items-center justify-center text-white mb-6 shadow-lg shadow-primary-container/30">
+<span class="material-symbols-outlined text-[40px]">handshake</span>
+</div>
+<h3 class="text-headline-lg-mobile font-headline-lg font-black text-center uppercase text-primary-container leading-none mb-4">Deal<br/>Breaker</h3>
+<div class="bg-white/80 p-sm rounded border border-primary-container/20 text-center text-sm font-medium w-full">
+                            Steal a complete set of properties from any player. (Includes any buildings).
+                        </div>
+<div class="absolute bottom-4 left-4 font-title-md font-bold text-primary-container text-xl border-2 border-primary-container rounded-full w-10 h-10 flex items-center justify-center bg-white">
+                            $5M
+                        </div>
+</div>
+<div class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full border-2 border-primary-container flex items-center justify-center z-10 shadow-sm"><span class="text-[10px] font-bold text-primary-container">$5M</span></div></div>
+<!-- Money Card: $5M -->
+<div class="relative aspect-[2.5/3.5] rounded-xl overflow-hidden card-inner-shadow card-bg-light text-surface group hover:-translate-y-2 transition-transform duration-300">
+<div class="absolute inset-0 texture-overlay"></div>
+<div class="h-full m-sm bg-[#8cd3a8] rounded-lg p-md flex flex-col items-center justify-between border-4 border-white relative overflow-hidden">
+<!-- Background Pattern -->
+<div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_transparent_0%,_#111_150%)]"></div>
+<div class="absolute inset-0" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 10px 10px; opacity: 0.2;"></div>
+<div class="w-full flex justify-between z-10"><span class="font-title-md font-black text-2xl text-white drop-shadow-md">$5M</span><span class="font-title-md font-black text-2xl text-white drop-shadow-md">$5M</span></div>
+<div class="z-10 bg-white w-24 h-24 rounded-full flex items-center justify-center border-4 border-[#5b9e73] shadow-lg"><span class="font-title-md font-black text-2xl text-white drop-shadow-md">$5M</span><span class="font-title-md font-black text-2xl text-white drop-shadow-md">$5M</span></div>
+<div class="z-10 w-full flex justify-between rotate-180"><span class="font-title-md font-black text-2xl text-white drop-shadow-md">$5M</span><span class="font-title-md font-black text-2xl text-white drop-shadow-md">$5M</span></div>
+</div>
+</div>
+<!-- Property Card: Park Lane (Dark Blue) -->
+<div class="relative aspect-[2.5/3.5] rounded-xl overflow-hidden card-inner-shadow card-bg-light text-surface group hover:-translate-y-2 transition-transform duration-300">
+<div class="absolute inset-0 texture-overlay"></div>
+<div class="h-[35%] bg-[#0055A4] rounded-t-lg mx-sm mt-sm flex flex-col items-center justify-center p-sm relative clip-property">
+<div class="text-[10px] tracking-widest font-bold uppercase text-white mb-1 flex items-center gap-2">
+<span class="w-4 h-px bg-white"></span>
+                            Property
+                            <span class="w-4 h-px bg-white"></span>
+</div>
+<h3 class="text-title-md font-title-md font-black text-white text-center leading-tight uppercase">Park<br/>Lane</h3>
+<div class="absolute -bottom-3 left-1/2 -translate-x-1/2 w-8 h-6 bg-white clip-star-point flex items-start justify-center pt-1">
+<span class="material-symbols-outlined text-[#0055A4] text-[14px]">star</span>
+</div>
+</div>
+<div class="pt-6 px-lg flex flex-col items-center flex-1">
+<h4 class="text-title-md font-title-md font-bold text-[#111] tracking-wider mb-2">RENT</h4>
+<div class="w-full border border-[#ddd] rounded-lg p-sm mb-4 mt-2"><div class="flex justify-between items-center py-1 border-b border-dashed border-[#ddd]"><span class="font-bold text-sm">1 SET</span><span class="font-bold text-title-md">$3M</span></div><div class="flex justify-between items-center py-1"><span class="font-bold text-sm flex flex-col leading-none">2 SETS <span class="text-[8px] font-normal">(COMPLETE)</span></span><span class="font-bold text-title-md">$8M</span></div></div>
+</div>
+<div class="absolute bottom-4 left-4 right-4 bg-[#e8e4db] rounded-lg p-2 flex items-center border border-[#d0cbbb]">
+<div class="w-10 h-10 rounded-full border-[3px] border-[#111] flex items-center justify-center relative overflow-hidden bg-white">
+<div class="absolute inset-1 rounded-full border border-dashed border-[#0055A4]"></div>
+<span class="font-title-md font-bold text-xl text-[#0055A4]">2</span>
+</div>
+<div class="ml-3 flex flex-col leading-tight">
+<span class="font-bold text-sm tracking-wide">PROPERTY</span>
+<span class="text-xs">SET SIZE</span>
+</div>
+</div>
+<div class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full border-2 border-[#0055A4] flex items-center justify-center z-10 shadow-sm"><span class="text-[10px] font-bold text-[#0055A4]">$4M</span></div></div>
+<!-- Wild Card: Dark Blue / Green -->
+<div class="relative aspect-[2.5/3.5] rounded-xl overflow-hidden card-inner-shadow card-bg-light text-surface group hover:-translate-y-2 transition-transform duration-300">
+<div class="absolute inset-0 texture-overlay"></div>
+<!-- Split Header -->
+<div class="h-[35%] mx-sm mt-sm relative overflow-hidden rounded-t-lg">
+<div class="absolute inset-0 flex">
+<div class="w-1/2 h-full bg-[#0055A4]"></div>
+<div class="w-1/2 h-full bg-[#27a644]"></div>
+</div>
+<div class="absolute inset-0 flex flex-col items-center justify-center p-sm">
+<div class="text-[10px] tracking-widest font-bold uppercase text-white mb-1 flex items-center gap-2">
+<span class="w-4 h-px bg-white"></span>
+                WILD CARD
+                <span class="w-4 h-px bg-white"></span>
+</div>
+<h3 class="text-title-md font-title-md font-black text-white text-center leading-tight uppercase drop-shadow-md">BLUE / GREEN</h3>
+</div>
+</div>
+<!-- Rent Info -->
+<div class="pt-6 px-lg flex flex-col items-center flex-1">
+<h4 class="text-title-md font-title-md font-bold text-[#111] tracking-wider mb-2">RENT</h4>
+<p class="text-label-sm text-center text-[#444] mb-4">Use as either color to complete a set.</p>
+<div class="w-full border border-[#ddd] rounded-lg p-sm mb-4">
+<div class="flex justify-between items-center py-1">
+<span class="font-bold text-sm">VARIES BY SET</span>
+<span class="font-bold text-title-md">$1M</span>
+</div>
+</div>
+</div>
+<!-- Bottom Indicator -->
+<div class="absolute bottom-4 left-4 right-4 bg-[#e8e4db] rounded-lg p-2 flex items-center border border-[#d0cbbb]">
+<div class="w-10 h-10 rounded-full border-[3px] border-[#111] flex items-center justify-center relative overflow-hidden bg-white">
+<span class="material-symbols-outlined text-[#111] text-xl">published_with_changes</span>
+</div>
+<div class="ml-3 flex flex-col leading-tight">
+<span class="font-bold text-sm tracking-wide">PROPERTY</span>
+<span class="text-xs">WILD CARD</span>
+</div>
+</div>
+<div class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full border-2 border-[#111] flex items-center justify-center z-10 shadow-sm">
+<span class="text-[10px] font-bold text-[#111]">$4M</span>
+</div>
+</div>
+<!-- Wild Card: Pink / Orange -->
+<div class="relative aspect-[2.5/3.5] rounded-xl overflow-hidden card-inner-shadow card-bg-light text-surface group hover:-translate-y-2 transition-transform duration-300">
+<div class="absolute inset-0 texture-overlay"></div>
+<!-- Split Header -->
+<div class="h-[35%] mx-sm mt-sm relative overflow-hidden rounded-t-lg">
+<div class="absolute inset-0 flex">
+<div class="w-1/2 h-full bg-[#ffb77d]"></div>
+<div class="w-1/2 h-full bg-[#F28C28]"></div>
+</div>
+<div class="absolute inset-0 flex flex-col items-center justify-center p-sm">
+<div class="text-[10px] tracking-widest font-bold uppercase text-white mb-1 flex items-center gap-2">
+<span class="w-4 h-px bg-white"></span>
+                WILD CARD
+                <span class="w-4 h-px bg-white"></span>
+</div>
+<h3 class="text-title-md font-title-md font-black text-white text-center leading-tight uppercase drop-shadow-md">PINK / ORANGE</h3>
+</div>
+</div>
+<!-- Rent Info -->
+<div class="pt-6 px-lg flex flex-col items-center flex-1">
+<h4 class="text-title-md font-title-md font-bold text-[#111] tracking-wider mb-2">RENT</h4>
+<p class="text-label-sm text-center text-[#444] mb-4">Use as either color to complete a set.</p>
+<div class="w-full border border-[#ddd] rounded-lg p-sm mb-4">
+<div class="flex justify-between items-center py-1">
+<span class="font-bold text-sm">VARIES BY SET</span>
+<span class="font-bold text-title-md">$1M</span>
+</div>
+</div>
+</div>
+<!-- Bottom Indicator -->
+<div class="absolute bottom-4 left-4 right-4 bg-[#e8e4db] rounded-lg p-2 flex items-center border border-[#d0cbbb]">
+<div class="w-10 h-10 rounded-full border-[3px] border-[#111] flex items-center justify-center relative overflow-hidden bg-white">
+<span class="material-symbols-outlined text-[#111] text-xl">published_with_changes</span>
+</div>
+<div class="ml-3 flex flex-col leading-tight">
+<span class="font-bold text-sm tracking-wide">PROPERTY</span>
+<span class="text-xs">WILD CARD</span>
+</div>
+</div>
+<div class="absolute top-2 right-2 w-8 h-8 bg-white rounded-full border-2 border-[#111] flex items-center justify-center z-10 shadow-sm">
+<span class="text-[10px] font-bold text-[#111]">$2M</span>
+</div>
+</div></div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dealopoly - Game Table</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&amp;family=JetBrains+Mono:wght@500&amp;family=Montserrat:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#00390f",
+                        "error-container": "#93000a",
+                        "primary-container": "#0055a4",
+                        "on-surface": "#e1e3e4",
+                        "surface-bright": "#373a3b",
+                        "tertiary-container": "#834500",
+                        "on-background": "#e1e3e4",
+                        "on-primary": "#003061",
+                        "on-primary-container": "#afccff",
+                        "outline": "#8c919d",
+                        "on-secondary-fixed-variant": "#00531a",
+                        "surface-tint": "#a8c8ff",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "secondary-fixed-dim": "#66df75",
+                        "on-primary-fixed": "#001b3c",
+                        "error": "#ffb4ab",
+                        "surface": "#111415",
+                        "inverse-primary": "#175ead",
+                        "surface-variant": "#323536",
+                        "primary-fixed": "#d5e3ff",
+                        "on-error": "#690005",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "surface-container-highest": "#323536",
+                        "surface-container": "#1d2021",
+                        "on-primary-fixed-variant": "#004689",
+                        "background": "#111415",
+                        "on-secondary-container": "#00320c",
+                        "surface-dim": "#111415",
+                        "on-surface-variant": "#c2c6d3",
+                        "on-secondary-fixed": "#002106",
+                        "tertiary": "#ffb77d",
+                        "primary": "#a8c8ff",
+                        "on-tertiary": "#4d2600",
+                        "primary-fixed-dim": "#a8c8ff",
+                        "tertiary-fixed": "#ffdcc3",
+                        "inverse-surface": "#e1e3e4",
+                        "surface-container-lowest": "#0c0f10",
+                        "outline-variant": "#424751",
+                        "on-tertiary-container": "#ffbc87",
+                        "secondary": "#66df75",
+                        "secondary-container": "#27a644",
+                        "inverse-on-surface": "#2e3132",
+                        "secondary-fixed": "#83fc8e",
+                        "surface-container-high": "#282a2b",
+                        "on-tertiary-fixed": "#2f1500",
+                        "surface-container-low": "#191c1d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "card-overlap": "-32px",
+                        "container-max": "1440px",
+                        "xl": "48px",
+                        "unit": "4px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-lg": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "body-lg": ["Inter"],
+                        "title-md": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .texture-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        /* Custom scrollbar for activity feed */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #424751; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8c919d; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen overflow-hidden flex flex-col font-body-md relative">
+<!-- Top Nav / Header -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-lg py-md md:px-xl bg-surface-container dark:bg-surface-container shadow-sm border-b border-outline-variant/30">
+<div class="text-title-md font-title-md font-bold text-primary dark:text-primary tracking-tight">Dealopoly</div>
+<div class="flex items-center gap-md">
+<span class="text-label-sm font-label-sm px-md py-sm bg-surface-variant rounded-full text-on-surface-variant">Turn: 2/3 Actions</span>
+<button class="material-symbols-outlined text-primary dark:text-primary hover:text-primary transition-colors duration-200" style="font-variation-settings: 'FILL' 0;">settings</button>
+<button class="material-symbols-outlined text-primary dark:text-primary hover:text-primary transition-colors duration-200" style="font-variation-settings: 'FILL' 0;">help</button>
+<img alt="Current player avatar" class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="A small circular avatar placeholder image for the current player, featuring a highly stylized neon geometric profile picture against a dark background, reflecting the modern corporate-gaming aesthetic of Dealopoly. Sharp contrast and subtle glow." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuU7FKHOM-DtnuzKh4a8yx4BfAECbUJ8o5QTchGFIAz3AVotERRzxB-vAJ8_24lN3zfpBbqoPdZPIJoXGzidUQ62I3-j53-JDEAVQtPPpP6pwVvJAN1IOVw6chtBAE8JwFzLYTIvr0OASASbv09gur9t_3nnLTAWPiZCa_NHT5JQ5AjlXqSJuApVjWm1IrSzmnm29z3i-tNJQsEufVW2ZZ-kBZe-pT-zdX7H_Cc8MR5kSXYJzJD9svgw"/>
+</div>
+</header>
+<!-- Side Nav (Hidden on mobile) -->
+<nav class="hidden lg:flex flex-col h-full p-md gap-md fixed top-16 left-0 w-64 bg-surface-container-low border-r border-outline-variant/30 z-40">
+<div class="flex items-center gap-md mb-xl p-sm">
+<img alt="User profile" class="w-12 h-12 rounded-full border-2 border-primary object-cover" data-alt="A stylized player avatar showing a neon blue and green cyber-themed character portrait, high contrast dark background, suitable for a competitive digital board game." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6QLZ050Z2Y8P9k3ibUmOrs6mAFJjGMbVzo4vIldRaiRrV0xeU_9fVZjvfAKLIlJi05hnMtvUO73ntiEJbL-NWUDNOh2g4b4D0uJ1m1wJVv2Qs4HWstulKBUGnHfk4ZkkacNFWB1UdqoWxV79LXeGrlyueUOCu_ComJuFM1YP5gW1ezE7_yo1nRyKsE6FCfQ7i-ez-WUdKFvG9brMoR7Kf1LmLUsspKTI40qn-UI59GGEja8mbixOKgA"/>
+<div>
+<h3 class="text-title-md font-title-md text-on-surface">Player 1</h3>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Rank: Pro Dealer</p>
+</div>
+</div>
+<!-- Tabs -->
+<div class="flex flex-col gap-sm flex-1">
+<button class="flex items-center gap-md bg-primary-container text-on-primary-container rounded-lg px-md py-sm scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">casino</span>
+<span class="text-label-sm font-label-sm">Play</span>
+</button>
+<button class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant rounded-lg px-md py-sm transition-all hover:text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">meeting_room</span>
+<span class="text-label-sm font-label-sm">Rooms</span>
+</button>
+<button class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant rounded-lg px-md py-sm transition-all hover:text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="text-label-sm font-label-sm">Friends</span>
+</button>
+<button class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant rounded-lg px-md py-sm transition-all hover:text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">history</span>
+<span class="text-label-sm font-label-sm">History</span>
+</button>
+</div>
+<div class="mt-auto">
+<button class="w-full bg-primary text-on-primary font-title-md text-title-md py-sm rounded-lg border-b-2 border-on-primary/30 hover:brightness-110 active:border-b-0 active:translate-y-[2px] transition-all">
+                New Game
+            </button>
+<button class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant rounded-lg px-md py-sm transition-all w-full mt-sm hover:text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="text-label-sm font-label-sm">Settings</span>
+</button>
+</div>
+</nav>
+<!-- Main Game Area -->
+<main class="flex-1 mt-16 lg:ml-64 relative flex flex-col md:flex-row bg-background">
+<!-- Central Board Area -->
+<div class="flex-1 flex flex-col relative p-lg">
+<!-- Opponents Row -->
+<div class="flex justify-center gap-xl mb-auto mt-md">
+<!-- Opponent 1 -->
+<div class="flex flex-col items-center gap-sm bg-surface-container-high rounded-xl p-md shadow-sm border border-outline-variant/20">
+<div class="relative">
+<img alt="Opponent 1" class="w-10 h-10 rounded-full border-2 border-outline-variant object-cover" data-alt="A red-themed player avatar portrait, dark background, sharp competitive lighting, highly detailed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuApnG5kWDt3_zpweLJqfmwjR3mZDEfENdv9E6S4Jmpml6TfHBKhc9m6m3mj1LrlbLf-jdqauhOypPfZIFREgiCPTYrjEINAVTG49J_4j0_6alm6vb0PTSKSzDvZ_t0qans8NiHx9bmPUSIN-vqbulP57BAcGqGB7BZ7pPmq2CDYLcHchRmwppNgg7USYta9MQ--wGFzkKp7yencddRtdGNwrkwQz2G7WDUSvl2nOK6edS5jo5hTOGAttg"/>
+<span class="absolute -bottom-1 -right-1 bg-surface text-on-surface text-label-sm font-label-sm px-1 rounded-full border border-outline-variant">5</span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface">P2 (Bank: $12M)</span>
+<!-- Mini Property Indicators -->
+<div class="flex gap-xs mt-1">
+<div class="w-4 h-6 bg-error rounded-sm opacity-80 border border-on-background/20"></div>
+<div class="w-4 h-6 bg-secondary rounded-sm opacity-80 border border-on-background/20"></div>
+</div>
+</div>
+<!-- Opponent 2 -->
+<div class="flex flex-col items-center gap-sm bg-surface-container-high rounded-xl p-md shadow-sm border border-outline-variant/20">
+<div class="relative">
+<img alt="Opponent 2" class="w-10 h-10 rounded-full border-2 border-outline-variant object-cover" data-alt="A purple-themed player avatar portrait, dark background, sharp competitive lighting, highly detailed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzIFp81LidsVspIuKaJC7PyJXSdTa1CTi3C6tJ44zaV9oLTIUSn9H2_Qy4Z-G_m9pG1HLc5MSYCEy8A5JyZVy2PujJvY326Sx6JfYWs_ARI0QGDZG6LM_wmExLYe7T0cD78q2gus2_gLlqxdTKuI121HtIvR7klgXsf3OB_yilFP2WFkwrtPjqk_8mxn4WR2TnSnWI9w9ua_Y8GSaxcLz9ayG02ul2P0s7EH7zAGjiHhokunlmTCZVKw"/>
+<span class="absolute -bottom-1 -right-1 bg-surface text-on-surface text-label-sm font-label-sm px-1 rounded-full border border-outline-variant">3</span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface">P3 (Bank: $4M)</span>
+<!-- Mini Property Indicators -->
+<div class="flex gap-xs mt-1">
+<div class="w-4 h-6 bg-primary rounded-sm opacity-80 border border-on-background/20"></div>
+</div>
+</div>
+</div>
+<!-- The Table Center (Draw / Discard) -->
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex gap-xl items-center bg-surface-container-low p-lg rounded-3xl shadow-inner border border-surface-bright">
+<!-- Draw Pile -->
+<div class="relative w-32 h-48 bg-surface-variant rounded-xl border-2 border-outline-variant shadow-lg flex items-center justify-center cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all">
+<!-- Fake stacking effect -->
+<div class="absolute inset-0 bg-surface-variant rounded-xl border-2 border-outline-variant translate-y-1 translate-x-1 -z-10"></div>
+<div class="absolute inset-0 bg-surface-variant rounded-xl border-2 border-outline-variant translate-y-2 translate-x-2 -z-20"></div>
+<span class="text-headline-lg font-headline-lg text-outline-variant opacity-50 font-bold rotate-45 tracking-tighter">DEAL</span>
+</div>
+<!-- Discard Pile -->
+<div class="relative w-32 h-48 bg-surface rounded-xl border border-outline-variant shadow-lg flex flex-col overflow-hidden">
+<!-- Card Content -->
+<div class="h-8 bg-error flex items-center justify-center border-b border-on-background/20">
+<span class="text-label-sm font-label-sm text-on-error font-bold uppercase">Action</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center p-sm text-center relative">
+<div class="absolute inset-0 texture-overlay"></div>
+<span class="material-symbols-outlined text-4xl text-error mb-1" style="font-variation-settings: 'FILL' 1;">payments</span>
+<span class="text-body-md font-body-md text-on-surface font-bold">Rent</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant mt-auto">Red/Yellow</span>
+</div>
+</div>
+</div>
+<!-- Current Player Zone (Bank & Properties) -->
+<div class="mt-auto mb-32 flex justify-between items-end w-full max-w-4xl mx-auto px-lg">
+<!-- Bank Area -->
+<div class="bg-surface-container p-md rounded-xl border border-outline-variant/30 min-w-[200px] shadow-sm flex flex-col gap-sm">
+<div class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest border-b border-outline-variant/30 pb-1">Bank</div>
+<div class="text-headline-lg font-headline-lg text-secondary">$14M</div>
+<div class="flex gap-[-8px] mt-2">
+<!-- Banked Cards Minified -->
+<div class="w-8 h-12 bg-surface-variant border border-outline-variant rounded-sm flex items-center justify-center z-10 shadow-sm"><span class="text-label-sm text-primary font-bold">5M</span></div>
+<div class="w-8 h-12 bg-surface-variant border border-outline-variant rounded-sm flex items-center justify-center z-20 shadow-sm -ml-4"><span class="text-label-sm text-primary font-bold">4M</span></div>
+<div class="w-8 h-12 bg-surface-variant border border-outline-variant rounded-sm flex items-center justify-center z-30 shadow-sm -ml-4"><span class="text-label-sm text-primary font-bold">5M</span></div>
+</div>
+</div>
+<!-- Active Properties -->
+<div class="flex gap-md bg-surface-container p-md rounded-xl border border-outline-variant/30 shadow-sm">
+<!-- Property Set 1 -->
+<div class="flex flex-col items-center gap-sm">
+<div class="flex space-x-[-16px]">
+<div class="w-16 h-24 bg-surface rounded-lg border border-outline-variant shadow-md flex flex-col overflow-hidden z-10">
+<div class="h-4 bg-primary border-b border-on-background/20"></div>
+<div class="flex-1 flex items-center justify-center"><span class="text-label-sm font-label-sm">$3M</span></div>
+</div>
+<div class="w-16 h-24 bg-surface rounded-lg border border-outline-variant shadow-md flex flex-col overflow-hidden z-20">
+<div class="h-4 bg-primary border-b border-on-background/20"></div>
+<div class="flex-1 flex items-center justify-center"><span class="text-label-sm font-label-sm">$3M</span></div>
+</div>
+</div>
+<span class="bg-surface-variant text-on-surface-variant text-label-sm font-label-sm px-2 py-0.5 rounded-full">2/3</span>
+</div>
+<!-- Property Set 2 (Complete) -->
+<div class="flex flex-col items-center gap-sm">
+<div class="flex space-x-[-16px]">
+<div class="w-16 h-24 bg-surface rounded-lg border-2 border-secondary shadow-md flex flex-col overflow-hidden z-10 relative">
+<div class="absolute inset-0 bg-secondary/10"></div>
+<div class="h-4 bg-secondary border-b border-on-background/20"></div>
+</div>
+<div class="w-16 h-24 bg-surface rounded-lg border-2 border-secondary shadow-md flex flex-col overflow-hidden z-20 relative">
+<div class="absolute inset-0 bg-secondary/10"></div>
+<div class="h-4 bg-secondary border-b border-on-background/20"></div>
+</div>
+</div>
+<span class="bg-secondary text-on-secondary text-label-sm font-label-sm px-2 py-0.5 rounded-full font-bold">2/2</span>
+</div>
+</div>
+<button class="bg-error text-on-error font-title-md text-title-md px-xl py-sm rounded-lg border-b-2 border-on-error/30 hover:brightness-110 active:border-b-0 active:translate-y-[2px] transition-all shadow-md">
+                    End Turn
+                </button>
+</div>
+<!-- Player's Hand -->
+<div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center space-x-card-overlap group/hand z-30 hover:space-x-[-16px] transition-all duration-300">
+<!-- Card 1 (Money) -->
+<div class="w-40 h-64 bg-surface rounded-xl border border-outline-variant shadow-lg hover:-translate-y-8 hover:z-50 hover:shadow-2xl transition-all duration-200 flex flex-col overflow-hidden cursor-pointer relative group/card">
+<div class="absolute inset-0 texture-overlay"></div>
+<div class="absolute inset-0 bg-primary/0 group-hover/card:bg-primary/5 transition-colors"></div>
+<div class="h-10 bg-primary-container flex items-center justify-center border-b border-on-background/20">
+<span class="text-label-sm font-label-sm text-on-primary-container font-bold uppercase tracking-wider">Money</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center p-md">
+<span class="text-display-lg font-display-lg text-primary font-bold">$5M</span>
+</div>
+<div class="p-sm bg-surface-container-highest text-center">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Bank to save</span>
+</div>
+</div>
+<!-- Card 2 (Property) -->
+<div class="w-40 h-64 bg-surface rounded-xl border border-outline-variant shadow-lg hover:-translate-y-8 hover:z-50 hover:shadow-2xl transition-all duration-200 flex flex-col overflow-hidden cursor-pointer relative group/card">
+<div class="absolute inset-0 texture-overlay"></div>
+<div class="absolute inset-0 bg-secondary/0 group-hover/card:bg-secondary/5 transition-colors"></div>
+<div class="h-10 bg-[#3b82f6] flex items-center justify-center border-b border-on-background/20">
+<span class="text-label-sm font-label-sm text-white font-bold uppercase tracking-wider">Property</span>
+</div>
+<div class="flex-1 flex flex-col items-center p-md text-center">
+<span class="material-symbols-outlined text-4xl text-[#3b82f6] mb-2" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-body-lg font-body-lg text-on-surface font-bold leading-tight">Boardwalk</span>
+<span class="text-title-md font-title-md text-primary mt-auto">$4M</span>
+</div>
+</div>
+<!-- Card 3 (Action - Playable state) -->
+<div class="w-40 h-64 bg-surface rounded-xl border-2 border-tertiary shadow-[0_0_15px_rgba(255,183,125,0.3)] hover:-translate-y-8 hover:z-50 hover:shadow-[0_8px_30px_rgba(255,183,125,0.5)] transition-all duration-200 flex flex-col overflow-hidden cursor-pointer relative group/card -translate-y-2">
+<div class="absolute inset-0 texture-overlay"></div>
+<div class="absolute inset-0 bg-tertiary/10"></div>
+<div class="h-10 bg-tertiary flex items-center justify-center border-b border-on-background/20">
+<span class="text-label-sm font-label-sm text-on-tertiary font-bold uppercase tracking-wider">Action</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center p-md text-center">
+<span class="material-symbols-outlined text-4xl text-tertiary mb-2" style="font-variation-settings: 'FILL' 1;">handshake</span>
+<span class="text-title-md font-title-md text-on-surface font-bold leading-tight mb-2">Sly Deal</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Steal a property</span>
+</div>
+</div>
+<!-- Card 4 (Property Wild) -->
+<div class="w-40 h-64 bg-surface rounded-xl border border-outline-variant shadow-lg hover:-translate-y-8 hover:z-50 hover:shadow-2xl transition-all duration-200 flex flex-col overflow-hidden cursor-pointer relative group/card">
+<div class="absolute inset-0 texture-overlay"></div>
+<div class="h-10 bg-gradient-to-r from-error via-secondary to-primary flex items-center justify-center border-b border-on-background/20">
+<span class="text-label-sm font-label-sm text-white font-bold uppercase tracking-wider drop-shadow-md">Wild</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center p-md text-center">
+<span class="material-symbols-outlined text-5xl text-outline mb-2" style="font-variation-settings: 'FILL' 0;">star</span>
+<span class="text-body-md font-body-md text-on-surface font-bold leading-tight">Any Color</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Activity Feed Sidebar (Hidden on mobile) -->
+<aside class="hidden md:flex flex-col w-72 bg-surface-container border-l border-outline-variant/30 h-[calc(100vh-64px)] z-20 shadow-[-4px_0_15px_rgba(0,0,0,0.1)]">
+<div class="p-md border-b border-outline-variant/30 bg-surface-container-high">
+<h2 class="text-title-md font-title-md text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">feed</span>
+                    Activity Log
+                </h2>
+</div>
+<div class="flex-1 overflow-y-auto p-md flex flex-col gap-md">
+<!-- Log Entry 1 -->
+<div class="flex gap-sm">
+<div class="w-2 h-2 rounded-full bg-primary mt-2 shrink-0"></div>
+<div>
+<span class="text-label-sm font-label-sm text-on-surface font-bold">You</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant"> banked $5M.</span>
+<div class="text-[10px] text-outline mt-1">Just now</div>
+</div>
+</div>
+<!-- Log Entry 2 -->
+<div class="flex gap-sm">
+<div class="w-2 h-2 rounded-full bg-error mt-2 shrink-0"></div>
+<div>
+<span class="text-label-sm font-label-sm text-on-surface font-bold">Player 2</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant"> played Rent (Red/Yellow).</span>
+<div class="text-[10px] text-outline mt-1">1m ago</div>
+</div>
+</div>
+<!-- Log Entry 3 -->
+<div class="flex gap-sm">
+<div class="w-2 h-2 rounded-full bg-secondary mt-2 shrink-0"></div>
+<div>
+<span class="text-label-sm font-label-sm text-on-surface font-bold">Player 3</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant"> completed a Green property set!</span>
+<div class="text-[10px] text-outline mt-1">5m ago</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Contextual Action Overlay (Hidden by default, simulating an active prompt) -->
+<!-- Remove hidden class to view -->
+<div class="hidden absolute inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+<div class="bg-surface-container-high p-xl rounded-2xl border border-outline-variant shadow-2xl max-w-md w-full text-center">
+<span class="material-symbols-outlined text-5xl text-tertiary mb-4" style="font-variation-settings: 'FILL' 1;">priority</span>
+<h3 class="text-headline-lg font-headline-lg text-on-surface mb-2">Select a Target</h3>
+<p class="text-body-md font-body-md text-on-surface-variant mb-xl">Choose an opponent's property to steal with your Sly Deal.</p>
+<div class="flex gap-md justify-center">
+<button class="bg-surface-variant text-on-surface px-lg py-sm rounded-lg hover:bg-surface-bright transition-colors text-title-md font-title-md">Cancel</button>
+<!-- In a real app, this would dismiss the modal and enter a targeting state -->
+</div>
+</div>
+</div>
+</main>
+</body></html>

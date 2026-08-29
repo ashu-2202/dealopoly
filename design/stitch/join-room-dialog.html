@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dealopoly - Join Room</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;family=Montserrat:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#001b3c",
+                        "on-tertiary-container": "#ffbc87",
+                        "inverse-on-surface": "#2e3132",
+                        "on-primary-container": "#afccff",
+                        "on-primary-fixed-variant": "#004689",
+                        "surface-container-lowest": "#0c0f10",
+                        "surface-dim": "#111415",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed": "#002106",
+                        "surface-container-high": "#282a2b",
+                        "secondary": "#66df75",
+                        "inverse-primary": "#175ead",
+                        "secondary-fixed": "#83fc8e",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "on-secondary-fixed-variant": "#00531a",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "primary-fixed": "#d5e3ff",
+                        "on-tertiary-fixed": "#2f1500",
+                        "surface-bright": "#373a3b",
+                        "on-tertiary": "#4d2600",
+                        "surface-container-highest": "#323536",
+                        "secondary-container": "#27a644",
+                        "inverse-surface": "#e1e3e4",
+                        "surface-tint": "#a8c8ff",
+                        "tertiary": "#ffb77d",
+                        "on-surface-variant": "#c2c6d3",
+                        "secondary-fixed-dim": "#66df75",
+                        "background": "#111415",
+                        "primary-container": "#0055a4",
+                        "on-secondary-container": "#00320c",
+                        "surface-variant": "#323536",
+                        "on-background": "#e1e3e4",
+                        "outline": "#8c919d",
+                        "on-primary": "#003061",
+                        "tertiary-container": "#834500",
+                        "on-surface": "#e1e3e4",
+                        "surface-container-low": "#191c1d",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#a8c8ff",
+                        "outline-variant": "#424751",
+                        "surface-container": "#1d2021",
+                        "surface": "#111415",
+                        "on-error": "#690005",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed": "#ffdcc3",
+                        "primary-fixed-dim": "#a8c8ff",
+                        "on-secondary": "#00390f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "48px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "container-max": "1440px",
+                        "unit": "4px",
+                        "card-overlap": "-32px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "title-md": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .texture-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        .pressed-effect:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen antialiased flex items-center justify-center relative overflow-hidden">
+<!-- Background element to simulate app underneath -->
+<div class="absolute inset-0 z-0 bg-surface flex flex-col">
+<header class="w-full bg-surface-container shadow-sm px-lg py-md flex justify-between items-center h-20">
+<div class="text-title-md font-title-md font-bold text-primary tracking-tight">Dealopoly</div>
+</header>
+<main class="flex-1 p-lg grid grid-cols-12 gap-md opacity-30">
+<div class="col-span-12 md:col-span-8 bg-surface-container-low rounded-xl h-96 border border-outline-variant"></div>
+<div class="col-span-12 md:col-span-4 bg-surface-container-low rounded-xl h-96 border border-outline-variant"></div>
+</main>
+</div>
+<!-- Blur Overlay -->
+<div class="absolute inset-0 z-10 bg-black/60 backdrop-blur-md"></div>
+<!-- Modal Dialog -->
+<div class="relative z-20 bg-surface-container-high rounded-xl border border-outline-variant shadow-2xl w-[90%] max-w-[440px] overflow-hidden">
+<div class="absolute inset-0 texture-overlay"></div>
+<!-- Header -->
+<div class="flex justify-between items-center px-lg py-md border-b border-outline-variant/30 relative">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Join Game Room</h2>
+<button aria-label="Close" class="text-on-surface-variant hover:text-primary transition-colors duration-200 p-sm rounded-full hover:bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<!-- Body -->
+<div class="p-lg flex flex-col gap-xl relative">
+<div class="flex flex-col gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider" for="roomCode">Room Code</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline" data-icon="meeting_room">meeting_room</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-lg py-md pl-xl pr-md text-on-surface font-label-sm text-body-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-outline-variant/70 tracking-widest uppercase" id="roomCode" maxlength="6" placeholder="Enter 6-digit code" type="text"/>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider" for="playerName">Your Name <span class="text-outline-variant/70 normal-case tracking-normal">(Optional)</span></label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline" data-icon="person">person</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-lg py-md pl-xl pr-md text-on-surface font-body-md text-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-outline-variant/70" id="playerName" placeholder="Guest Player" type="text"/>
+</div>
+</div>
+</div>
+<!-- Footer / Actions -->
+<div class="pt-sm">
+<button class="w-full bg-primary-container text-on-primary-container font-title-md text-title-md py-md rounded-lg hover:bg-primary hover:text-on-primary transition-all shadow-[0_4px_0_0_rgba(0,48,97,0.5)] pressed-effect flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined" data-icon="login">login</span>
+                    Join Room
+                </button>
+</div>
+</div>
+</div>
+</body></html>

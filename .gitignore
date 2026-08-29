@@ -1,0 +1,17 @@
+node_modules
+.next
+dist
+coverage
+.turbo
+.env
+.env.local
+!.env.example
+*.log
+.DS_Store
+.chrome-tmp
+.pnpm-store
+*.orig
+*.rej
+*.tsbuildinfo
+.agents
+.agents/

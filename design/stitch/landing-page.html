@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dealopoly - Deal Your Way to Victory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "on-secondary": "#00390f",
+                            "error-container": "#93000a",
+                            "primary-container": "#0055a4",
+                            "on-surface": "#e1e3e4",
+                            "surface-bright": "#373a3b",
+                            "tertiary-container": "#834500",
+                            "on-background": "#e1e3e4",
+                            "on-primary": "#003061",
+                            "on-primary-container": "#afccff",
+                            "outline": "#8c919d",
+                            "on-secondary-fixed-variant": "#00531a",
+                            "surface-tint": "#a8c8ff",
+                            "on-tertiary-fixed-variant": "#6e3900",
+                            "secondary-fixed-dim": "#66df75",
+                            "on-primary-fixed": "#001b3c",
+                            "error": "#ffb4ab",
+                            "surface": "#111415",
+                            "inverse-primary": "#175ead",
+                            "surface-variant": "#323536",
+                            "primary-fixed": "#d5e3ff",
+                            "on-error": "#690005",
+                            "on-error-container": "#ffdad6",
+                            "tertiary-fixed-dim": "#ffb77d",
+                            "surface-container-highest": "#323536",
+                            "surface-container": "#1d2021",
+                            "on-primary-fixed-variant": "#004689",
+                            "background": "#111415",
+                            "on-secondary-container": "#00320c",
+                            "surface-dim": "#111415",
+                            "on-surface-variant": "#c2c6d3",
+                            "on-secondary-fixed": "#002106",
+                            "tertiary": "#ffb77d",
+                            "primary": "#a8c8ff",
+                            "on-tertiary": "#4d2600",
+                            "primary-fixed-dim": "#a8c8ff",
+                            "tertiary-fixed": "#ffdcc3",
+                            "inverse-surface": "#e1e3e4",
+                            "surface-container-lowest": "#0c0f10",
+                            "outline-variant": "#424751",
+                            "on-tertiary-container": "#ffbc87",
+                            "secondary": "#66df75",
+                            "secondary-container": "#27a644",
+                            "inverse-on-surface": "#2e3132",
+                            "secondary-fixed": "#83fc8e",
+                            "surface-container-high": "#282a2b",
+                            "on-tertiary-fixed": "#2f1500",
+                            "surface-container-low": "#191c1d"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "card-overlap": "-32px",
+                            "container-max": "1440px",
+                            "xl": "48px",
+                            "unit": "4px",
+                            "xs": "4px",
+                            "lg": "24px",
+                            "md": "16px",
+                            "sm": "8px"
+                    },
+                    "fontFamily": {
+                            "body-md": [
+                                    "Inter"
+                            ],
+                            "headline-lg-mobile": [
+                                    "Montserrat"
+                            ],
+                            "label-sm": [
+                                    "JetBrains Mono"
+                            ],
+                            "headline-lg": [
+                                    "Montserrat"
+                            ],
+                            "display-lg": [
+                                    "Montserrat"
+                            ],
+                            "body-lg": [
+                                    "Inter"
+                            ],
+                            "title-md": [
+                                    "Montserrat"
+                            ]
+                    },
+                    "fontSize": {
+                            "body-md": [
+                                    "16px",
+                                    {
+                                            "lineHeight": "24px",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "headline-lg-mobile": [
+                                    "24px",
+                                    {
+                                            "lineHeight": "32px",
+                                            "fontWeight": "700"
+                                    }
+                            ],
+                            "label-sm": [
+                                    "12px",
+                                    {
+                                            "lineHeight": "16px",
+                                            "letterSpacing": "0.05em",
+                                            "fontWeight": "500"
+                                    }
+                            ],
+                            "headline-lg": [
+                                    "32px",
+                                    {
+                                            "lineHeight": "40px",
+                                            "fontWeight": "700"
+                                    }
+                            ],
+                            "display-lg": [
+                                    "48px",
+                                    {
+                                            "lineHeight": "56px",
+                                            "letterSpacing": "-0.02em",
+                                            "fontWeight": "800"
+                                    }
+                            ],
+                            "body-lg": [
+                                    "18px",
+                                    {
+                                            "lineHeight": "28px",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "title-md": [
+                                    "20px",
+                                    {
+                                            "lineHeight": "28px",
+                                            "fontWeight": "600"
+                                    }
+                            ]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .hero-pattern {
+            background-color: #111415;
+            background-image: radial-gradient(circle at center, #1d2021 0%, transparent 100%), 
+                              linear-gradient(rgba(168, 200, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(168, 200, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+        
+        .card-3d {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .card-3d:hover {
+            transform: translateY(-8px) rotateX(5deg) rotateY(-5deg);
+            box-shadow: 0 20px 40px -10px rgba(168, 200, 255, 0.15), 
+                        0 0 20px rgba(168, 200, 255, 0.2);
+        }
+        
+        .glass-panel {
+            background: rgba(40, 42, 43, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(194, 198, 211, 0.1);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 20px rgba(168, 200, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-lg py-md md:px-xl bg-surface dark:bg-surface shadow-sm bg-surface-container dark:bg-surface-container shadow-sm border-b-0 backdrop-blur-md bg-opacity-90">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary text-[32px]" style="font-variation-settings: 'FILL' 1;">playing_cards</span>
+<span class="text-title-md font-title-md font-bold text-primary dark:text-primary tracking-tight">Dealopoly</span>
+</div>
+<div class="flex items-center gap-lg">
+<nav class="hidden md:flex gap-lg">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200" href="#">Rules</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200" href="#">About</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors duration-200 hidden md:flex active:scale-95 transition-transform">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors duration-200 hidden md:flex active:scale-95 transition-transform">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<img alt="Current player avatar" class="w-10 h-10 rounded-full border-2 border-surface-variant hover:border-primary transition-colors cursor-pointer" data-alt="A small, stylized circular avatar image of a digital card player character. High contrast, modern gaming style, dark background, subtle neon blue highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgEEGURpsLPc_le2lVvOAj0jbukjlWbx-ZW3vawwHvfIqd3RbbtMUbS7b_a-HO04z1Hi3O-wJKsIzi86KmYqJ6-M252sra-WD91cPAxh1Zr5dIh5NohqOVGa2nbxIN_5hBr_wN-EIMwrKlN6_5VIDh3vxM5TElk4B9yc8lNbHnlHsyserq-FQm-Hg1Sm5llWJzSapJ-JACZrskvJ_BBJDPHsGhcaWJ5PArQ1P22SuMzQWwXNjWjlAlFw"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pt-[80px]">
+<!-- Hero Section -->
+<section class="relative min-h-[921px] flex items-center justify-center overflow-hidden hero-pattern px-lg py-xl">
+<!-- Decorative Elements -->
+<div class="absolute top-1/4 left-10 w-64 h-64 bg-primary opacity-5 rounded-full blur-3xl"></div>
+<div class="absolute bottom-1/4 right-10 w-80 h-80 bg-secondary opacity-5 rounded-full blur-3xl"></div>
+<div class="max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-2 gap-xl items-center relative z-10">
+<!-- Hero Copy & Actions -->
+<div class="flex flex-col gap-lg text-center lg:text-left z-20">
+<div class="inline-flex items-center gap-sm bg-surface-container px-4 py-2 rounded-full w-fit mx-auto lg:mx-0 border border-outline-variant/30">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="text-label-sm font-label-sm text-secondary">Servers Online • 1,204 Players</span>
+</div>
+<h1 class="text-display-lg font-display-lg text-on-surface md:text-[64px] md:leading-[72px] text-glow">
+                        Deal Your Way to <span class="text-primary">Victory</span>
+</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-xl mx-auto lg:mx-0">
+                        Experience the ruthless, fast-paced card game where properties change hands, debt collectors knock, and sly deals win the day. No setup required.
+                    </p>
+<div class="flex flex-col sm:flex-row flex-wrap gap-md mt-sm justify-center lg:justify-start">
+<!-- Create Room Button -->
+<a class="group flex items-center justify-center gap-md bg-primary text-on-primary px-8 py-4 rounded-lg font-title-md text-title-md transition-all hover:bg-primary-fixed active:scale-95 shadow-[0_4px_0_0_rgba(0,48,97,0.5)] hover:shadow-[0_2px_0_0_rgba(0,48,97,0.5)] hover:translate-y-[2px]" href="{{DATA:SCREEN:SCREEN_12}}">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+                            Create Room
+                        </a>
+<!-- Join Room Button -->
+<button class="group flex items-center justify-center gap-md bg-surface-container-high border border-outline-variant text-on-surface px-8 py-4 rounded-lg font-title-md text-title-md transition-all hover:bg-surface-variant hover:border-primary active:scale-95">
+<span class="material-symbols-outlined">login</span>
+                            Join Room
+                        </button>
+<!-- Play with Bots Button -->
+<button class="group flex items-center justify-center gap-md bg-transparent text-primary px-8 py-4 rounded-lg font-title-md text-title-md transition-all hover:bg-primary/10 active:scale-95">
+<span class="material-symbols-outlined">smart_toy</span>
+                            Play with Bots
+                        </button>
+</div>
+</div>
+<!-- Hero Visual (Card Stack) -->
+<div class="relative h-[500px] w-full hidden md:flex items-center justify-center perspective-[1000px] z-10">
+<!-- Background Card -->
+<div class="absolute w-[240px] h-[360px] bg-error-container rounded-xl border border-error/20 p-md shadow-2xl card-3d transform -rotate-12 -translate-x-16 -translate-y-4 opacity-80 flex flex-col justify-between" data-alt="A textured, stylized digital playing card with a deep crimson red theme. It features a fierce geometric icon representing a 'Debt Collector' action, set against a dark modern gaming background with subtle linen texture and glowing red accents." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDjKLrfanP79LCc2AXYo_lb1TStBYBUGuZCOQ_xSH6q7ZMthDhpESqHMPugU5iZ9ehjyJZObrktEwEtKHU4NAEfhcpb3d76euhh98oQasMpyPzMVRtWM_eKl3hEsWi5xYnjS6reQROQ9-cmnnBIV8DWrpOI70b0fDchbUDO-W1TrnbSedAw3tOC_OQXPazAHiJDUa2Ae9pmzyP0lKkrCJWtM6NlHZS7lrTAbZf4pxF71OqdyRogYLldkA'); background-size: cover;">
+<div class="w-full flex justify-between items-start">
+<span class="text-title-md font-title-md font-bold text-on-error-container">$5M</span>
+<span class="material-symbols-outlined text-on-error-container">payments</span>
+</div>
+<div class="w-full bg-black/40 backdrop-blur-sm p-sm rounded border border-white/10">
+<p class="text-label-sm font-label-sm text-on-error-container text-center">DEBT COLLECTOR</p>
+</div>
+</div>
+<!-- Middle Card -->
+<div class="absolute w-[240px] h-[360px] bg-tertiary-container rounded-xl border border-tertiary/20 p-md shadow-2xl card-3d transform rotate-6 translate-x-12 translate-y-8 opacity-90 flex flex-col justify-between" data-alt="A textured, stylized digital playing card with an amber/orange theme. It features an icon representing a 'Sly Deal' or theft action, set against a dark modern gaming background with subtle linen texture and glowing amber accents." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCHuywOORq_-nNiM49pvJJBvhlOEeoHrB6Zg_Av_u2tK3L_eu-5SNGJA4iqBiNz8f9_P7rhR6ahwyGs4-0qoafNPFqaCk599EieUoF6ADtAh9fkuwoRaPuvZDTtJrqe1fBQkYwWBDo4JCplWfkmPlXeRlG8gIc5OzSwwVSjgA9YWZ2v1_Kfcbg1keBV6kKb6Cp5IiFmM16ogdxWYasMVI3GSVh0h2HyiAqWCSFTwxFv6b6IRoCmLREipw'); background-size: cover;">
+<div class="w-full flex justify-between items-start">
+<span class="text-title-md font-title-md font-bold text-on-tertiary-container">ACTION</span>
+<span class="material-symbols-outlined text-on-tertiary-container">swap_horiz</span>
+</div>
+<div class="w-full bg-black/40 backdrop-blur-sm p-sm rounded border border-white/10">
+<p class="text-label-sm font-label-sm text-on-tertiary-container text-center">SLY DEAL</p>
+</div>
+</div>
+<!-- Hero Card (Foreground) -->
+<div class="absolute w-[260px] h-[390px] bg-primary-container rounded-xl border border-primary/30 p-md shadow-[0_20px_50px_rgba(0,85,164,0.3)] card-3d z-20 flex flex-col justify-between" data-alt="A premium, stylized digital playing card with a vibrant blue theme. It features a majestic property illustration representing 'Boardwalk', set against a dark modern gaming background with subtle linen texture and glowing blue neon accents." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDG3mBb0VB0r0Q7KdopE1sYbqw0fi_FhDHNSOJh97YEd0Wbka0JpXT3XWw06yOBjq_CflhbaJRLrFuE7yhARqHIDTVmMPS0mizG_Fcw9_EpCuUvEIyUaxzvExNU-o8f0imIk_pzR_tnJQlqwA7z6o0JYL-Lz_rg4Il07QQI_PmPXRVlxppbSAzqfA6Xzy0on_9Aziwg7SmrgiSCm5Nra6eQEC-EBuSxkKP-ecyxgVs7w4uwrwyATedLkg'); background-size: cover;">
+<div class="w-full flex justify-between items-start">
+<span class="text-title-md font-title-md font-bold text-on-primary-container">$4M</span>
+<div class="flex gap-xs">
+<span class="w-3 h-3 rounded-full bg-primary animate-pulse"></span>
+<span class="w-3 h-3 rounded-full bg-surface-variant"></span>
+</div>
+</div>
+<div class="w-full bg-black/50 backdrop-blur-md p-md rounded-lg border border-primary/20">
+<h3 class="text-title-md font-title-md font-bold text-on-primary-container mb-1">Park Place</h3>
+<p class="text-label-sm font-label-sm text-primary">Rent: $3M | Set: 2</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Section -->
+<section class="py-xl px-lg bg-surface-container-low border-y border-outline-variant/10">
+<div class="max-w-container-max mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="glass-panel p-lg rounded-xl flex flex-col items-center text-center gap-md hover:bg-surface-variant/50 transition-colors">
+<div class="w-16 h-16 rounded-full bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[32px]">bolt</span>
+</div>
+<h3 class="text-title-md font-title-md text-on-surface font-semibold">Real-time Multiplayer</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">Seamless sync across devices. See moves happen instantly without lag or waiting.</p>
+</div>
+<div class="glass-panel p-lg rounded-xl flex flex-col items-center text-center gap-md hover:bg-surface-variant/50 transition-colors">
+<div class="w-16 h-16 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[32px]">login</span>
+</div>
+<h3 class="text-title-md font-title-md text-on-surface font-semibold">No Sign-up Required</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">Jump straight into the action. Play anonymously or connect an account later.</p>
+</div>
+<div class="glass-panel p-lg rounded-xl flex flex-col items-center text-center gap-md hover:bg-surface-variant/50 transition-colors">
+<div class="w-16 h-16 rounded-full bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[32px]">menu_book</span>
+</div>
+<h3 class="text-title-md font-title-md text-on-surface font-semibold">Standard Rules</h3>
+<p class="text-body-md font-body-md text-on-surface-variant">Familiar mechanics with a modern twist. If you know the physical game, you're ready.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- How to Play Section -->
+<section class="py-xl px-lg relative overflow-hidden">
+<div class="max-w-container-max mx-auto relative z-10">
+<div class="text-center mb-xl">
+<h2 class="text-display-lg font-display-lg text-on-surface mb-sm">How to Play</h2>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Three simple steps to dominate the board.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-xl relative">
+<!-- Connecting Line (Desktop) -->
+<div class="hidden md:block absolute top-1/2 left-[15%] right-[15%] h-0.5 bg-outline-variant/30 -translate-y-1/2 z-0"></div>
+<!-- Step 1 -->
+<div class="relative z-10 flex flex-col items-center text-center gap-md group">
+<div class="w-20 h-20 rounded-2xl bg-surface-container-highest border border-outline-variant flex items-center justify-center text-title-md font-title-md font-bold text-on-surface shadow-lg group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors duration-300">
+                            1
+                        </div>
+<h4 class="text-title-md font-title-md text-on-surface font-semibold">Draw Cards</h4>
+<p class="text-body-md font-body-md text-on-surface-variant">Start your turn by drawing 2 cards from the central deck to replenish your hand.</p>
+</div>
+<!-- Step 2 -->
+<div class="relative z-10 flex flex-col items-center text-center gap-md group">
+<div class="w-20 h-20 rounded-2xl bg-surface-container-highest border border-outline-variant flex items-center justify-center text-title-md font-title-md font-bold text-on-surface shadow-lg group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors duration-300">
+                            2
+                        </div>
+<h4 class="text-title-md font-title-md text-on-surface font-semibold">Play up to 3 Actions</h4>
+<p class="text-body-md font-body-md text-on-surface-variant">Lay down properties, bank cash, or play action cards to disrupt your opponents.</p>
+</div>
+<!-- Step 3 -->
+<div class="relative z-10 flex flex-col items-center text-center gap-md group">
+<div class="w-20 h-20 rounded-2xl bg-surface-container-highest border border-outline-variant flex items-center justify-center text-title-md font-title-md font-bold text-on-surface shadow-lg group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors duration-300">
+                            3
+                        </div>
+<h4 class="text-title-md font-title-md text-on-surface font-semibold">Collect 3 Sets</h4>
+<p class="text-body-md font-body-md text-on-surface-variant">Be the first player to complete 3 full property sets to instantly win the game.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-xl px-lg flex flex-col md:flex-row justify-between items-center gap-md max-w-container-max mx-auto bg-surface-dim dark:bg-surface-dim border-t border-outline-variant mt-xl">
+<div class="flex items-center gap-sm">
+<span class="text-title-md font-title-md text-primary font-bold">Dealopoly</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant ml-2 bg-surface-variant px-2 py-0.5 rounded">v1.2.0</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant text-center md:text-left">
+            © 2024 Dealopoly. Deal your way to victory.
+        </p>
+<div class="flex items-center gap-md">
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary underline transition-all opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary underline transition-all opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary underline transition-all opacity-80 hover:opacity-100" href="#">Rules</a>
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-primary underline transition-all opacity-80 hover:opacity-100" href="#">Support</a>
+<a aria-label="GitHub" class="text-on-surface-variant hover:text-primary transition-colors ml-sm" href="#">
+<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+</svg>
+</a>
+</div>
+</footer>
+</body></html>

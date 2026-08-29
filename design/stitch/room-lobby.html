@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dealopoly - Room Lobby</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&amp;family=JetBrains+Mono:wght@500&amp;family=Montserrat:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary": "#00390f",
+                      "error-container": "#93000a",
+                      "primary-container": "#0055a4",
+                      "on-surface": "#e1e3e4",
+                      "surface-bright": "#373a3b",
+                      "tertiary-container": "#834500",
+                      "on-background": "#e1e3e4",
+                      "on-primary": "#003061",
+                      "on-primary-container": "#afccff",
+                      "outline": "#8c919d",
+                      "on-secondary-fixed-variant": "#00531a",
+                      "surface-tint": "#a8c8ff",
+                      "on-tertiary-fixed-variant": "#6e3900",
+                      "secondary-fixed-dim": "#66df75",
+                      "on-primary-fixed": "#001b3c",
+                      "error": "#ffb4ab",
+                      "surface": "#111415",
+                      "inverse-primary": "#175ead",
+                      "surface-variant": "#323536",
+                      "primary-fixed": "#d5e3ff",
+                      "on-error": "#690005",
+                      "on-error-container": "#ffdad6",
+                      "tertiary-fixed-dim": "#ffb77d",
+                      "surface-container-highest": "#323536",
+                      "surface-container": "#1d2021",
+                      "on-primary-fixed-variant": "#004689",
+                      "background": "#111415",
+                      "on-secondary-container": "#00320c",
+                      "surface-dim": "#111415",
+                      "on-surface-variant": "#c2c6d3",
+                      "on-secondary-fixed": "#002106",
+                      "tertiary": "#ffb77d",
+                      "primary": "#a8c8ff",
+                      "on-tertiary": "#4d2600",
+                      "primary-fixed-dim": "#a8c8ff",
+                      "tertiary-fixed": "#ffdcc3",
+                      "inverse-surface": "#e1e3e4",
+                      "surface-container-lowest": "#0c0f10",
+                      "outline-variant": "#424751",
+                      "on-tertiary-container": "#ffbc87",
+                      "secondary": "#66df75",
+                      "secondary-container": "#27a644",
+                      "inverse-on-surface": "#2e3132",
+                      "secondary-fixed": "#83fc8e",
+                      "surface-container-high": "#282a2b",
+                      "on-tertiary-fixed": "#2f1500",
+                      "surface-container-low": "#191c1d"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "card-overlap": "-32px",
+                      "container-max": "1440px",
+                      "xl": "48px",
+                      "unit": "4px",
+                      "xs": "4px",
+                      "lg": "24px",
+                      "md": "16px",
+                      "sm": "8px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Montserrat"
+                      ],
+                      "label-sm": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-lg": [
+                              "Montserrat"
+                      ],
+                      "display-lg": [
+                              "Montserrat"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "title-md": [
+                              "Montserrat"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Custom UI Shadows & Effects for Dealopoly */
+        .btn-primary {
+            box-shadow: 0 2px 0 0 theme('colors.primary-container');
+        }
+        .btn-primary:active {
+            transform: translateY(2px);
+            box-shadow: 0 0 0 0 theme('colors.primary-container');
+        }
+        
+        .slot-empty {
+            border: 1px dashed theme('colors.outline-variant');
+        }
+        
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+        
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(168, 200, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(168, 200, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(168, 200, 255, 0); }
+        }
+        
+        /* Linen texture for cards/slots */
+        .texture-linen {
+            background-image: 
+                linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px),
+                linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px);
+            background-size: 4px 4px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-lg py-md md:px-xl bg-surface dark:bg-surface shadow-sm bg-surface-container dark:bg-surface-container">
+<div class="flex items-center gap-md text-title-md font-title-md font-bold text-primary dark:text-primary tracking-tight">
+<span>Dealopoly</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border border-outline-variant">
+<img alt="Current player avatar" class="w-full h-full object-cover" data-alt="A stylized 3D avatar of a competitive board game player, depicted as a sleek, futuristic character wearing a minimalist visor. The lighting is dramatic and moody, utilizing deep neon blue accents against a dark slate background to fit the Dealopoly dark theme aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHG-DhYqiT8UbC-KV-JHhyVVBT6oCNMG9KS-8_64kEkry4balc9HhQPt-Mjc-H7OaigroBu9hpQKUytvvHr-8RHkU8is4Yon8HDczrWcTvjrEzLI_gyR06_xLIzEnjTcSAv8hAf8L4IXqyhPxwsi8tj7juCdgHn1kcH7ND5ZDGxdBZgi39ltF9qs0wSRVr_9--q6-oLUHhVnciyKSD1emcT5qgEkZP-CRuKE9X2rV1NOeMKSRyyipdQQ"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar & Main Content -->
+<div class="flex-1 flex pt-[72px] h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="hidden lg:flex flex-col h-full p-md gap-md docked full-height left-0 w-64 bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant">
+<!-- User Header -->
+<div class="flex items-center gap-md p-sm mb-md">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-variant shrink-0">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A stylized 3D avatar of a competitive board game player, depicted as a sleek, futuristic character wearing a minimalist visor. The lighting is dramatic and moody, utilizing deep neon blue accents against a dark slate background to fit the Dealopoly dark theme aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDn71l-5bW6Q0lLtpCA5-QEJQzkpYvy4uBwWkh22pNgd3e3JkB5wsiQpgYDEPYfLqKaKLR7VqwozrTGOn1m7okYKVEf14oyHnrSKZT-ywNi5kfK09vkclrYSHsIes2jx1O92_3gZlndWlu1jA5hNhkX0K43m9rrGBEa8k_6ziys5YBppPovceV2UxfaWoWza8shWEHtShfwCg4AOCLFl3LvkWpXUPL_cIw0kpBCoJw_EJrottKXDGSzvA"/>
+</div>
+<div>
+<h3 class="text-title-md font-title-md text-on-surface">Player 1</h3>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Rank: Pro Dealer</p>
+</div>
+</div>
+<!-- CTA -->
+<button class="w-full py-sm px-md bg-primary text-on-primary rounded-lg font-title-md text-title-md btn-primary mb-md transition-all active:scale-95">
+                New Game
+            </button>
+<!-- Navigation Links -->
+<div class="flex-1 flex flex-col gap-sm">
+<a class="flex items-center gap-md bg-primary-container text-on-primary-container rounded-lg px-md py-sm" href="#">
+<span class="material-symbols-outlined" data-icon="meeting_room">meeting_room</span>
+<span class="text-label-sm font-label-sm">Rooms</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant rounded-lg px-md py-sm hover:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="casino">casino</span>
+<span class="text-label-sm font-label-sm">Play</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant rounded-lg px-md py-sm hover:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-label-sm font-label-sm">Friends</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant rounded-lg px-md py-sm hover:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="text-label-sm font-label-sm">History</span>
+</a>
+</div>
+<!-- Footer Links -->
+<div class="mt-auto pt-md border-t border-outline-variant">
+<a class="flex items-center gap-md text-on-surface-variant hover:bg-surface-variant rounded-lg px-md py-sm hover:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-label-sm font-label-sm">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Canvas: Room Lobby -->
+<main class="flex-1 overflow-y-auto bg-surface relative flex flex-col">
+<!-- Table Background Effect -->
+<div class="absolute inset-0 pointer-events-none opacity-5" data-alt="A subtle, dark, seamless linen fabric texture suitable for a high-end casino card table background. It features a deep charcoal hue with very faint, tightly woven crosshatch patterns to provide a tactile feel without distracting from foreground UI elements." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDG5Yg1FNifHvmHmF560c2QLPlntlqm3g8K_d5xQWPagS6EQ-dE7GzgDOsh6WgKkArlyJ7kFzBqbXJHY0EC6Q0vRZniGQeIWT-cURDrbhYAEhCLMQ2pKwMVi-WXoqJ8B-OwfyjL659Dfum36kjLpc5IUE0jqtM95OsDYoSm1bqbJBdXO4o5s-g2-tmUHKDJL6RPu_RvUwcv54VbVlaCaU5ppQjQUEFdo-ZuKqUHFxSk3Rl9jCd3w7BtGg')"></div>
+<div class="flex-1 max-w-container-max mx-auto w-full p-md lg:p-xl flex flex-col gap-lg z-10">
+<!-- Lobby Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-md pb-md border-b border-outline-variant">
+<div>
+<h1 class="text-display-lg font-display-lg text-primary tracking-tight">Lobby</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant mt-sm">Waiting for players to join...</p>
+</div>
+<div class="bg-surface-container-high rounded-xl p-md border border-outline-variant flex flex-col items-center min-w-[200px] shadow-sm">
+<span class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-xs">Room Code</span>
+<div class="text-headline-lg font-headline-lg text-on-surface font-mono tracking-widest bg-surface-container px-md py-xs rounded-lg border border-outline mb-sm">
+                            XY-Z9
+                        </div>
+<button class="w-full flex justify-center items-center gap-sm text-label-sm font-label-sm text-primary hover:text-primary-fixed transition-colors py-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="content_copy">content_copy</span>
+                            Copy Invite Link
+                        </button>
+</div>
+</div>
+<!-- Main Layout Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg flex-1">
+<!-- Player Slots Area (Left - 8 cols) -->
+<div class="lg:col-span-8 flex flex-col gap-md">
+<div class="flex justify-between items-center px-sm">
+<h2 class="text-title-md font-title-md text-on-surface">Players (1/5)</h2>
+</div>
+<!-- Player Slots Container (Bento style) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+<!-- Slot 1: Current Player (You) -->
+<div class="bg-surface-container-high rounded-xl p-md border-2 border-primary relative overflow-hidden texture-linen shadow-md flex items-center gap-md">
+<div class="absolute top-0 right-0 bg-primary text-on-primary text-label-sm font-label-sm px-2 py-1 rounded-bl-lg font-bold">Host</div>
+<div class="w-16 h-16 rounded-full overflow-hidden bg-surface-variant border-2 border-primary pulse-glow shrink-0">
+<img alt="Player 1 avatar" class="w-full h-full object-cover" data-alt="A sleek, low-poly 3D render of a futuristic cyber-punk style avatar face, lit with vibrant neon blues against a pitch black background. It perfectly matches the competitive, high-stakes aesthetic of the Dealopoly dark theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9UCocymC4kVTmnxGFvIeIP7XCER3wPMW6bn8-A53C82BGTcCljuGktD-2VlkdisTwzCdOf9NJhawGG4kJaeMOBQ7hB6ft-4Ds6d5yjpYJt0zz0WWeG6nBl8hc3mIX8WDpkEg4aIumx2CicrjxzTe-dvReeMwbBt-7Yp3Ni_i-PwJkrVm-usEe0jtyjTH37t9nNDdwS9a4d7tV6q0mPeQCM9AqEj84KSbBHRTpYAK9_cl-6PTAzV_Heg"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-sm">
+<h3 class="text-title-md font-title-md text-on-surface">Player 1</h3>
+<span class="text-label-sm font-label-sm bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full">You</span>
+</div>
+<p class="text-body-md font-body-md text-on-surface-variant">Ready</p>
+</div>
+</div>
+<!-- Slot 2: Empty -->
+<div class="slot-empty bg-surface-container rounded-xl p-md flex flex-col items-center justify-center gap-sm min-h-[100px] hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-full border-2 border-dashed border-outline-variant flex items-center justify-center text-outline-variant group-hover:border-primary group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant group-hover:text-primary">Add Bot</span>
+</div>
+<!-- Slot 3: Empty -->
+<div class="slot-empty bg-surface-container rounded-xl p-md flex flex-col items-center justify-center gap-sm min-h-[100px] opacity-70">
+<div class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center text-outline-variant">
+<span class="material-symbols-outlined" data-icon="hourglass_empty">hourglass_empty</span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Waiting...</span>
+</div>
+<!-- Slot 4: Empty -->
+<div class="slot-empty bg-surface-container rounded-xl p-md flex flex-col items-center justify-center gap-sm min-h-[100px] opacity-70">
+<div class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center text-outline-variant">
+<span class="material-symbols-outlined" data-icon="hourglass_empty">hourglass_empty</span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Waiting...</span>
+</div>
+<!-- Slot 5: Empty -->
+<div class="slot-empty bg-surface-container rounded-xl p-md flex flex-col items-center justify-center gap-sm min-h-[100px] opacity-70 sm:col-span-2">
+<div class="w-12 h-12 rounded-full bg-surface-variant flex items-center justify-center text-outline-variant">
+<span class="material-symbols-outlined" data-icon="hourglass_empty">hourglass_empty</span>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Waiting...</span>
+</div>
+</div>
+</div>
+<!-- Right Sidebar (Settings & Start) - 4 cols -->
+<div class="lg:col-span-4 flex flex-col gap-md">
+<!-- Game Settings Glassmorphism Card -->
+<div class="bg-surface-container-high/80 backdrop-blur-md rounded-xl p-md border border-outline-variant shadow-sm">
+<div class="flex items-center gap-sm mb-md pb-sm border-b border-outline-variant">
+<span class="material-symbols-outlined text-primary" data-icon="settings_applications">settings_applications</span>
+<h3 class="text-title-md font-title-md text-on-surface">Game Settings</h3>
+</div>
+<div class="flex flex-col gap-lg">
+<!-- Setting: Game Mode -->
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface-variant mb-xs">Game Mode</label>
+<div class="relative">
+<select class="w-full bg-surface-container border border-outline-variant rounded-lg px-md py-sm text-body-md font-body-md text-on-surface appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+<option>Standard</option>
+<option>Fast Deal</option>
+<option>Custom Rules</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-sm text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Setting: Turn Timer -->
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface-variant mb-xs">Turn Timer (Seconds)</label>
+<input class="w-full h-2 bg-surface-variant rounded-lg appearance-none cursor-pointer accent-primary" max="120" min="30" step="15" type="range" value="60"/>
+<div class="flex justify-between text-label-sm font-label-sm text-on-surface-variant mt-xs">
+<span>30s</span>
+<span class="text-primary font-bold">60s</span>
+<span>120s</span>
+</div>
+</div>
+<!-- Setting: Auto-pass -->
+<div class="flex items-center justify-between">
+<div>
+<label class="block text-body-md font-body-md text-on-surface">Auto-pass</label>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Skip turn if timer runs out</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+<!-- Activity Log / Chat Minimal -->
+<div class="flex-1 bg-surface-container rounded-xl border border-outline-variant flex flex-col min-h-[200px] overflow-hidden">
+<div class="bg-surface-container-high py-xs px-md border-b border-outline-variant">
+<span class="text-label-sm font-label-sm text-on-surface-variant">Lobby Log</span>
+</div>
+<div class="flex-1 p-md overflow-y-auto flex flex-col gap-xs">
+<p class="text-label-sm font-label-sm text-on-surface-variant"><span class="text-primary">System:</span> Room XY-Z9 created.</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant"><span class="text-on-surface">Player 1</span> joined the room.</p>
+</div>
+<div class="p-sm border-t border-outline-variant bg-surface-container-lowest flex gap-sm">
+<input class="flex-1 bg-surface-container border border-outline-variant rounded-full px-md py-xs text-label-sm font-label-sm text-on-surface focus:outline-none focus:border-primary" placeholder="Send a message..." type="text"/>
+<button class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center hover:bg-primary hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="send">send</span>
+</button>
+</div>
+</div>
+<!-- Start Button -->
+<button class="w-full py-md px-lg bg-surface-variant text-on-surface-variant rounded-xl font-title-md text-title-md uppercase tracking-wider cursor-not-allowed border border-outline-variant mt-auto" disabled="">
+                            Start Game
+                        </button>
+<p class="text-center text-label-sm font-label-sm text-error mt-xs">Waiting for at least 2 players</p>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Join Game Room - Dealopoly</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Montserrat:wght@600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#001b3c",
+                        "on-tertiary-container": "#ffbc87",
+                        "inverse-on-surface": "#2e3132",
+                        "on-primary-container": "#afccff",
+                        "on-primary-fixed-variant": "#004689",
+                        "surface-container-lowest": "#0c0f10",
+                        "surface-dim": "#111415",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed": "#002106",
+                        "surface-container-high": "#282a2b",
+                        "secondary": "#66df75",
+                        "inverse-primary": "#175ead",
+                        "secondary-fixed": "#83fc8e",
+                        "tertiary-fixed-dim": "#ffb77d",
+                        "on-secondary-fixed-variant": "#00531a",
+                        "on-tertiary-fixed-variant": "#6e3900",
+                        "primary-fixed": "#d5e3ff",
+                        "on-tertiary-fixed": "#2f1500",
+                        "surface-bright": "#373a3b",
+                        "on-tertiary": "#4d2600",
+                        "surface-container-highest": "#323536",
+                        "secondary-container": "#27a644",
+                        "inverse-surface": "#e1e3e4",
+                        "surface-tint": "#a8c8ff",
+                        "tertiary": "#ffb77d",
+                        "on-surface-variant": "#c2c6d3",
+                        "secondary-fixed-dim": "#66df75",
+                        "background": "#111415",
+                        "primary-container": "#0055a4",
+                        "on-secondary-container": "#00320c",
+                        "surface-variant": "#323536",
+                        "on-background": "#e1e3e4",
+                        "outline": "#8c919d",
+                        "on-primary": "#003061",
+                        "tertiary-container": "#834500",
+                        "on-surface": "#e1e3e4",
+                        "surface-container-low": "#191c1d",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#a8c8ff",
+                        "outline-variant": "#424751",
+                        "surface-container": "#1d2021",
+                        "surface": "#111415",
+                        "on-error": "#690005",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed": "#ffdcc3",
+                        "primary-fixed-dim": "#a8c8ff",
+                        "on-secondary": "#00390f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "48px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "container-max": "1440px",
+                        "unit": "4px",
+                        "card-overlap": "-32px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "title-md": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Scrim background */
+        .scrim {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        
+        /* Focus styles for the 6-digit input */
+        input.room-code-input {
+            letter-spacing: 0.5em;
+            text-align: center;
+        }
+        
+        input.room-code-input:focus {
+            outline: none;
+            border-color: theme('colors.primary');
+            box-shadow: 0 0 0 2px theme('colors.primary-container');
+        }
+
+        /* 3D button effect */
+        .btn-3d {
+            border-bottom: 2px solid theme('colors.primary-container');
+        }
+        .btn-3d:active {
+            border-bottom-width: 0px;
+            transform: translateY(2px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background min-h-screen flex items-end justify-center font-body-md text-on-background relative overflow-hidden">
+<!-- Ambient background representing the game lobby behind the modal -->
+<div class="absolute inset-0 z-0">
+<div class="bg-cover bg-center w-full h-full opacity-30" data-alt="A dark, atmospheric digital card game lobby. Deep jet black background with subtle neon blue and bright green geometric accents. The environment feels competitive and modern, evoking a high-stakes digital tabletop arena. Soft, ambient glowing lights cast subtle shadows across a sleek, minimalist surface, reinforcing a premium, tactical gaming experience." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDyRMi2LUsqluLLAjmnDSVImTG-vyT8ItN6duhylovKTkAdMvaCXv9qkUyFm0DDXogq08M_TknoOQ73Edl6Whuyg-Nzv_nZTb41cH6ja0B-s6yz6DjLjQAWyAQfZVT12xMDMY1qILVBhQrA-VT3uqT_lZpBEtBHwU7MhppsFZHJNYX-4MmAbmIaOYSuXFjXNMAa8qVfEwtfWrwxTBdeQ9AvucJTSSPZqELsJL7qz7XxqueXqgM1q5RCsA')"></div>
+</div>
+<!-- Scrim Overlay -->
+<div class="fixed inset-0 scrim z-40 transition-opacity duration-300"></div>
+<!-- Bottom Sheet Modal Container -->
+<div class="w-full max-w-md bg-surface-container-high rounded-t-xl z-50 transform transition-transform duration-300 ease-out translate-y-0 shadow-[0_-8px_30px_rgba(0,0,0,0.5)]">
+<!-- Drag Handle Indicator -->
+<div class="w-full flex justify-center pt-sm pb-2">
+<div class="w-12 h-1 bg-outline-variant rounded-full"></div>
+</div>
+<!-- Header -->
+<div class="flex justify-between items-center px-lg py-md border-b border-surface-container-highest">
+<h2 class="font-title-md text-title-md text-on-surface">Join Game Room</h2>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors active:scale-95 flex items-center justify-center p-sm rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">close</span>
+</button>
+</div>
+<!-- Content Area -->
+<div class="p-lg flex flex-col gap-lg">
+<!-- Instructions -->
+<p class="font-body-md text-body-md text-on-surface-variant text-center">
+                Enter the 6-digit room code provided by the host to join their game.
+            </p>
+<!-- Input Field Group -->
+<div class="flex flex-col gap-sm">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest pl-sm" for="roomCode">Room Code</label>
+<div class="relative">
+<input autocomplete="off" class="room-code-input w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-md px-md font-label-sm text-display-lg text-primary placeholder-on-surface-variant/30 transition-all duration-200" id="roomCode" inputmode="numeric" maxlength="6" pattern="[0-9]*" placeholder="000000" type="text"/>
+</div>
+<!-- Validation/Helper Text (hidden by default, shown for demo) -->
+<!-- <p class="font-label-sm text-label-sm text-error pl-sm">Invalid code. Please try again.</p> -->
+</div>
+<!-- Recent Rooms (Optional fast-join) -->
+<div class="flex flex-col gap-sm mt-md">
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest pl-sm">Recent</h3>
+<button class="flex items-center justify-between w-full bg-surface-container py-md px-md rounded-lg border border-transparent hover:border-outline-variant/30 transition-all active:scale-[0.98]">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">groups</span>
+</div>
+<div class="flex flex-col items-start">
+<span class="font-body-md text-body-md text-on-surface font-semibold">High Rollers Lounge</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Code: 849201</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0;">arrow_forward_ios</span>
+</button>
+</div>
+<!-- Action Button -->
+<div class="mt-sm pb-safe">
+<button class="w-full bg-primary text-on-primary font-title-md text-title-md py-md rounded-lg btn-3d transition-all duration-150 flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">login</span>
+                    Join Room
+                </button>
+</div>
+</div>
+</div>
+<!-- Safe area padding for mobile devices without home indicator styling -->
+<style>
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 16px);
+        }
+    </style>
+</body></html>
