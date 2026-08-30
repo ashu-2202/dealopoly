@@ -305,7 +305,7 @@ export function HeroCardShowcase() {
                 rotate: animRotate,
                 rotateY: animRotateY,
                 scale: animScale,
-                opacity: isOtherHovered ? 0.8 : 1,
+                filter: isOtherHovered ? "brightness(0.92)" : "brightness(1)",
                 zIndex: animZ,
               }}
               transition={{
