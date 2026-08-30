@@ -1802,9 +1802,8 @@ p {
     padding: 6px 16px 12px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-evenly;
     align-items: center;
-    gap: clamp(4px, 1.5vh, 12px);
     overflow: hidden;
   }
 
@@ -1828,7 +1827,7 @@ p {
   }
 
   .hero-copy h1 {
-    font-size: clamp(1.4rem, 5.5vw, 1.85rem);
+    font-size: clamp(1.4rem, 5.5vw, 1.75rem);
     line-height: 1.1;
     margin: 2px 0 2px;
     letter-spacing: -0.02em;
@@ -1960,15 +1959,30 @@ p {
 @media (max-width: 640px) and (min-height: 700px) {
   .hero-section {
     padding: 10px 18px 16px;
-    gap: clamp(6px, 2vh, 16px);
   }
 
   .hero-showcase-wrapper {
-    min-height: 195px;
-    height: 195px;
-    max-height: 210px;
-    transform: scale(0.55);
+    min-height: 240px;
+    height: 240px;
+    max-height: 255px;
+    transform: scale(0.60);
     margin: 0;
+  }
+
+  .hero-showcase-stage {
+    margin-top: -55px;
+  }
+
+  .hero-platform-container {
+    bottom: -75px;
+    width: 510px;
+    height: 190px;
+  }
+
+  .hero-platform-base {
+    width: 480px;
+    height: 180px;
+    transform: rotateX(72deg);
   }
 
   .hero-badge {
@@ -1981,21 +1995,21 @@ p {
   }
 
   .hero-copy h1 {
-    font-size: clamp(1.7rem, 5.8vw, 2.05rem);
-    margin: 4px 0;
+    font-size: clamp(1.8rem, 5.8vw, 2.15rem);
+    margin: 3px 0 4px;
   }
 
   .hero-copy .lede {
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     line-height: 1.4;
-    margin: 3px auto 8px;
+    margin: 3px auto 10px;
     max-width: 350px;
   }
 
   .hero-actions {
     max-width: 380px;
-    gap: 10px;
-    margin: 8px auto 3px;
+    gap: 8px;
+    margin: 6px auto 3px;
   }
 
   .hero-actions .button--primary {
@@ -2005,8 +2019,8 @@ p {
 
   .hero-actions .button--secondary,
   .hero-actions .button--ghost {
-    padding: 9px 12px;
-    font-size: 0.82rem;
+    padding: 10px 14px;
+    font-size: 0.84rem;
   }
 
   .availability {
@@ -2019,20 +2033,35 @@ p {
 @media (max-width: 640px) and (min-height: 821px) {
   .hero-section {
     padding: 14px 20px 22px;
-    gap: clamp(8px, 2.5vh, 20px);
   }
 
   .hero-showcase-wrapper {
-    min-height: 235px;
-    height: 235px;
-    max-height: 250px;
-    transform: scale(0.62);
+    min-height: 310px;
+    height: 310px;
+    max-height: 330px;
+    transform: scale(0.72);
     margin: 0;
+  }
+
+  .hero-showcase-stage {
+    margin-top: -70px;
+  }
+
+  .hero-platform-container {
+    bottom: -80px;
+    width: 560px;
+    height: 210px;
+  }
+
+  .hero-platform-base {
+    width: 530px;
+    height: 195px;
+    transform: rotateX(72deg);
   }
 
   .hero-badge {
     padding: 5px 16px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .badge-text {
@@ -2040,34 +2069,34 @@ p {
   }
 
   .hero-copy h1 {
-    font-size: clamp(1.95rem, 6.5vw, 2.35rem);
-    line-height: 1.15;
-    margin: 6px 0 6px;
+    font-size: clamp(2.15rem, 6.8vw, 2.6rem);
+    line-height: 1.12;
+    margin: 4px 0 6px;
   }
 
   .hero-copy .lede {
-    font-size: 0.88rem;
+    font-size: 0.92rem;
     line-height: 1.45;
-    margin: 4px auto 12px;
-    max-width: 370px;
+    margin: 4px auto 14px;
+    max-width: 380px;
     -webkit-line-clamp: 3;
   }
 
   .hero-actions {
     max-width: 400px;
     gap: 10px;
-    margin: 10px auto 4px;
+    margin: 8px auto 4px;
   }
 
   .hero-actions .button--primary {
-    padding: 13px 20px;
-    font-size: 0.98rem;
+    padding: 14px 22px;
+    font-size: 1.02rem;
   }
 
   .hero-actions .button--secondary,
   .hero-actions .button--ghost {
-    padding: 10px 14px;
-    font-size: 0.86rem;
+    padding: 12px 16px;
+    font-size: 0.88rem;
   }
 
   .availability {
