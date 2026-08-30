@@ -27,13 +27,12 @@ export function UserNav() {
     return (
       <Link
         href="/login"
-        className="button button--secondary"
-        style={{ padding: "6px 14px", fontSize: "0.82rem", height: "34px", display: "inline-flex", alignItems: "center", gap: "6px" }}
+        className="user-nav-signin-btn"
       >
-        <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+        <span className="material-symbols-outlined user-nav-signin-icon">
           login
         </span>
-        Sign In
+        <span>Sign In</span>
       </Link>
     );
   }
