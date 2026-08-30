@@ -496,7 +496,7 @@ p {
   justify-content: center;
   z-index: 10;
   transform-style: preserve-3d;
-  margin-top: -30px;
+  margin-top: -55px;
 }
 
 .hero-showcase-card-container {
@@ -571,36 +571,36 @@ p {
   opacity: 0.35;
 }
 
-/* 3D Circular Platform Positioned Underneath Cards */
+/* 3D Circular Platform Positioned Underneath Cards (Moved lower to form base pedestal) */
 .hero-platform-container {
   position: absolute;
-  bottom: 25px;
+  bottom: -15px;
   left: 50%;
   transform: translateX(-50%);
-  width: 520px;
-  height: 220px;
+  width: 560px;
+  height: 230px;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  z-index: 2;
+  z-index: 1;
   perspective: 900px;
 }
 
 .hero-platform-shadow {
   position: absolute;
-  width: 480px;
-  height: 130px;
+  width: 520px;
+  height: 140px;
   border-radius: 50%;
   background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.5) 50%, transparent 75%);
-  filter: blur(22px);
-  transform: translateY(32px);
+  filter: blur(24px);
+  transform: translateY(36px);
 }
 
 .hero-platform-base {
   position: relative;
-  width: 480px;
-  height: 210px;
+  width: 520px;
+  height: 220px;
   transform-style: preserve-3d;
   transform: rotateX(74deg);
   display: flex;
