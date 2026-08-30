@@ -203,6 +203,105 @@ export default function HomePage() {
           {activeGame === "monodeal" ? <HeroCardShowcase /> : <LeastCountHeroShowcase />}
         </section>
 
+        {/* Arcade Games Catalogue Section */}
+        <section id="games" className="shell" style={{ padding: "40px 16px 20px" }}>
+          <div className="section-header" style={{ textAlign: "center", marginBottom: "32px" }}>
+            <p className="kicker">DEALOPOLY ARCADE</p>
+            <h2>Choose Your Game</h2>
+            <p>Jump into ruthless property trading or intense point-shedding bluffing.</p>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "24px" }}>
+            {/* Game Card 1: Monodeal */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)",
+                border: "1.5px solid rgba(56, 189, 248, 0.25)",
+                borderRadius: "16px",
+                padding: "24px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                boxShadow: "0 12px 32px rgba(0, 0, 0, 0.5)",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <div style={{ position: "absolute", top: "16px", right: "16px" }}>
+                <span className="badge" style={{ background: "rgba(56, 189, 248, 0.15)", color: "#38bdf8", border: "1px solid rgba(56, 189, 248, 0.3)" }}>
+                  2–5 PLAYERS
+                </span>
+              </div>
+              <div>
+                <div style={{ fontSize: "2.2rem", marginBottom: "8px" }}>🃏</div>
+                <h3 style={{ fontSize: "1.4rem", fontWeight: 900, color: "#f8fafc", margin: "0 0 8px" }}>Monodeal</h3>
+                <p style={{ fontSize: "0.88rem", color: "#94a3b8", lineHeight: 1.5, marginBottom: "16px" }}>
+                  The authentic real-estate card trading game. Collect 3 full property sets, charge ruthless rent, and steal properties with Deal Breakers!
+                </p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "20px" }}>
+                  <span style={{ fontSize: "0.72rem", background: "rgba(255,255,255,0.06)", padding: "4px 8px", borderRadius: "6px", color: "#cbd5e1" }}>⏱️ 10–15 Mins</span>
+                  <span style={{ fontSize: "0.72rem", background: "rgba(255,255,255,0.06)", padding: "4px 8px", borderRadius: "6px", color: "#cbd5e1" }}>🎴 110 Cards</span>
+                  <span style={{ fontSize: "0.72rem", background: "rgba(255,255,255,0.06)", padding: "4px 8px", borderRadius: "6px", color: "#cbd5e1" }}>🏢 Real Estate</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <Link href="/game?mode=bot&game=monodeal" className="button button--primary button--sm" style={{ flex: 1, justifyContent: "center" }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>smart_toy</span>
+                  Play Bots
+                </Link>
+                <Link href="/lobby?game=monodeal" className="button button--secondary button--sm" style={{ flex: 1, justifyContent: "center" }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>add_circle</span>
+                  Create Room
+                </Link>
+              </div>
+            </div>
+
+            {/* Game Card 2: Least Count */}
+            <div
+              style={{
+                background: "linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)",
+                border: "1.5px solid rgba(234, 179, 8, 0.3)",
+                borderRadius: "16px",
+                padding: "24px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                boxShadow: "0 12px 32px rgba(0, 0, 0, 0.5)",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <div style={{ position: "absolute", top: "16px", right: "16px" }}>
+                <span className="badge" style={{ background: "rgba(234, 179, 8, 0.15)", color: "#facc15", border: "1px solid rgba(234, 179, 8, 0.3)" }}>
+                  2–6 PLAYERS
+                </span>
+              </div>
+              <div>
+                <div style={{ fontSize: "2.2rem", marginBottom: "8px" }}>🎯</div>
+                <h3 style={{ fontSize: "1.4rem", fontWeight: 900, color: "#f8fafc", margin: "0 0 8px" }}>Least Count</h3>
+                <p style={{ fontSize: "0.88rem", color: "#94a3b8", lineHeight: 1.5, marginBottom: "16px" }}>
+                  The ultimate point-shedding and bluffing showdown. Discard pairs & runs, hold 0-point Kings, and call SHOW when hand total ≤ 7!
+                </p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "20px" }}>
+                  <span style={{ fontSize: "0.72rem", background: "rgba(255,255,255,0.06)", padding: "4px 8px", borderRadius: "6px", color: "#cbd5e1" }}>⏱️ 5–10 Mins</span>
+                  <span style={{ fontSize: "0.72rem", background: "rgba(255,255,255,0.06)", padding: "4px 8px", borderRadius: "6px", color: "#cbd5e1" }}>👑 King = 0 pts</span>
+                  <span style={{ fontSize: "0.72rem", background: "rgba(255,255,255,0.06)", padding: "4px 8px", borderRadius: "6px", color: "#cbd5e1" }}>💥 +40 Penalty</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <Link href="/game?mode=bot&game=least_count" className="button button--primary button--sm" style={{ flex: 1, justifyContent: "center" }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>smart_toy</span>
+                  Play Bots
+                </Link>
+                <Link href="/lobby?game=least_count" className="button button--secondary button--sm" style={{ flex: 1, justifyContent: "center" }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>add_circle</span>
+                  Create Room
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section id="features" className="features-section" aria-label="Game highlights">
           <div className="shell">

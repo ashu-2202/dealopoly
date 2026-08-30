@@ -73,12 +73,29 @@ const COLOR_FILTERS: { label: string; color: CardColor | "all" }[] = [
 
 import { UserNav } from "../_components/user-nav";
 import { BackButton } from "../_components/back-button";
+import { StandardCard } from "../_components/standard-card";
+import { createLeastCountDeck, type LeastCountCard } from "@dealopoly/game-engine";
 
 export default function CardCataloguePage() {
+  const [selectedGame, setSelectedGame] = useState<"monodeal" | "least_count">("monodeal");
   const [selectedType, setSelectedType] = useState<CardType | "all">("all");
   const [selectedColor, setSelectedColor] = useState<CardColor | "all">("all");
+  const [selectedSuit, setSelectedSuit] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCard, setActiveCard] = useState<CardDefinition | null>(null);
+
+  const leastCountDeck = useMemo(() => createLeastCountDeck(2), []);
+
+  const filteredLeastCountCards = useMemo(() => {
+    return leastCountDeck.filter((c) => {
+      if (selectedSuit !== "all" && c.suit !== selectedSuit) return false;
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        return c.rank.toLowerCase().includes(query) || c.suit.toLowerCase().includes(query);
+      }
+      return true;
+    });
+  }, [leastCountDeck, selectedSuit, searchQuery]);
 
   const filteredCards = useMemo(() => {
     return CARD_CATALOGUE.filter((card) => {
@@ -88,15 +105,15 @@ export default function CardCataloguePage() {
       }
       // Color filter
       if (selectedColor !== "all") {
-        if (
-          card.primaryColor !== selectedColor &&
-          card.secondaryColor !== selectedColor
-        ) {
+        const isExactColor = card.primaryColor === selectedColor;
+        const isSecondaryColor =
+          "secondaryColor" in card && card.secondaryColor === selectedColor;
+        if (!isExactColor && !isSecondaryColor) {
           return false;
         }
       }
-      // Search query
-      if (searchQuery.trim()) {
+      // Search
+      if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesName = card.name.toLowerCase().includes(query);
         const matchesDesc = card.description?.toLowerCase().includes(query);
@@ -124,114 +141,215 @@ export default function CardCataloguePage() {
         <section className="catalogue-header">
           <div className="catalogue-header-copy">
             <BackButton fallbackUrl="/" label="Back to Home" variant="subtle" style={{ marginBottom: "10px" }} />
-            <h1>Card Catalogue</h1>
+
+            {/* Game Selector Switcher */}
+            <div
+              style={{
+                display: "inline-flex",
+                gap: "8px",
+                margin: "0 0 14px",
+                background: "rgba(15, 23, 42, 0.85)",
+                padding: "4px",
+                borderRadius: "999px",
+                border: "1px solid rgba(255, 255, 255, 0.14)",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.4)",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setSelectedGame("monodeal")}
+                className={`button button--sm ${selectedGame === "monodeal" ? "button--primary" : "button--ghost"}`}
+                style={{ borderRadius: "999px", padding: "6px 16px", fontSize: "0.80rem" }}
+              >
+                🃏 Monodeal (110 Cards)
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedGame("least_count")}
+                className={`button button--sm ${selectedGame === "least_count" ? "button--primary" : "button--ghost"}`}
+                style={{ borderRadius: "999px", padding: "6px 16px", fontSize: "0.80rem" }}
+              >
+                🎯 Least Count (52 Cards)
+              </button>
+            </div>
+
+            <h1>{selectedGame === "monodeal" ? "Monodeal Card Catalogue" : "Least Count Deck Catalogue"}</h1>
             <p>
-              Explore the complete 110-card deck with authentic color schemes,
-              rent multipliers, and card mechanics matching the classic game.
+              {selectedGame === "monodeal"
+                ? "Explore the complete 110-card deck with authentic color schemes, rent multipliers, and action mechanics."
+                : "Browse the full standard 52-card suit deck with King=0 pts, Ace=1 pt, Jack=11 pts, Queen=12 pts."}
             </p>
           </div>
 
           <div className="catalogue-stats-box">
             <div>
               <div className="catalogue-stat-val catalogue-stat-val--blue">
-                {totalFilteredCopies}
+                {selectedGame === "monodeal" ? totalFilteredCopies : filteredLeastCountCards.length}
               </div>
               <div className="catalogue-stat-lbl">Cards Shown</div>
             </div>
             <div className="catalogue-stat-divider" />
             <div>
               <div className="catalogue-stat-val catalogue-stat-val--green">
-                {filteredCards.length}
+                {selectedGame === "monodeal" ? filteredCards.length : filteredLeastCountCards.length}
               </div>
               <div className="catalogue-stat-lbl">Unique Types</div>
             </div>
             <div className="catalogue-stat-divider" />
             <div>
               <div className="catalogue-stat-val" style={{ color: "var(--tertiary)" }}>
-                110
+                {selectedGame === "monodeal" ? 110 : 52}
               </div>
               <div className="catalogue-stat-lbl">Total Deck</div>
             </div>
           </div>
         </section>
 
-        {/* Category Tabs */}
-        <div className="catalogue-tabs" role="tablist">
-          {TYPE_TABS.map((tab) => {
-            const isActive = selectedType === tab.value;
-            return (
-              <button
-                key={tab.value}
-                onClick={() => setSelectedType(tab.value)}
-                className={`catalogue-tab-btn ${
-                  isActive ? "catalogue-tab-btn--active" : ""
-                }`}
-                role="tab"
-                aria-selected={isActive}
-              >
-                <span>{tab.label}</span>
-                <span className="catalogue-tab-count">{tab.count}</span>
-              </button>
-            );
-          })}
-        </div>
+        {/* Category Tabs / Filters */}
+        {selectedGame === "monodeal" ? (
+          <>
+            <div className="catalogue-tabs" role="tablist">
+              {TYPE_TABS.map((tab) => {
+                const isActive = selectedType === tab.value;
+                return (
+                  <button
+                    key={tab.value}
+                    onClick={() => setSelectedType(tab.value)}
+                    className={`catalogue-tab-btn ${
+                      isActive ? "catalogue-tab-btn--active" : ""
+                    }`}
+                    role="tab"
+                    aria-selected={isActive}
+                  >
+                    <span>{tab.label}</span>
+                    <span className="catalogue-tab-count">{tab.count}</span>
+                  </button>
+                );
+              })}
+            </div>
 
-        {/* Filters Toolbar */}
-        <div className="catalogue-toolbar">
-          {/* Color Chips */}
-          <div className="catalogue-colors">
-            {COLOR_FILTERS.map((f) => {
-              const isSelected = selectedColor === f.color;
-              const config =
-                f.color !== "all" ? COLOR_CONFIG[f.color] : undefined;
-              return (
-                <button
-                  key={f.color}
-                  onClick={() => setSelectedColor(f.color)}
-                  className={`catalogue-color-chip ${
-                    isSelected ? "catalogue-color-chip--active" : ""
-                  }`}
-                >
-                  {config && (
-                    <span
-                      className="color-dot"
-                      style={{ backgroundColor: config.hex }}
-                    />
-                  )}
-                  <span>{f.label}</span>
-                </button>
-              );
-            })}
-          </div>
+            {/* Filters Toolbar */}
+            <div className="catalogue-toolbar">
+              {/* Color Chips */}
+              <div className="catalogue-colors">
+                {COLOR_FILTERS.map((f) => {
+                  const isSelected = selectedColor === f.color;
+                  const config =
+                    f.color !== "all" ? COLOR_CONFIG[f.color] : undefined;
+                  return (
+                    <button
+                      key={f.color}
+                      onClick={() => setSelectedColor(f.color)}
+                      className={`catalogue-color-chip ${
+                        isSelected ? "catalogue-color-chip--active" : ""
+                      }`}
+                    >
+                      {config && (
+                        <span
+                          className="color-dot"
+                          style={{ backgroundColor: config.hex }}
+                        />
+                      )}
+                      <span>{f.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
 
-          {/* Search Box */}
-          <div className="catalogue-search-wrap">
-            <span className="material-symbols-outlined catalogue-search-icon">
-              search
-            </span>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search cards, rent, effects..."
-              className="catalogue-search-input"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="catalogue-search-clear"
-                aria-label="Clear search"
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>
-                  close
+              {/* Search Box */}
+              <div className="catalogue-search-wrap">
+                <span className="material-symbols-outlined catalogue-search-icon">
+                  search
                 </span>
-              </button>
-            )}
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search cards, rent, effects..."
+                  className="catalogue-search-input"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="catalogue-search-clear"
+                    aria-label="Clear search"
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>
+                      close
+                    </span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          /* Least Count Suit Filter Toolbar */
+          <div className="catalogue-toolbar" style={{ margin: "16px 0 24px" }}>
+            <div className="catalogue-colors">
+              {[
+                { id: "all", label: "All Suits (52)", icon: "🎴" },
+                { id: "spades", label: "♠ Spades (13)", icon: "♠" },
+                { id: "hearts", label: "♥ Hearts (13)", icon: "♥" },
+                { id: "diamonds", label: "♦ Diamonds (13)", icon: "♦" },
+                { id: "clubs", label: "♣ Clubs (13)", icon: "♣" },
+              ].map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setSelectedSuit(s.id)}
+                  className={`catalogue-color-chip ${selectedSuit === s.id ? "catalogue-color-chip--active" : ""}`}
+                  style={{ padding: "6px 14px" }}
+                >
+                  <span>{s.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Search Box */}
+            <div className="catalogue-search-wrap">
+              <span className="material-symbols-outlined catalogue-search-icon">
+                search
+              </span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search rank (K, Q, A, 7)..."
+                className="catalogue-search-input"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="catalogue-search-clear"
+                  aria-label="Clear search"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>
+                    close
+                  </span>
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Card Gallery Grid */}
-        {filteredCards.length === 0 ? (
+        {selectedGame === "least_count" ? (
+          <div className="catalogue-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: "20px" }}>
+            {filteredLeastCountCards.map((card) => (
+              <article key={card.instanceId} className="catalogue-card-container" style={{ alignItems: "center" }}>
+                <StandardCard
+                  card={card}
+                  size="md"
+                  showPointsBadge
+                />
+                <div className="catalogue-card-footer" style={{ marginTop: "8px" }}>
+                  <span className="catalogue-value-badge" style={{ color: card.rank === "K" ? "#facc15" : "#38bdf8" }}>
+                    {card.rank === "K" ? "👑 0 PTS" : `${card.points} PTS`}
+                  </span>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : filteredCards.length === 0 ? (
           <div className="catalogue-empty">
             <span className="material-symbols-outlined catalogue-empty-icon">
               sentiment_dissatisfied

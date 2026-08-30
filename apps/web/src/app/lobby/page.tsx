@@ -178,9 +178,11 @@ export default function LobbyPage(props: {
       <header className="app-header">
         <div>
           <p className="breadcrumb">
-            ROOMS / <b>{roomCode || "CREATING..."}</b>
+            ARCADE / {urlGame === "least_count" ? "LEAST COUNT" : "MONODEAL"} / <b>{roomCode || "CREATING..."}</b>
           </p>
-          <h1>Game Lobby</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <h1>{urlGame === "least_count" ? "🎯 Least Count Lobby" : "🃏 Monodeal Lobby"}</h1>
+          </div>
         </div>
         <div className="header-actions">
           <div

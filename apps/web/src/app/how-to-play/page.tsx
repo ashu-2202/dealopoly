@@ -5,9 +5,12 @@ import Link from "next/link";
 import { MarketingNav } from "../_components/marketing-nav";
 import { BackButton } from "../_components/back-button";
 import { Card } from "../_components/card";
+import { StandardCard } from "../_components/standard-card";
 import { CARD_CATALOGUE, type CardDefinition } from "@dealopoly/shared";
 
 export default function HowToPlayPage() {
+  const [selectedGame, setSelectedGame] = useState<"monodeal" | "least_count">("monodeal");
+
   // 1. Property Set Showcase State
   const [activeSetTab, setActiveSetTab] = useState<"brown" | "dark-blue" | "railroad" | "green">("brown");
 
@@ -61,43 +64,163 @@ export default function HowToPlayPage() {
               <BackButton fallbackUrl="/" label="Back to Home" variant="subtle" />
             </div>
 
+            {/* Game Switcher */}
+            <div
+              style={{
+                display: "inline-flex",
+                gap: "8px",
+                margin: "0 auto 16px",
+                background: "rgba(15, 23, 42, 0.85)",
+                padding: "4px",
+                borderRadius: "999px",
+                border: "1px solid rgba(255, 255, 255, 0.14)",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.4)",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setSelectedGame("monodeal")}
+                className={`button button--sm ${selectedGame === "monodeal" ? "button--primary" : "button--ghost"}`}
+                style={{ borderRadius: "999px", padding: "6px 18px", fontSize: "0.82rem" }}
+              >
+                🃏 Monodeal Guide
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedGame("least_count")}
+                className={`button button--sm ${selectedGame === "least_count" ? "button--primary" : "button--ghost"}`}
+                style={{ borderRadius: "999px", padding: "6px 18px", fontSize: "0.82rem" }}
+              >
+                🎯 Least Count Guide
+              </button>
+            </div>
+
             <div className="how-hero-pill">
               <span>🎮 Quick & Fun Beginner's Guide</span>
             </div>
 
             <h1 className="how-hero-title">
-              How to Play <span className="glow-word">Dealopoly</span>
+              How to Play <span className="glow-word">{selectedGame === "monodeal" ? "Monodeal" : "Least Count"}</span>
             </h1>
 
             <p className="how-hero-lede">
-              Learn the fast-paced card game where properties change hands, debt collectors knock, and sneaky moves win
-              the day! Master the game in <strong>3 minutes</strong> with this simple visual guide.
+              {selectedGame === "monodeal"
+                ? "Learn the fast-paced card game where properties change hands, debt collectors knock, and sneaky moves win the day!"
+                : "Master point shedding, matching pairs, suit runs, 0-point Kings, and calling SHOW to outsmart your rivals!"}
             </p>
 
             <div className="how-stats-ribbon">
               <div className="how-stat-chip">
                 <span className="material-symbols-outlined">timer</span>
-                <span><strong>15 Mins</strong> per game</span>
+                <span><strong>{selectedGame === "monodeal" ? "15 Mins" : "5–10 Mins"}</strong> per game</span>
               </div>
               <div className="how-stat-chip">
                 <span className="material-symbols-outlined">groups</span>
-                <span><strong>2 to 5</strong> Players</span>
+                <span><strong>{selectedGame === "monodeal" ? "2 to 5" : "2 to 6"}</strong> Players</span>
               </div>
               <div className="how-stat-chip">
                 <span className="material-symbols-outlined">emoji_events</span>
-                <span><strong>3 Sets</strong> to Win</span>
+                <span><strong>{selectedGame === "monodeal" ? "3 Sets to Win" : "Lowest Score Wins"}</strong></span>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ============================================================ */}
-        {/* STEP 1: THE OBJECTIVE (WINNING 3 SETS)                      */}
-        {/* ============================================================ */}
-        <section className="how-step-section shell" style={{ marginTop: "24px" }}>
-          <div className="how-step-card glass-panel">
-            <div className="how-step-header">
-              <div className="how-step-badge">STEP 1</div>
+        {selectedGame === "least_count" ? (
+          /* ============================================================ */
+          /* LEAST COUNT GUIDE                                            */
+          /* ============================================================ */
+          <section className="shell" style={{ maxWidth: "860px", marginTop: "24px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+              {/* Step 1: Objective */}
+              <div className="how-step-card glass-panel" style={{ padding: "28px" }}>
+                <div className="how-step-header">
+                  <div className="how-step-badge">STEP 1</div>
+                  <div>
+                    <h2>The Big Goal: Lowest Hand Score!</h2>
+                    <p>Each card in your hand has a point value. Your mission is to discard cards to get your total to <strong>≤ 7 points</strong>, then call <strong>SHOW</strong>.</p>
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px", marginTop: "18px" }}>
+                  <div style={{ background: "rgba(234, 179, 8, 0.12)", border: "1px solid rgba(234, 179, 8, 0.3)", borderRadius: "10px", padding: "12px", textAlign: "center" }}>
+                    <div style={{ fontSize: "1.6rem" }}>👑</div>
+                    <div style={{ fontWeight: 900, color: "#facc15" }}>King (K)</div>
+                    <div style={{ fontSize: "0.78rem", color: "#94a3b8" }}>0 Points (The Winner!)</div>
+                  </div>
+                  <div style={{ background: "rgba(56, 189, 248, 0.12)", border: "1px solid rgba(56, 189, 248, 0.3)", borderRadius: "10px", padding: "12px", textAlign: "center" }}>
+                    <div style={{ fontSize: "1.6rem" }}>⭐</div>
+                    <div style={{ fontWeight: 900, color: "#38bdf8" }}>Ace (A)</div>
+                    <div style={{ fontSize: "0.78rem", color: "#94a3b8" }}>1 Point</div>
+                  </div>
+                  <div style={{ background: "rgba(255, 255, 255, 0.06)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "10px", padding: "12px", textAlign: "center" }}>
+                    <div style={{ fontSize: "1.6rem" }}>🔢</div>
+                    <div style={{ fontWeight: 900, color: "#f8fafc" }}>2 to 10</div>
+                    <div style={{ fontSize: "0.78rem", color: "#94a3b8" }}>Face Value (2–10 pts)</div>
+                  </div>
+                  <div style={{ background: "rgba(244, 63, 94, 0.12)", border: "1px solid rgba(244, 63, 94, 0.3)", borderRadius: "10px", padding: "12px", textAlign: "center" }}>
+                    <div style={{ fontSize: "1.6rem" }}>👸 🃏</div>
+                    <div style={{ fontWeight: 900, color: "#f43f5e" }}>J & Q</div>
+                    <div style={{ fontSize: "0.78rem", color: "#94a3b8" }}>J=11 pts, Q=12 pts</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 2: Discard & Draw */}
+              <div className="how-step-card glass-panel" style={{ padding: "28px" }}>
+                <div className="how-step-header">
+                  <div className="how-step-badge">STEP 2</div>
+                  <div>
+                    <h2>Turn Cycle: Discard, then Draw</h2>
+                    <p>On your turn, drop cards to shed points, then draw 1 replacement card.</p>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "16px", color: "#cbd5e1", lineHeight: 1.6 }}>
+                  <div>
+                    <strong style={{ color: "#f8fafc" }}>1. Discard Options:</strong>
+                    <ul style={{ margin: "6px 0 0 20px" }}>
+                      <li><strong>Single Card:</strong> Drop any 1 high-value card.</li>
+                      <li><strong>Matching Pair:</strong> Drop 2 cards of the same rank (e.g. two Kings or two 9s) to dump points fast!</li>
+                      <li><strong>3-Card Suit Run:</strong> Drop 3 consecutive cards in the same suit (e.g. 5♥-6♥-7♥).</li>
+                    </ul>
+                  </div>
+                  <div style={{ marginTop: "6px" }}>
+                    <strong style={{ color: "#f8fafc" }}>2. Draw Option:</strong>
+                    <p style={{ margin: "4px 0 0" }}>Draw 1 card from the closed deck OR take the top open card from the discard pile if it helps you.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 3: Declare Show */}
+              <div className="how-step-card glass-panel" style={{ padding: "28px" }}>
+                <div className="how-step-header">
+                  <div className="how-step-badge">STEP 3</div>
+                  <div>
+                    <h2>Declare SHOW & Win the Round!</h2>
+                    <p>When your hand score is <strong>≤ 7 points</strong>, hit the glowing <strong>⭐ DECLARE SHOW</strong> button at the start of your turn.</p>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginTop: "16px" }}>
+                  <div style={{ background: "rgba(34, 197, 94, 0.12)", border: "1px solid rgba(34, 197, 94, 0.3)", borderRadius: "10px", padding: "14px" }}>
+                    <strong style={{ color: "#4ade80" }}>🎉 Successful Show:</strong> You score <strong>0 points</strong> for the round. All other players add their hand scores to their match penalties!
+                  </div>
+                  <div style={{ background: "rgba(244, 63, 94, 0.12)", border: "1px solid rgba(244, 63, 94, 0.3)", borderRadius: "10px", padding: "14px" }}>
+                    <strong style={{ color: "#f87171" }}>💥 Wrong Show:</strong> If an opponent has equal or fewer points than you, they score 0 and you receive <strong>handScore + 40 penalty points</strong>!
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : (
+          /* MONODEAL GUIDE */
+          <>
+          {/* STEP 1 */}
+          <section className="how-step-section shell" style={{ marginTop: "24px" }}>
+            <div className="how-step-card glass-panel">
+              <div className="how-step-header">
+                <div className="how-step-badge">STEP 1</div>
               <div>
                 <h2>The Big Goal: Complete 3 Property Sets!</h2>
                 <p>The first player to complete <strong>3 full property sets</strong> in front of them wins instantly.</p>
@@ -568,6 +691,8 @@ export default function HowToPlayPage() {
             </div>
           </div>
         </section>
+        </>
+        )}
 
         {/* ============================================================ */}
         {/* CALL TO ACTION                                               */}

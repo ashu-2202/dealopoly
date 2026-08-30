@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MarketingNav } from "../_components/marketing-nav";
 import { BackButton } from "../_components/back-button";
 import { Card } from "../_components/card";
+import { StandardCard } from "../_components/standard-card";
 import { CARD_CATALOGUE, COLOR_CONFIG, type CardColor } from "@dealopoly/shared";
 
 type RuleCategory =
@@ -36,6 +37,7 @@ const RULE_TABS: TabConfig[] = [
 ];
 
 export default function RulesPage() {
+  const [selectedGame, setSelectedGame] = useState<"monodeal" | "least_count">("monodeal");
   const [activeTab, setActiveTab] = useState<RuleCategory>("general");
 
   // Lookup Sample Cards
@@ -77,46 +79,160 @@ export default function RulesPage() {
               <BackButton fallbackUrl="/" label="Back to Home" variant="subtle" />
             </div>
 
+            {/* Game Selector Switcher */}
+            <div
+              style={{
+                display: "inline-flex",
+                gap: "8px",
+                margin: "0 auto 16px",
+                background: "rgba(15, 23, 42, 0.85)",
+                padding: "4px",
+                borderRadius: "999px",
+                border: "1px solid rgba(255, 255, 255, 0.14)",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.4)",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setSelectedGame("monodeal")}
+                className={`button button--sm ${selectedGame === "monodeal" ? "button--primary" : "button--ghost"}`}
+                style={{ borderRadius: "999px", padding: "6px 18px", fontSize: "0.82rem" }}
+              >
+                🃏 Monodeal Rules
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedGame("least_count")}
+                className={`button button--sm ${selectedGame === "least_count" ? "button--primary" : "button--ghost"}`}
+                style={{ borderRadius: "999px", padding: "6px 18px", fontSize: "0.82rem" }}
+              >
+                🎯 Least Count Rules
+              </button>
+            </div>
+
             <div className="how-hero-pill">
-              <span>📖 Official Dealopoly Rulebook</span>
+              <span>📖 Official {selectedGame === "monodeal" ? "Dealopoly" : "Least Count"} Rulebook</span>
             </div>
 
             <h1 className="how-hero-title">
-              Complete <span className="glow-word">Game Rules</span>
+              {selectedGame === "monodeal" ? "Monodeal Rules" : "Least Count Rules"}
             </h1>
 
             <p className="how-hero-lede">
-              Explore the official rules, card interactions, payments, and strategy tips broken down into clear,
-              searchable categories.
+              {selectedGame === "monodeal"
+                ? "Explore official rules, card interactions, payments, and strategy tips broken down into clear categories."
+                : "Master point shedding, matching pairs, 3-card sequences, 0-point Kings, and the strategic Show declaration."}
             </p>
           </div>
 
-          {/* Category Tabs */}
-          <div className="rules-tabs-wrapper">
-            <div className="rules-tabs-bar" role="tablist" aria-label="Game Rules Categories">
-              {RULE_TABS.map((tab) => {
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={isActive}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`rules-nav-tab ${isActive ? "active" : ""}`}
-                  >
-                    <span className="material-symbols-outlined rules-tab-icon">{tab.icon}</span>
-                    <span className="rules-tab-text-full">{tab.label}</span>
-                    <span className="rules-tab-text-short">{tab.shortLabel}</span>
-                  </button>
-                );
-              })}
+          {/* Monodeal Category Tabs (only shown for Monodeal) */}
+          {selectedGame === "monodeal" && (
+            <div className="rules-tabs-wrapper">
+              <div className="rules-tabs-bar" role="tablist" aria-label="Game Rules Categories">
+                {RULE_TABS.map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`rules-nav-tab ${isActive ? "active" : ""}`}
+                    >
+                      <span className="material-symbols-outlined rules-tab-icon">{tab.icon}</span>
+                      <span className="rules-tab-text-full">{tab.label}</span>
+                      <span className="rules-tab-text-short">{tab.shortLabel}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </section>
 
         {/* Tab Content Section */}
-        <section className="shell" style={{ marginTop: "16px" }}>
+        {selectedGame === "least_count" ? (
+          <section className="shell" style={{ marginTop: "16px", maxWidth: "920px" }}>
+            <div className="rules-card-container" style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+              {/* 1. Objective */}
+              <div className="rule-box" style={{ background: "rgba(15, 23, 42, 0.7)", border: "1px solid rgba(56, 189, 248, 0.25)", borderRadius: "14px", padding: "24px" }}>
+                <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "#38bdf8", margin: "0 0 10px" }}>🎯 Game Objective</h3>
+                <p style={{ color: "#cbd5e1", lineHeight: 1.6, margin: 0 }}>
+                  The objective of <strong>Least Count</strong> is to have the lowest total score in your hand at the end of each round.
+                  When your hand points are <strong>7 or less</strong>, you can declare <strong>"SHOW"</strong> to end the round.
+                  If your score is strictly the lowest, you score <strong>0 points</strong> while opponents receive penalty points equal to their hand totals.
+                </p>
+              </div>
+
+              {/* 2. Card Point Values */}
+              <div className="rule-box" style={{ background: "rgba(15, 23, 42, 0.7)", border: "1px solid rgba(234, 179, 8, 0.25)", borderRadius: "14px", padding: "24px" }}>
+                <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "#facc15", margin: "0 0 16px" }}>👑 Card Point Values & Ranks</h3>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px", marginBottom: "20px" }}>
+                  <div style={{ background: "rgba(234, 179, 8, 0.12)", border: "1px solid rgba(234, 179, 8, 0.3)", borderRadius: "10px", padding: "14px", textAlign: "center" }}>
+                    <div style={{ fontSize: "1.8rem" }}>👑</div>
+                    <div style={{ fontWeight: 900, color: "#facc15", fontSize: "1.1rem" }}>King (K)</div>
+                    <div style={{ fontSize: "0.82rem", color: "#94a3b8" }}>0 Points (Golden!)</div>
+                  </div>
+                  <div style={{ background: "rgba(56, 189, 248, 0.12)", border: "1px solid rgba(56, 189, 248, 0.3)", borderRadius: "10px", padding: "14px", textAlign: "center" }}>
+                    <div style={{ fontSize: "1.8rem" }}>⭐</div>
+                    <div style={{ fontWeight: 900, color: "#38bdf8", fontSize: "1.1rem" }}>Ace (A)</div>
+                    <div style={{ fontSize: "0.82rem", color: "#94a3b8" }}>1 Point</div>
+                  </div>
+                  <div style={{ background: "rgba(255, 255, 255, 0.06)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "10px", padding: "14px", textAlign: "center" }}>
+                    <div style={{ fontSize: "1.8rem" }}>🔢</div>
+                    <div style={{ fontWeight: 900, color: "#f8fafc", fontSize: "1.1rem" }}>2 through 10</div>
+                    <div style={{ fontSize: "0.82rem", color: "#94a3b8" }}>Face Value (2–10 pts)</div>
+                  </div>
+                  <div style={{ background: "rgba(244, 63, 94, 0.12)", border: "1px solid rgba(244, 63, 94, 0.3)", borderRadius: "10px", padding: "14px", textAlign: "center" }}>
+                    <div style={{ fontSize: "1.8rem" }}>🃏 👸</div>
+                    <div style={{ fontWeight: 900, color: "#f43f5e", fontSize: "1.1rem" }}>J = 11 pts, Q = 12 pts</div>
+                    <div style={{ fontSize: "0.82rem", color: "#94a3b8" }}>High penalty cards</div>
+                  </div>
+                </div>
+                <p style={{ fontSize: "0.82rem", color: "#94a3b8", margin: 0 }}>
+                  * Jokers are excluded entirely. 2 players use 1 deck (52 cards); 3 to 6 players use 2 decks combined (104 cards).
+                </p>
+              </div>
+
+              {/* 3. Discard Rules */}
+              <div className="rule-box" style={{ background: "rgba(15, 23, 42, 0.7)", border: "1px solid rgba(16, 185, 129, 0.25)", borderRadius: "14px", padding: "24px" }}>
+                <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "#34d399", margin: "0 0 16px" }}>📥 Legal Discard Combinations</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px", color: "#cbd5e1", lineHeight: 1.6 }}>
+                  <div>
+                    <strong style={{ color: "#f8fafc" }}>1. Single Card:</strong> Drop any 1 card from your hand.
+                  </div>
+                  <div>
+                    <strong style={{ color: "#f8fafc" }}>2. Matching Pair (2 Cards):</strong> Drop exactly 2 cards of the <strong>exact same rank</strong> (e.g. two Kings, two Queens, or two 7s).
+                  </div>
+                  <div>
+                    <strong style={{ color: "#f8fafc" }}>3. 3-Card Suit Sequence:</strong> Drop exactly 3 consecutive cards in the <strong>same suit</strong> (e.g. 5♥-6♥-7♥ or 10♠-J♠-Q♠).
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. Declare Show & Wrong Show Penalties */}
+              <div className="rule-box" style={{ background: "rgba(15, 23, 42, 0.7)", border: "1px solid rgba(244, 63, 94, 0.25)", borderRadius: "14px", padding: "24px" }}>
+                <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "#fb7185", margin: "0 0 16px" }}>💥 Declaring SHOW & Penalties</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", color: "#cbd5e1", lineHeight: 1.6 }}>
+                  <p style={{ margin: 0 }}>
+                    When your hand total is <strong>7 points or fewer</strong>, you can declare <strong>SHOW</strong> at the beginning of your turn before discarding.
+                  </p>
+                  <div style={{ background: "rgba(34, 197, 94, 0.1)", border: "1px solid rgba(34, 197, 94, 0.3)", borderRadius: "8px", padding: "12px" }}>
+                    <strong style={{ color: "#4ade80" }}>🎉 Successful Show:</strong> If your hand score is strictly lower than every opponent, you score <strong>0 points</strong> and all opponents add their hand scores to their match total.
+                  </div>
+                  <div style={{ background: "rgba(244, 63, 94, 0.1)", border: "1px solid rgba(244, 63, 94, 0.3)", borderRadius: "8px", padding: "12px" }}>
+                    <strong style={{ color: "#f87171" }}>💥 Wrong Show (Countered):</strong> If ANY opponent has a score less than or equal to yours, the lowest opponent scores 0 points and you are penalized with <strong>your hand score + 40 penalty points</strong>!
+                  </div>
+                  <p style={{ margin: "8px 0 0", fontSize: "0.85rem", color: "#94a3b8" }}>
+                    A player is eliminated when their cumulative match score exceeds 100 points. The last remaining player wins the match!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <section className="shell" style={{ marginTop: "16px" }}>
           {/* ======================================================== */}
           {/* 1. GENERAL RULES TAB                                     */}
           {/* ======================================================== */}
@@ -573,6 +689,7 @@ export default function RulesPage() {
             </div>
           )}
         </section>
+        )}
 
         {/* Bottom CTA Banner */}
         <section className="shell" style={{ marginTop: "40px", textAlign: "center" }}>
