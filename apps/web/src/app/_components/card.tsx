@@ -93,6 +93,18 @@ export function Card({
       ? "attach_money"
       : "help");
 
+  // Resolve rent tiers from card or fallback to COLOR_CONFIG
+  const effectiveRentTiers =
+    card.rentTiers && card.rentTiers.length > 0
+      ? card.rentTiers
+      : primaryConfig?.rentTiers
+      ? primaryConfig.rentTiers.map((rent, idx) => ({
+          setCount: idx + 1,
+          rent,
+          isComplete: idx + 1 === (primaryConfig.setSize || card.setSize || 3),
+        }))
+      : [];
+
   return (
     <div
       onClick={onClick}
@@ -214,7 +226,9 @@ export function Card({
         {/* ============================================================ */}
         <div
           className={`card-body-section card-body-section--${card.type} ${
-            card.rentTiers ? `card-body-section--tiers-${card.rentTiers.length}` : ""
+            effectiveRentTiers.length > 0
+              ? `card-body-section--tiers-${effectiveRentTiers.length}`
+              : ""
           }`}
         >
           {/* Property Card Body (Matching Shared Reference) */}
@@ -230,7 +244,7 @@ export function Card({
               </p>
               <div className="card-rent-table-box">
                 <div className="card-rent-table-rows">
-                  {card.rentTiers?.map((tier) => (
+                  {effectiveRentTiers.map((tier) => (
                     <div key={tier.setCount} className="card-rent-row">
                       <div className="card-rent-set-col">
                         <span className="card-rent-set-label">
