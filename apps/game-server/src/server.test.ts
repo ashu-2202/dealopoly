@@ -1,7 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { createGameServer } from "./server.js";
 
-describe("Dealopoly Real-Time Game Server", { timeout: 15000 }, () => {
+describe("Dealopoly Real-Time Game Server", () => {
+  beforeAll(() => {
+    delete process.env.DATABASE_URL;
+  });
   it("reports that it is healthy", async () => {
     const server = createGameServer();
     const response = await server.inject({ method: "GET", url: "/health" });

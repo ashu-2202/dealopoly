@@ -94,4 +94,45 @@ describe("Game Setup and Initial Deal", () => {
     expect(nextState.turn.phase).toBe("action");
     expect(nextState.deck.length).toBe(game.deck.length - 2);
   });
+
+  it("should reshuffle discard pile into main deck when deck runs out and update deck count", () => {
+    const game = createGame({
+      seed: 42,
+      players: [
+        { id: "p1", name: "Alice" },
+        { id: "p2", name: "Bob" },
+      ],
+    });
+
+    // Create a mock state where deck is completely empty and discard pile has 10 cards
+    const sampleDiscardCards = game.deck.slice(0, 10);
+    const depletedState = {
+      ...game,
+      deck: [],
+      discardPile: sampleDiscardCards,
+    };
+
+    const { nextState, events } = applyCommand(depletedState, {
+      type: "draw_cards",
+      playerId: "p1",
+    });
+
+    // Active player drew 2 cards (hand went from 5 to 7)
+    expect(nextState.players["p1"]?.hand.length).toBe(7);
+
+    // Discard pile is emptied
+    expect(nextState.discardPile.length).toBe(0);
+
+    // Main deck now has the remaining reshuffled cards: 10 - 2 = 8
+    expect(nextState.deck.length).toBe(8);
+
+    // Masked view reflects accurate deck count of 8 and empty discard pile
+    const masked = getMaskedView(nextState, "p1");
+    expect(masked.deckCount).toBe(8);
+    expect(masked.discardPile.length).toBe(0);
+    expect(masked.discardPileTop).toBeNull();
+
+    // Event logs deck reshuffle
+    expect(events[0]?.message).toContain("Deck reshuffled from 10 discard cards");
+  });
 });

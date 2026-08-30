@@ -3272,8 +3272,8 @@ p {
 /* 3D Stacked Draw Pile */
 .game-draw-pile {
   position: relative;
-  width: 96px;
-  height: 138px;
+  width: 110px;
+  height: 160px;
   cursor: pointer;
   perspective: 600px;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -3338,7 +3338,7 @@ p {
 
 .game-draw-title {
   font-family: var(--display);
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   font-weight: 900;
   letter-spacing: 0.08em;
   color: rgba(255, 255, 255, 0.9);
@@ -3348,7 +3348,7 @@ p {
 
 .game-draw-count-badge {
   font-family: var(--mono);
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: #FFFFFF;
   line-height: 1;
@@ -3356,7 +3356,7 @@ p {
 
 .game-draw-subtitle {
   font-family: var(--mono);
-  font-size: 0.6rem;
+  font-size: 0.62rem;
   font-weight: 700;
   color: #a8c8ff;
   text-align: center;
@@ -3364,11 +3364,11 @@ p {
   line-height: 1;
 }
 
-/* Discard Pile */
+/* 3D Stacked Discard Pile */
 .game-discard-pile {
   position: relative;
-  width: 96px;
-  height: 138px;
+  width: 110px;
+  height: 160px;
   border-radius: 12px;
   background: rgba(18, 24, 38, 0.6);
   border: 1.5px dashed rgba(66, 71, 81, 0.5);
@@ -3381,7 +3381,7 @@ p {
   transition: transform 0.2s ease, border-color 0.2s;
 }
 .game-discard-pile:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   border-color: var(--primary);
 }
 
@@ -3395,59 +3395,68 @@ p {
   padding: 6px;
 }
 
-.game-discard-card-view {
+.game-discard-stack-wrapper {
   position: absolute;
   inset: 0;
   border-radius: 12px;
-  background: var(--surface-highest);
-  border: 1.5px solid var(--outline);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
-  transform: rotate(2deg);
-  transition: transform 0.2s;
-}
-.game-discard-pile:hover .game-discard-card-view {
-  transform: rotate(0deg) scale(1.02);
 }
 
-.game-discard-card-header {
-  padding: 4px 6px;
-  color: #FFFFFF;
+.game-discard-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: rgba(18, 33, 55, 0.95);
+  background-image: url('/card-back.png');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.game-discard-layer--bottom {
+  transform: translate(-3px, 3px) rotate(-4deg);
+  z-index: 1;
+  opacity: 0.75;
+}
+
+.game-discard-layer--middle {
+  transform: translate(3px, 1px) rotate(3deg);
+  z-index: 2;
+  opacity: 0.9;
+}
+
+.game-discard-top-card {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  transform: rotate(-0.5deg);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+}
+
+.game-discard-top-card .monopoly-card {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
+}
+
+.game-discard-pile:hover .game-discard-top-card {
+  transform: translateY(-4px) rotate(0deg) scale(1.02);
+}
+
+.game-discard-count-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  z-index: 10;
+  background: #111415;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
   font-family: var(--mono);
-  font-size: 0.58rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  text-align: center;
-}
-
-.game-discard-card-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  text-align: center;
-  gap: 2px;
-}
-
-.game-discard-card-name {
   font-size: 0.68rem;
-  color: var(--text);
-  line-height: 1.2;
-  max-width: 95%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.game-discard-card-val {
-  font-size: 0.64rem;
-  color: #66df75;
-  font-weight: 700;
-  font-family: var(--mono);
+  font-weight: 800;
+  padding: 1px 7px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  pointer-events: none;
 }
 
 /* Center Table Action Reel / Floating Announcer */
@@ -4485,15 +4494,27 @@ p {
 
   .game-draw-pile,
   .game-discard-pile {
-    width: 74px;
-    height: 104px;
+    width: 76px;
+    height: 110px;
     border-radius: 10px;
   }
 
   .game-draw-card-layer,
   .game-draw-card-top,
-  .game-discard-card-view {
+  .game-discard-layer,
+  .game-discard-stack-wrapper {
     border-radius: 10px;
+  }
+
+  .game-discard-top-card .monopoly-card--xs {
+    font-size: 5.06px !important;
+  }
+
+  .game-discard-count-badge {
+    font-size: 0.58rem;
+    padding: 1px 5px;
+    top: -6px;
+    right: -6px;
   }
 
   .game-draw-title {
@@ -4507,11 +4528,6 @@ p {
 
   .game-draw-subtitle {
     font-size: 0.5rem;
-  }
-
-  .game-discard-card-header {
-    font-size: 0.48rem;
-    padding: 2px 3px;
   }
 
   .game-discard-card-name {

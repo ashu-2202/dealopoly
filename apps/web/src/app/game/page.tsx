@@ -677,34 +677,44 @@ export default function GamePage(props: {
                 </div>
               </div>
 
-              {/* Discard Pile */}
+              {/* Discard Pile with stacked authentic cards */}
               <div
                 className="game-discard-pile"
                 onClick={() => setIsDiscardInspectorOpen(true)}
                 title="Tap to Inspect Discard Pile"
               >
                 {gameState.discardPileTop ? (
-                  <div className="game-discard-card-view">
-                    <div
-                      className="game-discard-card-header"
-                      style={{
-                        background:
-                          COLOR_CONFIG[gameState.discardPileTop.currentColor || gameState.discardPileTop.primaryColor || "dark-blue"]?.hex ||
-                          "#0055a4",
-                      }}
-                    >
-                      {gameState.discardPileTop.type}
+                  <div className="game-discard-stack-wrapper">
+                    {/* Layer 1 (bottom card in stack if 3+ cards) */}
+                    {(gameState.discardPile?.length ?? 1) >= 3 && (
+                      <div className="game-discard-layer game-discard-layer--bottom" />
+                    )}
+                    {/* Layer 2 (middle card in stack if 2+ cards) */}
+                    {(gameState.discardPile?.length ?? 1) >= 2 && (
+                      <div className="game-discard-layer game-discard-layer--middle" />
+                    )}
+                    {/* Top Card rendered as authentic pure CSS Card */}
+                    <div className="game-discard-top-card">
+                      <Card
+                        card={{
+                          id: gameState.discardPileTop.defId,
+                          name: gameState.discardPileTop.name,
+                          type: gameState.discardPileTop.type,
+                          primaryColor: gameState.discardPileTop.primaryColor,
+                          secondaryColor: gameState.discardPileTop.secondaryColor,
+                          value: gameState.discardPileTop.value,
+                          setSize: gameState.discardPileTop.setSize,
+                          description: gameState.discardPileTop.description,
+                          icon: gameState.discardPileTop.icon,
+                          count: 1,
+                        }}
+                        size="xs"
+                        isInteractive={false}
+                      />
                     </div>
-                    <div className="game-discard-card-body">
-                      <span className="material-symbols-outlined" style={{ fontSize: "20px", color: "var(--primary)" }}>
-                        {gameState.discardPileTop.icon || "layers"}
-                      </span>
-                      <b className="game-discard-card-name">
-                        {gameState.discardPileTop.name}
-                      </b>
-                      <span className="game-discard-card-val">
-                        ${gameState.discardPileTop.value}M
-                      </span>
+                    {/* Discard count badge */}
+                    <div className="game-discard-count-badge">
+                      <span>{gameState.discardPile?.length || 1}</span>
                     </div>
                   </div>
                 ) : (
@@ -713,7 +723,10 @@ export default function GamePage(props: {
                       layers_clear
                     </span>
                     <span style={{ fontSize: "0.58rem", color: "var(--outline)", fontFamily: "var(--mono)", fontWeight: 700, letterSpacing: "0.04em" }}>
-                      DISCARD
+                      DISCARD PILE
+                    </span>
+                    <span style={{ fontSize: "0.52rem", color: "var(--muted)", fontFamily: "var(--mono)" }}>
+                      (0 Cards)
                     </span>
                   </div>
                 )}

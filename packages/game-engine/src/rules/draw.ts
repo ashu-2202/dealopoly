@@ -17,13 +17,17 @@ export function drawCardsForActivePlayer(
 
   let currentDeck = [...state.deck];
   let currentDiscard = [...state.discardPile];
+  let wasReshuffled = false;
+  let reshuffledCount = 0;
 
   // If deck is depleted, reshuffle discard pile
   if (currentDeck.length < countNeeded && currentDiscard.length > 0) {
+    reshuffledCount = currentDiscard.length;
     const rng = createRng(state.seed + state.turn.turnNumber * 7919);
     const reshuffled = shuffleDeck(currentDiscard, rng);
     currentDeck = [...currentDeck, ...reshuffled];
     currentDiscard = [];
+    wasReshuffled = true;
   }
 
   const actualDrawCount = Math.min(countNeeded, currentDeck.length);
@@ -42,7 +46,9 @@ export function drawCardsForActivePlayer(
     playerId: activePlayer.id,
     count: actualDrawCount,
     drawnCards,
-    message: `${activePlayer.name} drew ${actualDrawCount} card(s).`,
+    message: wasReshuffled
+      ? `${activePlayer.name} drew ${actualDrawCount} card(s) (Deck reshuffled from ${reshuffledCount} discard cards).`
+      : `${activePlayer.name} drew ${actualDrawCount} card(s).`,
   };
 
   const nextState: GameState = {
