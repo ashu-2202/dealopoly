@@ -2,6 +2,7 @@
 
 import { useState, use, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardBack } from "../_components/card";
 import { CardLoader } from "../_components/card-loader";
@@ -40,6 +41,7 @@ export default function GamePage(props: {
   const botDifficulty = searchParams?.difficulty;
   const customPlayerName = searchParams?.name; // 'player' is now ID, 'name' is name if needed
 
+  const { data: authSession } = useSession();
   const profile = getStoredProfile();
   const session = urlRoomCode ? getRoomSession(urlRoomCode, urlPlayerId) : null;
   const playerId = session?.playerId || urlPlayerId || profile.id;
@@ -476,7 +478,7 @@ export default function GamePage(props: {
 
         {/* Top bar actions */}
         <div className="game-topbar-actions">
-          {/* Desktop links */}
+          {/* Match Status Pill */}
           <div
             className="hero-badge game-desktop-only"
             style={{
@@ -492,6 +494,7 @@ export default function GamePage(props: {
             </span>
           </div>
 
+          {/* Card Catalogue Link */}
           <Link href="/cards" className="game-icon-btn game-desktop-only" title="Card Catalogue">
             <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
               menu_book
@@ -517,23 +520,42 @@ export default function GamePage(props: {
             )}
           </button>
 
-          <Link href="/cards" className="game-icon-btn game-desktop-only" title="Card Catalogue">
-            <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
-              menu_book
-            </span>
-          </Link>
-
+          {/* Desktop Full Red Leave Game Button */}
           <button
             type="button"
-            className="game-icon-btn game-desktop-only"
-            title="Leave Game"
+            className="game-topbar-leave-btn game-desktop-only"
+            title="Leave Match"
             onClick={() => setIsExitDialogOpen(true)}
-            style={{ color: "#ef4444" }}
           >
-            <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+            <span className="material-symbols-outlined" style={{ fontSize: "17px" }}>
               exit_to_app
             </span>
+            <span>Leave Game</span>
           </button>
+
+          {/* User Profile Avatar */}
+          {(() => {
+            const userImg = authSession?.user?.image;
+            const displayName = you?.name || authSession?.user?.name || profile.name || "Player";
+            const initials = (displayName || "P").substring(0, 2).toUpperCase();
+
+            return userImg ? (
+              <img
+                src={userImg}
+                alt={displayName}
+                className="game-topbar-avatar game-desktop-only"
+                referrerPolicy="no-referrer"
+                title={displayName}
+              />
+            ) : (
+              <div
+                className="game-topbar-avatar game-topbar-avatar--fallback game-desktop-only"
+                title={displayName}
+              >
+                {initials}
+              </div>
+            );
+          })()}
 
           {/* Mobile Menu Toggle */}
           <button
@@ -546,25 +568,6 @@ export default function GamePage(props: {
               menu
             </span>
           </button>
-
-          <div
-            className="game-desktop-only avatar-theme--blue"
-            style={{
-              width: "34px",
-              height: "34px",
-              borderRadius: "50%",
-              display: "grid",
-              placeItems: "center",
-              fontWeight: 800,
-              fontSize: "0.85rem",
-              color: "#FFFFFF",
-              border: "1.5px solid #60a5fa",
-              boxShadow: "0 0 10px rgba(59, 130, 246, 0.4)",
-            }}
-            title={you?.name || "Player"}
-          >
-            {you?.name[0]?.toUpperCase() || "P"}
-          </div>
         </div>
       </header>
 

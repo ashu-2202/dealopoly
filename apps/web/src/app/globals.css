@@ -3073,6 +3073,55 @@ p {
   color: #FFFFFF;
 }
 
+.game-topbar-leave-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  color: #f87171;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+.game-topbar-leave-btn:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+  transform: translateY(-1px);
+}
+.game-topbar-leave-btn:active {
+  transform: translateY(0);
+}
+
+.game-topbar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+.game-topbar-avatar--fallback {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #0055a4 0%, #002b5c 100%);
+  color: #ffffff;
+  font-family: var(--mono);
+  font-weight: 800;
+  font-size: 0.76rem;
+  letter-spacing: 0.5px;
+  border: 2px solid var(--primary);
+  box-shadow: 0 0 10px rgba(0, 85, 164, 0.4);
+}
+
 .game-desktop-only {
   display: flex !important;
 }
