@@ -189,11 +189,6 @@ export function HeroCardShowcase() {
   const handleShuffle = () => {
     if (isShuffling) return;
 
-    // Desktop view only check (enabled only for screen width >= 900px)
-    if (typeof window !== "undefined" && window.innerWidth < 900) {
-      return;
-    }
-
     setIsShuffling(true);
     setShuffleStep("gather");
 

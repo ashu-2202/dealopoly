@@ -1622,6 +1622,9 @@ p {
   .hero-showcase-stage {
     margin-top: -75px;
   }
+  .hero-shuffle-badge {
+    display: none !important;
+  }
   .hero-platform-container {
     bottom: -35px;
     width: 580px;
