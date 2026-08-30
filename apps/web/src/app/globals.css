@@ -2612,31 +2612,29 @@ p {
   z-index: 2;
 }
 
-/* ── 1. Top Arched Header Banner (Fixed 35.5% Card Height with 3D Gloss & Bevel) ── */
+/* ── 1. Top Header Banner (Matching Shared Reference Design) ─── */
 .card-arched-header {
   position: relative;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.04) 35%, rgba(0, 0, 0, 0.12) 100%),
-    var(--card-color, #8B4513);
-  color: var(--card-text-color, #FFFFFF);
-  border-radius: 36% 36% 0 0 / 18% 18% 0 0;
-  margin: 0.18em 0.18em 0;
-  border: 0.1em solid var(--card-color-dark, #54280B);
-  border-bottom: none;
-  height: 35.5%;
-  flex: 0 0 35.5%;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(0, 0, 0, 0.12) 100%),
+    var(--card-color, #F28C28);
+  color: #FFFFFF;
+  border-radius: 0.65em 0.65em 0 0;
+  margin: 0.16em 0.16em 0;
+  height: 36.5%;
+  flex: 0 0 36.5%;
   min-height: 0;
   flex-shrink: 0;
   box-sizing: border-box;
-  padding: 0.9em 0.5em 1.25em;
+  padding: 0.55em 0.55em 0.85em;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
+  clip-path: polygon(0 0, 100% 0, 100% 86%, 58% 86%, 50% 100%, 42% 86%, 0 86%);
   box-shadow:
-    inset 0 1.5px 1px rgba(255, 255, 255, 0.5),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.25),
+    inset 0 0 0 1.5px rgba(255, 255, 255, 0.4),
     0 3px 6px rgba(0, 0, 0, 0.25);
 }
 
@@ -2647,98 +2645,94 @@ p {
   color: #FFFFFF !important;
 }
 
-/* Symmetrical Coin Badges (Top-Left Building Icon & Top-Right Money Value with 3D Metallic Edge) */
-.card-header-coin {
+/* Top-Left Circular White Badge with City Silhouette in Card Color */
+.card-header-badge-circle {
   position: absolute;
-  top: 0.5em;
-  width: 2.0em;
-  height: 2.0em;
+  top: 0.45em;
+  left: 0.45em;
+  width: 2.15em;
+  height: 2.15em;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #3D261A 0%, #1A0E08 100%);
-  border: 0.12em solid #D4AF37;
+  background: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FFFFFF;
-  box-shadow:
-    0 3px 6px rgba(0, 0, 0, 0.45),
-    inset 0 1.5px 1px rgba(255, 255, 255, 0.5),
-    inset 0 -1.5px 1px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
   z-index: 3;
+  padding: 0.25em;
   box-sizing: border-box;
 }
 
-.card-header-coin--left {
-  left: 0.45em;
+.card-header-city-svg {
+  width: 100%;
+  height: 100%;
+  fill: var(--card-color, #F28C28);
 }
 
-.card-header-coin--right {
-  right: 0.45em;
-}
-
-.card-header-coin--right span {
-  font-family: var(--mono);
-  font-size: 0.6em;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  color: #FFFFFF;
-  display: block;
-  text-align: center;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-}
-
-.card-header-coin--left .material-symbols-outlined {
-  font-size: 1.2em;
-  line-height: 1;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
-}
-
-/* Category Label in Header */
+/* Category Label with Enclosing Dash Lines */
 .card-header-category {
   font-family: var(--display, system-ui);
-  font-size: 0.62em;
+  font-size: 0.60em;
   font-weight: 800;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  opacity: 0.95;
+  color: rgba(255, 255, 255, 0.95);
   margin-bottom: 0.2em;
-  display: block;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-}
-
-/* Card Main Title */
-.card-header-title {
-  font-family: var(--display, system-ui);
-  font-size: 1.12em;
-  font-weight: 900;
-  line-height: 1.1;
-  text-transform: uppercase;
-  letter-spacing: -0.01em;
-  margin: 0;
-  padding: 0 0.25em;
-  text-shadow: 0 1.5px 3px rgba(0, 0, 0, 0.35);
-  word-break: break-word;
-}
-
-/* Gold Star Emblem Overlapping Header Bottom */
-.card-header-star-emblem {
-  position: absolute;
-  bottom: -0.72em;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1.45em;
-  height: 1.45em;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 5;
-  color: #D4AF37;
-  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45)) drop-shadow(0 1px 1px rgba(255, 255, 255, 0.3));
+  gap: 0.45em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
-.card-star-icon {
-  font-size: 1.45em !important;
-  color: #D4AF37 !important;
+
+.card-header-category::before,
+.card-header-category::after {
+  content: "";
+  display: inline-block;
+  width: 1.4em;
+  height: 0.12em;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 1px;
+}
+
+/* Card Main Title in Bold Condensed Black Typography */
+.card-header-title {
+  font-family: var(--display, Impact, "Arial Black", system-ui);
+  font-size: 1.42em;
+  font-weight: 900;
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: #181818 !important;
+  margin: 0;
+  padding: 0 0.15em;
+  max-width: 96%;
+  word-break: break-word;
+  text-shadow: none;
+}
+
+/* Bottom Center Point Star Shield */
+.card-header-star-shield {
+  position: absolute;
+  bottom: 0.02em;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.45em;
+  height: 1.35em;
+  background: #FFFFFF;
+  clip-path: polygon(0 0, 100% 0, 100% 35%, 50% 100%, 0 35%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0.08em;
+  z-index: 5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.card-star-glyph {
+  font-size: 0.82em;
+  color: var(--card-color, #F28C28);
+  line-height: 1;
 }
 
 /* ── 2. Card Body Section (Fixed 52.5% Flexible Middle Area) ──── */

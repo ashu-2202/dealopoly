@@ -116,7 +116,7 @@ export function Card({
       {/* Inner Card Frame */}
       <div className="card-inner-frame">
         {/* ============================================================ */}
-        {/* 1. TOP ARCHED HEADER BANNER                                  */}
+        {/* 1. TOP HEADER BANNER (Matching Shared Reference Design)      */}
         {/* ============================================================ */}
         <div
           className={`card-arched-header ${
@@ -137,37 +137,36 @@ export function Card({
               : undefined
           }
         >
-          {/* Top-Left Circular Building / Category Coin Badge */}
-          <div className="card-header-coin card-header-coin--left">
-            <span
-              className="material-symbols-outlined"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              {coinIcon}
-            </span>
+          {/* Top-Left Circular White Badge with City Silhouette in Card Color */}
+          <div className="card-header-badge-circle">
+            {card.type === "property" ? (
+              <svg
+                viewBox="0 0 28 28"
+                className="card-header-city-svg"
+                fill="var(--card-color, #F28C28)"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M2 24h24v2H2v-2zm2-8h2.5v8H4v-8zm3.5-4h3v12h-3V12zm1-3l1.5-4L11 9H8.5zm4.5 4h3v9h-3V13zm4.5-7h4v16h-4V6zm1-3l2-3 2 3h-4zm5 6h3.5v10H23V9z" />
+              </svg>
+            ) : (
+              <span
+                className="material-symbols-outlined"
+                style={{ color: "var(--card-color, #0055A4)", fontVariationSettings: "'FILL' 1", fontSize: "1.25em" }}
+              >
+                {coinIcon}
+              </span>
+            )}
           </div>
 
-          {/* Top-Right Money Value Badge (Symmetrically Aligned) */}
-          {card.value > 0 && (
-            <div className="card-header-coin card-header-coin--right">
-              <span>${card.value}M</span>
-            </div>
-          )}
-
-          {/* Category Tag */}
+          {/* Category Tag with Dash Accents (e.g. — PROPERTY —) */}
           <span className="card-header-category">{categoryLabel}</span>
 
-          {/* Main Card Title */}
+          {/* Main Card Title in Bold High-Contrast Black Typography */}
           <h3 className="card-header-title">{card.name}</h3>
 
-          {/* Overlapping Gold Star Emblem at Bottom of Header */}
-          <div className="card-header-star-emblem">
-            <span
-              className="material-symbols-outlined card-star-icon"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              star
-            </span>
+          {/* Bottom Center Point Star Shield */}
+          <div className="card-header-star-shield">
+            <span className="card-star-glyph">★</span>
           </div>
         </div>
 
