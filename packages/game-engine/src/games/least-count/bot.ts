@@ -59,9 +59,9 @@ export class LeastCountBotController {
         ? state.discardPile[state.discardPile.length - 1]
         : undefined;
 
-      // Draw from discard pile if it is low point value (<= 3 pts or Joker) or matches rank with hand
+      // Draw from discard pile if it is low point value (K=0 pts, A=1 pt, 2 pts) or matches rank with hand
       if (discardTop) {
-        const isLowValue = discardTop.isJoker || discardTop.points <= 3;
+        const isLowValue = discardTop.rank === "K" || discardTop.points <= 2;
         const matchesHandRank = bot.hand.some((c) => c.rank === discardTop.rank);
 
         if (isLowValue || matchesHandRank) {
@@ -85,7 +85,10 @@ export class LeastCountBotController {
   }
 
   /**
-   * Evaluates hand and finds the legal discard combination that sheds the highest point total
+   * Evaluates hand and finds the legal discard combination that sheds the highest point total:
+   * 1. 3-card sequences of same suit (e.g. 10-J-Q = 33 pts)
+   * 2. 2-card pairs of same rank (e.g. Q-Q = 24 pts)
+   * 3. Single card with highest point value (e.g. Q = 12 pts, J = 11 pts)
    */
   private static findBestDiscard(hand: LeastCountCard[]): LeastCountCard[] {
     if (hand.length === 0) return [];
@@ -94,28 +97,9 @@ export class LeastCountBotController {
     let bestCombination: LeastCountCard[] = [];
     let maxPointsDropped = -1;
 
-    // 1. Evaluate sets/pairs (same rank)
-    const rankGroups: Record<string, LeastCountCard[]> = {};
-    for (const card of hand) {
-      if (!card.isJoker) {
-        if (!rankGroups[card.rank]) rankGroups[card.rank] = [];
-        rankGroups[card.rank]!.push(card);
-      }
-    }
-
-    for (const group of Object.values(rankGroups)) {
-      if (group.length >= 2) {
-        const points = group.reduce((sum, c) => sum + c.points, 0);
-        if (points > maxPointsDropped && validateDiscardCombination(group).valid) {
-          maxPointsDropped = points;
-          bestCombination = group;
-        }
-      }
-    }
-
-    // 2. Evaluate all subsets of length >= 3 for runs
-    for (let size = 3; size <= hand.length; size++) {
-      const combinations = this.getCombinations(hand, size);
+    // 1. Evaluate 3-card sequences in same suit
+    if (hand.length >= 3) {
+      const combinations = this.getCombinations(hand, 3);
       for (const combo of combinations) {
         if (validateDiscardCombination(combo).valid) {
           const points = combo.reduce((sum, c) => sum + c.points, 0);
@@ -127,7 +111,21 @@ export class LeastCountBotController {
       }
     }
 
-    // 3. Fallback: single card with highest points
+    // 2. Evaluate pairs of exact same rank
+    for (let i = 0; i < hand.length; i++) {
+      for (let j = i + 1; j < hand.length; j++) {
+        const pair = [hand[i]!, hand[j]!];
+        if (validateDiscardCombination(pair).valid) {
+          const points = pair.reduce((sum, c) => sum + c.points, 0);
+          if (points > maxPointsDropped) {
+            maxPointsDropped = points;
+            bestCombination = pair;
+          }
+        }
+      }
+    }
+
+    // 3. Fallback: single card with highest points (Never discard King if possible, since King is 0 pts!)
     if (bestCombination.length === 0) {
       const sortedByPoints = [...hand].sort((a, b) => b.points - a.points);
       bestCombination = [sortedByPoints[0]!];

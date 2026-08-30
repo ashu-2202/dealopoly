@@ -10,17 +10,18 @@ import type {
 } from "./types.js";
 
 /**
- * Calculates total point value of a hand of cards
+ * Calculates total point value of a hand of cards:
+ * King = 0, Ace = 1, 2-10 = Face Value, J = 11, Q = 12
  */
 export function calculateHandScore(cards: LeastCountCard[]): number {
-  return cards.reduce((sum, c) => sum + (c.isJoker ? 0 : c.points), 0);
+  return cards.reduce((sum, c) => sum + c.points, 0);
 }
 
 /**
  * Validates whether a selection of cards is a legal discard move:
- * 1. Single card (any card)
- * 2. Set/Group: 2 or more cards of the exact same rank (e.g. 7-7 or 7-7-7, Jokers allowed)
- * 3. Sequence/Run: 3 or more consecutive cards in the same suit (e.g. 4♥-5♥-6♥, Jokers allowed)
+ * 1. Single card: Any 1 card.
+ * 2. Pair / 2-card set: Exactly 2 cards of the exact same rank (e.g. two Kings, two 8s).
+ * 3. 3-card sequence: Exactly 3 cards forming an increasing sequence in the same suit (e.g., 5-6-7 of Hearts).
  */
 export function validateDiscardCombination(cards: LeastCountCard[]): { valid: boolean; reason?: string } {
   if (!cards || cards.length === 0) {
@@ -32,57 +33,48 @@ export function validateDiscardCombination(cards: LeastCountCard[]): { valid: bo
     return { valid: true };
   }
 
-  const nonJokers = cards.filter((c) => !c.isJoker);
-  const jokerCount = cards.length - nonJokers.length;
-
-  // If all cards are Jokers, it's valid as a group of Jokers
-  if (nonJokers.length === 0) {
-    return { valid: true };
-  }
-
-  // 2. Check for Set / Group (Same Rank)
-  const firstRank = nonJokers[0]!.rank;
-  const isSameRankSet = nonJokers.every((c) => c.rank === firstRank);
-  if (isSameRankSet) {
-    return { valid: true };
-  }
-
-  // 3. Check for Sequence / Run (3+ cards of same suit in consecutive order)
-  if (cards.length >= 3) {
-    const suit = nonJokers[0]!.suit;
-    const isSameSuit = nonJokers.every((c) => c.suit === suit);
-
-    if (isSameSuit) {
-      // Sort non-joker cards by rank numeric value
-      const sorted = [...nonJokers].sort((a, b) => a.rankValue - b.rankValue);
-
-      // Check for duplicate ranks in run (not allowed in a sequence)
-      let hasDuplicates = false;
-      for (let i = 0; i < sorted.length - 1; i++) {
-        if (sorted[i]!.rankValue === sorted[i + 1]!.rankValue) {
-          hasDuplicates = true;
-          break;
-        }
-      }
-
-      if (!hasDuplicates) {
-        // Calculate gaps between consecutive cards
-        let neededJokers = 0;
-        for (let i = 0; i < sorted.length - 1; i++) {
-          const gap = sorted[i + 1]!.rankValue - sorted[i]!.rankValue - 1;
-          neededJokers += gap;
-        }
-
-        if (neededJokers <= jokerCount) {
-          return { valid: true };
-        }
-      }
+  // 2. Exactly 2 cards: Must be the exact same rank (e.g., two Kings or two 7s)
+  if (cards.length === 2) {
+    if (cards[0]!.rank === cards[1]!.rank) {
+      return { valid: true };
     }
+    return {
+      valid: false,
+      reason: "Two-card discard must be a pair of the exact same rank (e.g., two Kings or two 7s).",
+    };
+  }
+
+  // 3. Exactly 3 cards: Must be an increasing sequence of the same suit (e.g., 5-6-7 of Hearts)
+  if (cards.length === 3) {
+    const suit = cards[0]!.suit;
+    const isSameSuit = cards.every((c) => c.suit === suit);
+
+    if (!isSameSuit) {
+      return {
+        valid: false,
+        reason: "Three-card sequence must all belong to the same suit.",
+      };
+    }
+
+    // Sort cards by rank numeric value (A=1, 2=2... 10=10, J=11, Q=12, K=13)
+    const sorted = [...cards].sort((a, b) => a.rankValue - b.rankValue);
+    const isConsecutive =
+      sorted[0]!.rankValue + 1 === sorted[1]!.rankValue &&
+      sorted[1]!.rankValue + 1 === sorted[2]!.rankValue;
+
+    if (isConsecutive) {
+      return { valid: true };
+    }
+
+    return {
+      valid: false,
+      reason: "Three-card discard must be a continuous sequence in the same suit (e.g., 5-6-7 or 10-J-Q).",
+    };
   }
 
   return {
     valid: false,
-    reason: "Invalid discard. Must be a single card, a matching set (same rank), or a 3+ card run in the same suit.",
+    reason: "Discards are limited to 1 card, a pair of the same rank, or a 3-card sequence in the same suit.",
   };
 }
 
@@ -107,7 +99,9 @@ export function shuffleArray<T>(array: T[], seed?: number): T[] {
 }
 
 /**
- * Initializes a new Least Count game session
+ * Initializes a new Least Count game session.
+ * - 2 players: 1 standard 52-card deck.
+ * - 3 to 6 players: 2 standard decks combined (104 cards).
  */
 export function createLeastCountGame(options: {
   gameId?: string;
@@ -124,9 +118,9 @@ export function createLeastCountGame(options: {
   const showThreshold = config?.showThreshold ?? 7;
   const maxScore = config?.maxScore ?? 100;
   const wrongShowPenalty = config?.wrongShowPenalty ?? 40;
-  const includeJokers = config?.includeJokers ?? true;
 
-  let deck = shuffleArray(createLeastCountDeck(includeJokers), seed);
+  // Deck scaling: 1 deck for 2 players, 2 decks for 3-6 players
+  let deck = shuffleArray(createLeastCountDeck(players.length), seed);
   const playerStates: Record<string, any> = {};
   const playerOrder = players.map((p) => p.id);
 
@@ -221,7 +215,7 @@ export function handleDiscardCards(
     turnPhase: "draw",
   };
 
-  const discardNames = cardsToDiscard.map((c) => (c.isJoker ? "Joker" : `${c.rank}${c.suit.charAt(0).toUpperCase()}`)).join(", ");
+  const discardNames = cardsToDiscard.map((c) => `${c.rank}${c.suit.charAt(0).toUpperCase()}`).join(", ");
   const events: LeastCountEvent[] = [
     {
       id: `evt-${Date.now()}-1`,
@@ -266,7 +260,6 @@ export function handleDrawCard(
     if (nextDiscardPile.length === 0) {
       throw new Error("Discard pile is empty");
     }
-    // Player draws the topmost card of the discard pile (prior to current turn discards)
     drawnCard = nextDiscardPile.pop()!;
   } else {
     // Draw from closed draw pile
@@ -486,7 +479,7 @@ export function handleStartNextRound(
     throw new Error("Game is already completed");
   }
 
-  let deck = shuffleArray(createLeastCountDeck(true), Date.now());
+  let deck = shuffleArray(createLeastCountDeck(state.playerOrder.length), Date.now());
   const updatedPlayers: Record<string, any> = {};
 
   for (const pid of state.playerOrder) {
