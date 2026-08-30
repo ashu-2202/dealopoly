@@ -310,12 +310,12 @@ export function Card({
         {/* 3. CARD FOOTER WITH SKYLINE & PLINTH & BRAND TAB             */}
         {/* ============================================================ */}
         <div className="card-footer-zone">
-          {/* Skyline Silhouette Watermark */}
+          {/* Skyline Silhouette Watermark (Spanning Full Left to Right) */}
           <div
             className="card-skyline-vector"
             style={{
               backgroundImage:
-                "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 50' fill='%23B8ACA0'%3E%3Cpath d='M0,50 L0,36 L12,36 L12,24 L18,24 L18,14 L24,14 L24,50 L34,50 L34,18 L40,8 L46,18 L46,50 L64,50 L64,30 L74,30 L74,50 L92,50 L92,20 L102,20 L102,50 L118,50 L118,28 L128,28 L128,50 L144,50 L144,15 L150,5 L156,15 L156,50 Z'/%3E%3C/svg%3E\")",
+                "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 50' fill='%239E9284'%3E%3Cpath d='M0,50 L0,32 L8,32 L8,24 L14,24 L14,14 L20,14 L20,50 L28,50 L28,20 L34,10 L40,20 L40,50 L48,50 L48,34 L56,34 L56,50 L66,50 L66,16 L72,6 L78,16 L78,50 L90,50 L90,26 L100,26 L100,50 L112,50 L112,22 L118,12 L124,22 L124,50 L136,50 L136,30 L146,30 L146,50 L158,50 L158,18 L164,8 L170,18 L170,50 L182,50 L182,24 L192,24 L192,50 L204,50 L204,14 L210,4 L216,14 L216,50 L226,50 L226,30 L234,30 L234,50 L240,50 L240,50 Z'/%3E%3C/svg%3E\")",
             }}
           />
 
