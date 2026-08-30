@@ -11,23 +11,29 @@ import { HeroCardShowcase } from "./_components/hero-card-showcase";
 const features = [
   {
     icon: "bolt",
+    tag: "INSTANT SYNC",
     title: "Real-time Multiplayer",
     description:
       "Seamless sync across devices. See moves happen instantly without lag or waiting.",
+    themeClass: "feature-card--blue",
     boxModifier: "feature-icon-box--blue",
   },
   {
     icon: "login",
+    tag: "ZERO FRICTION",
     title: "No Sign-up Required",
     description:
       "Jump straight into the action. Play anonymously or connect an account later.",
+    themeClass: "feature-card--green",
     boxModifier: "feature-icon-box--green",
   },
   {
     icon: "menu_book",
+    tag: "CLASSIC DEAL",
     title: "Standard Rules",
     description:
       "Familiar mechanics with a modern twist. If you know the physical game, you're ready.",
+    themeClass: "feature-card--amber",
     boxModifier: "feature-icon-box--amber",
   },
 ];
@@ -154,14 +160,19 @@ export default function HomePage() {
           <div className="shell">
             <div className="features-grid">
               {features.map((f) => (
-                <article className="feature-card glass-panel" key={f.title}>
-                  <div className={`feature-icon-box ${f.boxModifier}`}>
-                    <span className="material-symbols-outlined" style={{ fontSize: "28px" }}>
-                      {f.icon}
-                    </span>
+                <article className={`feature-card ${f.themeClass}`} key={f.title}>
+                  <div className="feature-card-header">
+                    <div className={`feature-icon-box ${f.boxModifier}`}>
+                      <span className="material-symbols-outlined" style={{ fontSize: "26px", fontVariationSettings: "'FILL' 1" }}>
+                        {f.icon}
+                      </span>
+                    </div>
+                    <span className="feature-card-tag">{f.tag}</span>
                   </div>
-                  <h3>{f.title}</h3>
-                  <p>{f.description}</p>
+                  <div className="feature-card-content">
+                    <h3>{f.title}</h3>
+                    <p>{f.description}</p>
+                  </div>
                 </article>
               ))}
             </div>
