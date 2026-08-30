@@ -179,9 +179,9 @@ function pickThreeRandomCards(excludeIds: string[] = []): CardDefinition[] {
 
 export function HeroCardShowcase() {
   const [cards, setCards] = useState<HeroCardData[]>(INITIAL_HERO_CARDS);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [isShuffling, setIsShuffling] = useState(false);
-  const [shuffleStep, setShuffleStep] = useState<"idle" | "gather" | "interleave" | "deal">("idle");
+  const [shufflePhase, setShufflePhase] = useState<"idle" | "split" | "gather" | "fan">("idle");
   const shuffleTimerRef = useRef<NodeJS.Timeout[]>([]);
 
   useEffect(() => {
@@ -194,15 +194,10 @@ export function HeroCardShowcase() {
     if (isShuffling) return;
 
     setIsShuffling(true);
-    setShuffleStep("gather");
+    setShufflePhase("split");
 
-    // Phase 1: Pull together to center
+    // Phase 1: Smoothly split cards outward into dramatic 3D fan arc
     const t1 = setTimeout(() => {
-      setShuffleStep("interleave");
-    }, 180);
-
-    // Phase 2: Pick 3 new distinct cards and replace
-    const t2 = setTimeout(() => {
       const currentIds = cards.map((c) => c.card.id);
       const newThree = pickThreeRandomCards(currentIds);
 
@@ -213,20 +208,26 @@ export function HeroCardShowcase() {
       ];
 
       const newHeroCards: HeroCardData[] = newThree.map((card, idx) => ({
-        id: `${card.id}-${Date.now()}-${idx}`,
+        id: `slot-${idx}-${card.id}`,
         card,
         ...getHeroCardMetadata(card),
         resting: positions[idx] ?? { x: 0, y: 0, z: 10, rotate: 0, scale: 1, zIndex: 10 },
       }));
 
+      // Swap cards at maximum separation while in fluid flight
       setCards(newHeroCards);
-      setShuffleStep("deal");
-    }, 440);
+      setShufflePhase("gather");
+    }, 280);
 
-    // Phase 3: Settle back into resting state
+    // Phase 2: Gather and interleave through center
+    const t2 = setTimeout(() => {
+      setShufflePhase("fan");
+    }, 500);
+
+    // Phase 3: Settle softly into final resting posture
     const t3 = setTimeout(() => {
       setIsShuffling(false);
-      setShuffleStep("idle");
+      setShufflePhase("idle");
     }, 850);
 
     shuffleTimerRef.current = [t1, t2, t3];
@@ -244,77 +245,76 @@ export function HeroCardShowcase() {
         title="Click any card to shuffle deck"
       >
         {cards.map((item, idx) => {
-          const isHovered = hoveredId === item.id && !isShuffling;
-          const isOtherHovered = hoveredId !== null && !isHovered && !isShuffling;
+          const isHovered = hoveredIdx === idx && !isShuffling;
+          const isOtherHovered = hoveredIdx !== null && !isHovered && !isShuffling;
 
-          // Shuffle animation coordinates & transforms
+          // Compute continuous smooth 3D transforms
           let animX = item.resting.x;
           let animY = item.resting.y;
-          let animZTranslate = item.resting.z;
+          let animZ = item.resting.z;
           let animRotate = item.resting.rotate;
-          let animRotateY = 0;
           let animScale = item.resting.scale;
-          let animZ = item.resting.zIndex;
+          let animZIndex = item.resting.zIndex;
 
           if (isShuffling) {
-            if (shuffleStep === "gather") {
-              animX = 0;
-              animY = 0;
-              animZTranslate = idx * 10;
-              animRotate = (idx - 1) * 5;
-              animScale = 1.04;
-              animRotateY = 0;
-              animZ = 30 + idx;
-            } else if (shuffleStep === "interleave") {
-              animX = idx === 0 ? -50 : idx === 2 ? 50 : 0;
-              animY = idx === 1 ? -28 : 16;
-              animZTranslate = (2 - idx) * 15;
-              animRotate = (idx - 1) * 18;
-              animScale = 1.08;
-              animRotateY = 180;
-              animZ = 30 + (2 - idx);
-            } else if (shuffleStep === "deal") {
+            if (shufflePhase === "split") {
+              // Smooth outward 3D burst
+              animX = idx === 0 ? -150 : idx === 2 ? 150 : 0;
+              animY = idx === 1 ? -60 : -10;
+              animZ = idx === 1 ? 110 : 70;
+              animRotate = (idx - 1) * 22;
+              animScale = idx === 1 ? 1.12 : 1.04;
+              animZIndex = idx === 1 ? 35 : 20;
+            } else if (shufflePhase === "gather") {
+              // Crisp interleave sweep
+              animX = idx === 0 ? 30 : idx === 2 ? -30 : 0;
+              animY = idx === 1 ? 10 : -15;
+              animZ = (2 - idx) * 25 + 20;
+              animRotate = (1 - idx) * 8;
+              animScale = 1.0;
+              animZIndex = (2 - idx) * 10 + 20;
+            } else if (shufflePhase === "fan") {
+              // Smoothly glide into resting slots
               animX = item.resting.x;
               animY = item.resting.y;
-              animZTranslate = item.resting.z;
+              animZ = item.resting.z;
               animRotate = item.resting.rotate;
               animScale = item.resting.scale;
-              animRotateY = 0;
-              animZ = item.resting.zIndex;
+              animZIndex = item.resting.zIndex;
             }
           } else {
             animX = isHovered ? item.resting.x * 0.75 : isOtherHovered ? item.resting.x * 1.12 : item.resting.x;
             animY = isHovered ? item.resting.y - 36 : isOtherHovered ? item.resting.y + 6 : item.resting.y;
-            animZTranslate = isHovered ? 90 : isOtherHovered ? item.resting.z * 0.5 : item.resting.z;
+            animZ = isHovered ? 90 : isOtherHovered ? item.resting.z * 0.5 : item.resting.z;
             animRotate = isHovered ? 0 : item.resting.rotate;
             animScale = isHovered ? 1.14 : isOtherHovered ? 0.90 : item.resting.scale;
-            animZ = isHovered ? 50 : item.resting.zIndex;
+            animZIndex = isHovered ? 50 : item.resting.zIndex;
           }
 
           return (
             <motion.div
-              key={item.id}
+              key={`hero-slot-${idx}`}
               className="hero-showcase-card-container"
               style={{
-                zIndex: animZ,
+                zIndex: animZIndex,
               }}
               animate={{
                 x: animX,
                 y: animY,
-                z: animZTranslate,
+                z: animZ,
                 rotate: animRotate,
-                rotateY: animRotateY,
                 scale: animScale,
                 filter: isOtherHovered ? "brightness(0.92)" : "brightness(1)",
-                zIndex: animZ,
+                zIndex: animZIndex,
               }}
               transition={{
                 type: "spring",
-                stiffness: isShuffling ? 420 : 340,
-                damping: isShuffling ? 22 : 24,
+                stiffness: isShuffling ? 280 : 360,
+                damping: isShuffling ? 22 : 25,
+                mass: 0.8,
               }}
-              onHoverStart={() => !isShuffling && setHoveredId(item.id)}
-              onHoverEnd={() => !isShuffling && setHoveredId(null)}
+              onHoverStart={() => !isShuffling && setHoveredIdx(idx)}
+              onHoverEnd={() => !isShuffling && setHoveredIdx(null)}
             >
               {/* Dynamic Aura Glow */}
               <div
