@@ -4504,7 +4504,9 @@ p {
 .game-hand-cards-row {
   display: flex;
   justify-content: center;
-  margin-left: 28px;
+  align-items: flex-end;
+  margin: 0 auto;
+  min-width: max-content;
 }
 
 .game-hand-card-wrapper {
@@ -4512,6 +4514,9 @@ p {
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s;
   cursor: pointer;
   position: relative;
+}
+.game-hand-card-wrapper:first-child {
+  margin-left: 0;
 }
 .game-hand-card-wrapper:hover {
   transform: translateY(-28px) scale(1.08);
@@ -5099,7 +5104,7 @@ p {
     gap: 1px;
   }
 
-  /* Player Hand Horizontal Scrolling */
+  /* Player Hand Horizontal Scrolling & Centering */
   .game-hand-fanned-container {
     min-height: 152px;
     padding-top: 10px;
@@ -5108,8 +5113,10 @@ p {
     overflow-y: visible;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    justify-content: flex-start;
-    padding-inline: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding-inline: 16px;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
@@ -5119,10 +5126,13 @@ p {
   }
 
   .game-hand-cards-row {
-    margin-left: 0;
-    padding-right: 48px;
-    display: inline-flex;
+    display: flex;
+    justify-content: center;
     align-items: flex-end;
+    margin: 0 auto;
+    min-width: max-content;
+    padding-right: 0;
+    margin-left: 0;
   }
 
   .game-hand-card-wrapper {
