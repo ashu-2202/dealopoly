@@ -219,8 +219,9 @@ export default function HomePage() {
         </section>
       </main>
 
-      {/* Footer */}
+      {/* Footer with Full-Width Skyscraper Skyline Backdrop */}
       <footer className="marketing-footer">
+        <SkyscraperBackdrop className="footer-skyscraper-backdrop" />
         <div className="shell footer-inner">
           <div className="footer-brand-wrap">
             <span className="brand" style={{ fontSize: "1.1rem" }}>

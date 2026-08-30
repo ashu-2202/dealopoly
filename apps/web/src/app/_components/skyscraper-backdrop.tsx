@@ -1,8 +1,10 @@
-import React from "react";
+interface SkyscraperBackdropProps {
+  className?: string;
+}
 
-export function SkyscraperBackdrop() {
+export function SkyscraperBackdrop({ className = "" }: SkyscraperBackdropProps) {
   return (
-    <div className="skyscraper-backdrop-container" aria-hidden="true">
+    <div className={`skyscraper-backdrop-container ${className}`} aria-hidden="true">
       {/* Ambient Atmosphere Lighting Glows */}
       <div className="skyscraper-atmosphere-glow skyscraper-atmosphere-glow--cyan" />
       <div className="skyscraper-atmosphere-glow skyscraper-atmosphere-glow--green" />
