@@ -106,9 +106,8 @@ export function HeroCardShowcase() {
 
   return (
     <div className="hero-showcase-wrapper" aria-label="Dealopoly 3D Card Showcase">
-      {/* Ambient Table Lighting Ring */}
-      <div className="hero-showcase-table-glow" />
-      <div className="hero-showcase-grid-disc" />
+      {/* Ambient Spotlight */}
+      <div className="hero-showcase-spotlight" />
 
       {/* 3D Cards Deck Stage */}
       <div className="hero-showcase-stage">
@@ -123,10 +122,10 @@ export function HeroCardShowcase() {
               initial={item.resting}
               animate={{
                 x: isHovered ? item.resting.x * 0.75 : isOtherHovered ? item.resting.x * 1.12 : item.resting.x,
-                y: isHovered ? item.resting.y - 42 : isOtherHovered ? item.resting.y + 10 : item.resting.y,
+                y: isHovered ? item.resting.y - 36 : isOtherHovered ? item.resting.y + 6 : item.resting.y,
                 rotate: isHovered ? 0 : item.resting.rotate,
-                scale: isHovered ? 1.16 : isOtherHovered ? 0.88 : item.resting.scale,
-                opacity: isOtherHovered ? 0.75 : 1,
+                scale: isHovered ? 1.14 : isOtherHovered ? 0.90 : item.resting.scale,
+                opacity: isOtherHovered ? 0.8 : 1,
                 zIndex: isHovered ? 50 : item.resting.zIndex,
               }}
               transition={{
@@ -167,9 +166,25 @@ export function HeroCardShowcase() {
               <div className="hero-card-physical-frame">
                 <Card card={item.card} size="md" isInteractive={false} />
               </div>
+
+              {/* Base Contact Shadow */}
+              <div className="hero-card-contact-shadow" />
             </motion.div>
           );
         })}
+      </div>
+
+      {/* 3D Circular Pedestal Platform (Positioned directly below the cards) */}
+      <div className="hero-platform-container">
+        <div className="hero-platform-shadow" />
+        <div className="hero-platform-base">
+          <div className="hero-platform-outer-ring" />
+          <div className="hero-platform-middle-ring" />
+          <div className="hero-platform-surface">
+            <div className="hero-platform-surface-glow" />
+            <div className="hero-platform-concentric-lines" />
+          </div>
+        </div>
       </div>
     </div>
   );
