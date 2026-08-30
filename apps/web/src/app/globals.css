@@ -2541,28 +2541,35 @@ p {
   position: relative;
   width: 15em;                      /* 240px at md */
   aspect-ratio: 240 / 352;          /* height derived */
-  background-color: #FAF6EE;
+  background: linear-gradient(145deg, #FFFDF8 0%, #FAF6EE 60%, #F0E9DC 100%);
   border-radius: 1.1em;            /* ~18px */
   border: 0.14em solid var(--card-color-dark, #54280B);
   box-shadow:
-    0 0.5em 1.5em rgba(0, 0, 0, 0.4),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+    0 0.8em 2em rgba(0, 0, 0, 0.45),
+    0 0.25em 0.6em rgba(0, 0, 0, 0.3),
+    inset 0 1.5px 0.5px rgba(255, 255, 255, 0.85),
+    inset 0 -1.5px 1px rgba(0, 0, 0, 0.2),
+    inset 1px 0 0 rgba(255, 255, 255, 0.4),
+    inset -1px 0 0 rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   user-select: none;
   font-family: var(--body);
   color: #1A1A1A;
-  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.28s ease;
   overflow: hidden;
   box-sizing: border-box;
+  transform-style: preserve-3d;
 }
 
 .monopoly-card--interactive:hover {
-  transform: translateY(-0.5em) scale(1.02);
+  transform: translateY(-0.6em) perspective(800px) rotateX(3deg) scale(1.025);
   box-shadow:
-    0 0 0 0.156em var(--card-color, #A8C8FF),
-    0 1.375em 3.125em rgba(0, 0, 0, 0.65);
+    0 1.4em 3.2em rgba(0, 0, 0, 0.6),
+    0 0.5em 1em rgba(0, 0, 0, 0.35),
+    0 0 0 0.15em var(--card-color, #A8C8FF),
+    inset 0 2px 1px rgba(255, 255, 255, 0.9);
   cursor: pointer;
 }
 
@@ -2587,7 +2594,7 @@ p {
   border-radius: 1.4em;
 }
 
-/* Inner Frame of the Card */
+/* Inner Frame of the Card with 3D Emboss */
 .card-inner-frame {
   position: absolute;
   inset: 0.22em;
@@ -2598,13 +2605,19 @@ p {
   justify-content: space-between;
   overflow: hidden;
   background: #FAF6EE;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.15),
+    inset 0 -1.5px 2px rgba(255, 255, 255, 0.7),
+    0 1px 3px rgba(0, 0, 0, 0.18);
   z-index: 2;
 }
 
-/* ── 1. Top Arched Header Banner (Fixed 35.5% Card Height) ────── */
+/* ── 1. Top Arched Header Banner (Fixed 35.5% Card Height with 3D Gloss & Bevel) ── */
 .card-arched-header {
   position: relative;
-  background: var(--card-color, #8B4513);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.04) 35%, rgba(0, 0, 0, 0.12) 100%),
+    var(--card-color, #8B4513);
   color: var(--card-text-color, #FFFFFF);
   border-radius: 36% 36% 0 0 / 18% 18% 0 0;
   margin: 0.18em 0.18em 0;
@@ -2621,6 +2634,10 @@ p {
   align-items: center;
   justify-content: center;
   text-align: center;
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.5),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.25),
+    0 3px 6px rgba(0, 0, 0, 0.25);
 }
 
 .card-arched-header--dark-text {
@@ -2630,20 +2647,23 @@ p {
   color: #FFFFFF !important;
 }
 
-/* Symmetrical Coin Badges (Top-Left Building Icon & Top-Right Money Value) */
+/* Symmetrical Coin Badges (Top-Left Building Icon & Top-Right Money Value with 3D Metallic Edge) */
 .card-header-coin {
   position: absolute;
   top: 0.5em;
   width: 2.0em;
   height: 2.0em;
   border-radius: 50%;
-  background: #2B1810;
+  background: radial-gradient(circle at 35% 35%, #3D261A 0%, #1A0E08 100%);
   border: 0.12em solid #D4AF37;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #FFFFFF;
-  box-shadow: 0 0.15em 0.35em rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.45),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.5),
+    inset 0 -1.5px 1px rgba(0, 0, 0, 0.6);
   z-index: 3;
   box-sizing: border-box;
 }
@@ -2665,11 +2685,13 @@ p {
   color: #FFFFFF;
   display: block;
   text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
 .card-header-coin--left .material-symbols-outlined {
   font-size: 1.2em;
   line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
 }
 
 /* Category Label in Header */
@@ -2682,6 +2704,7 @@ p {
   opacity: 0.95;
   margin-bottom: 0.2em;
   display: block;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 /* Card Main Title */
@@ -2694,7 +2717,7 @@ p {
   letter-spacing: -0.01em;
   margin: 0;
   padding: 0 0.25em;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  text-shadow: 0 1.5px 3px rgba(0, 0, 0, 0.35);
   word-break: break-word;
 }
 
@@ -2711,7 +2734,7 @@ p {
   justify-content: center;
   z-index: 5;
   color: #D4AF37;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45)) drop-shadow(0 1px 1px rgba(255, 255, 255, 0.3));
 }
 .card-star-icon {
   font-size: 1.45em !important;
@@ -2753,14 +2776,17 @@ p {
   font-weight: 500;
 }
 
-/* Base Rent Value Table Box */
+/* Base Rent Value Table Box with 3D Plate Emboss */
 .card-rent-table-box {
   width: 96%;
-  background: rgba(255, 255, 255, 0.88);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 244, 236, 0.92) 100%);
   border: 0.08em solid #DDD5C7;
   border-radius: 0.45em;
   padding: 0.28em 0.5em;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04);
   margin-bottom: 0.08em;
   box-sizing: border-box;
 }
@@ -3056,7 +3082,7 @@ p {
   color: #333;
 }
 
-/* ── 3. Card Footer Zone (Fixed 12% Card Height) ─────────────── */
+/* ── 3. Card Footer Zone (Fixed 12% Card Height with 3D Depth) ─── */
 .card-footer-zone {
   position: relative;
   width: 100%;
@@ -3070,7 +3096,8 @@ p {
   align-items: center;
   justify-content: center;
   overflow: visible;
-  background: #EDE7DC;
+  background: linear-gradient(180deg, #EDE7DC 0%, #E2DACB 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .card-skyline-vector {
@@ -3095,13 +3122,15 @@ p {
   transform: translateX(-50%);
   width: 1.85em;
   height: 1.75em;
-  background: #1B232A;
+  background: linear-gradient(180deg, #28323C 0%, #151C22 100%);
   border-radius: 0.35em 0.35em 0.15em 0.15em;
   border: 0.08em solid #111827;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.3);
   z-index: 4;
 }
 
@@ -3119,7 +3148,8 @@ p {
   font-size: 0.75em;
   font-weight: 900;
   line-height: 1;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 .card-bottom-brand-pill {
@@ -3127,7 +3157,7 @@ p {
   bottom: 0.15em;
   left: 50%;
   transform: translateX(-50%);
-  background: #FFFFFF;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F5F3ED 100%);
   border: 0.07em solid #222;
   border-radius: 0.25em;
   padding: 0.04em 0.4em;
@@ -3136,7 +3166,9 @@ p {
   font-weight: 900;
   letter-spacing: 0.15em;
   color: #111;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
   z-index: 5;
   white-space: nowrap;
   text-transform: uppercase;
