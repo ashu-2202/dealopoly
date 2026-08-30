@@ -7,6 +7,7 @@ import { MarketingNav } from "./_components/marketing-nav";
 import { JoinRoomDialog } from "./_components/join-room-dialog";
 import { PlayBotsDialog } from "./_components/play-bots-dialog";
 import { HeroCardShowcase } from "./_components/hero-card-showcase";
+import { SkyscraperBackdrop } from "./_components/skyscraper-backdrop";
 
 const features = [
   {
@@ -179,23 +180,28 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* How to Play Section */}
-        <section id="how-to-play" className="how-to-play-section shell" aria-labelledby="how-title">
-          <div className="section-header">
-            <p className="kicker">QUICK TO LEARN</p>
-            <h2 id="how-title">How to play</h2>
-            <p>Three simple steps to dominate the board.</p>
-          </div>
+        {/* How to Play Section with Skyscraper Architectural Backdrop */}
+        <section id="how-to-play" className="how-to-play-section" aria-labelledby="how-title">
+          {/* Architectural Skyscraper Skyline Background Sketch */}
+          <SkyscraperBackdrop />
 
-          <div className="steps-grid">
-            <div className="steps-connector" aria-hidden="true" />
-            {howToPlaySteps.map((step) => (
-              <article className="step-card" key={step.number}>
-                <div className="step-number-box">{step.number}</div>
-                <h4>{step.title}</h4>
-                <p>{step.description}</p>
-              </article>
-            ))}
+          <div className="shell how-to-play-content">
+            <div className="section-header">
+              <p className="kicker">QUICK TO LEARN</p>
+              <h2 id="how-title">How to play</h2>
+              <p>Three simple steps to dominate the board.</p>
+            </div>
+
+            <div className="steps-grid">
+              <div className="steps-connector" aria-hidden="true" />
+              {howToPlaySteps.map((step) => (
+                <article className="step-card" key={step.number}>
+                  <div className="step-number-box">{step.number}</div>
+                  <h4>{step.title}</h4>
+                  <p>{step.description}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
