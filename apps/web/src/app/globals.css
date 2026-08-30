@@ -1828,7 +1828,7 @@ p {
 
   .hero-platform-container {
     display: flex !important;
-    bottom: -160px;
+    bottom: -200px;
     width: 520px;
     height: 220px;
   }
