@@ -11,6 +11,7 @@ interface GameOverSummaryProps {
   currentPlayerId: string;
   onPlayAgain?: () => void;
   roomCode?: string;
+  isBotMode?: boolean;
 }
 
 interface RankedPlayer {
@@ -42,6 +43,7 @@ export function GameOverSummary({
   currentPlayerId,
   onPlayAgain,
   roomCode,
+  isBotMode = false,
 }: GameOverSummaryProps) {
   const winnerId = gameState.winnerId;
   const isYouWinner = winnerId === currentPlayerId;
@@ -319,8 +321,8 @@ export function GameOverSummary({
           <Brand className="brand brand--app" />
         </div>
         <div className="victory-top-actions">
-          <Link href="/lobby" className="victory-icon-btn" title="Back to Lobby">
-            <span className="material-symbols-outlined">meeting_room</span>
+          <Link href={isBotMode ? "/" : "/lobby"} className="victory-icon-btn" title={isBotMode ? "Return to Home" : "Back to Lobby"}>
+            <span className="material-symbols-outlined">{isBotMode ? "home" : "meeting_room"}</span>
           </Link>
           <Link href="/cards" className="victory-icon-btn" title="Card Catalogue">
             <span className="material-symbols-outlined">style</span>
@@ -701,7 +703,7 @@ export function GameOverSummary({
             </button>
           ) : (
             <Link
-              href={roomCode ? `/lobby?room=${roomCode}` : "/lobby"}
+              href={isBotMode ? "/game?mode=bot" : (roomCode ? `/lobby?room=${roomCode}` : "/lobby")}
               className="button button--primary victory-btn-play-again"
             >
               <span className="material-symbols-outlined">replay</span>
@@ -709,9 +711,9 @@ export function GameOverSummary({
             </Link>
           )}
 
-          <Link href="/lobby" className="button button--ghost victory-btn-lobby">
-            <span className="material-symbols-outlined">meeting_room</span>
-            <span>Return to Lobby</span>
+          <Link href={isBotMode ? "/" : "/lobby"} className="button button--ghost victory-btn-lobby">
+            <span className="material-symbols-outlined">{isBotMode ? "home" : "meeting_room"}</span>
+            <span>{isBotMode ? "Return to Home" : "Return to Lobby"}</span>
           </Link>
         </section>
       </main>

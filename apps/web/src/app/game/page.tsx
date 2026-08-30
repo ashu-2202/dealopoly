@@ -317,8 +317,10 @@ export default function GamePage(props: {
   const handleExitGame = () => {
     if (!isBotMode) {
       sendCommand({ type: "LEAVE_GAME", playerId: actualPlayerId } as any);
+      window.location.href = "/lobby";
+    } else {
+      window.location.href = "/";
     }
-    window.location.href = "/lobby";
   };
 
   if (gameState.status === "completed") {
@@ -328,6 +330,7 @@ export default function GamePage(props: {
         currentPlayerId={actualPlayerId}
         onPlayAgain={handlePlayAgain}
         roomCode={urlRoomCode}
+        isBotMode={isBotMode}
       />
     );
   }
@@ -1925,8 +1928,8 @@ export default function GamePage(props: {
 
             <div className="dialog-body" style={{ padding: "20px" }}>
               <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--on-surface-variant)", lineHeight: 1.5 }}>
-                {isLocal
-                  ? "Are you sure you want to exit? Your solo game progress will be lost."
+                {isBotMode
+                  ? "Are you sure you want to leave? Your match progress will be lost and you will return to the home page."
                   : (roomInfo?.hostPlayerId === actualPlayerId 
                     ? "Are you sure you want to leave? Because you are the Host, this will instantly end the game for everyone."
                     : "Are you sure you want to leave? A bot will take over your seat for the remainder of the game."
