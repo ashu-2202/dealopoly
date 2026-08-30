@@ -3459,6 +3459,31 @@ p {
   pointer-events: none;
 }
 
+/* Wildcard Table Switch Button */
+.game-wild-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(168, 200, 255, 0.16);
+  border: 1px solid rgba(168, 200, 255, 0.4);
+  color: #a8c8ff;
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.game-wild-switch-btn:hover {
+  background: rgba(168, 200, 255, 0.32);
+  border-color: #a8c8ff;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
 /* Center Table Action Reel / Floating Announcer */
 .game-action-reel {
   display: flex;

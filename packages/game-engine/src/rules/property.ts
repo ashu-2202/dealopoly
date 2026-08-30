@@ -101,14 +101,6 @@ export function playPropertyCard(
     }
   }
 
-  // Wild Property Card validation: cannot start a new set if no property of that color is present
-  if (card.type === "property-wild" && !effectiveTargetSetId) {
-    throw new GameEngineError(
-      "WILD_CARD_REQUIRES_EXISTING_PROPERTY",
-      `Cannot play a Wild Property Card as ${assignedColor.toUpperCase()} without an existing property card of that color already on your table`,
-    );
-  }
-
   if (effectiveTargetSetId) {
     const existingIndex = updatedSets.findIndex((s) => s.setId === effectiveTargetSetId);
     if (existingIndex === -1) {
@@ -134,7 +126,7 @@ export function playPropertyCard(
     };
     updatedSets[existingIndex] = targetSet;
   } else {
-    // Create new set (only for standard property cards)
+    // Create new set (for standard property cards AND wild cards)
     targetSet = createNewPropertySet(assignedColor, cardWithColor);
     updatedSets.push(targetSet);
     isNewSet = true;
@@ -187,6 +179,18 @@ export function reorganizeWildCard(
     throw new GameEngineError("NOT_YOUR_TURN", "Player not found");
   }
 
+  if (state.turn.activePlayerId !== playerId) {
+    throw new GameEngineError("NOT_YOUR_TURN", "Can only reorganize property sets during your own turn");
+  }
+
+  if (state.turn.phase !== "action") {
+    throw new GameEngineError("MUST_DRAW_FIRST", "Must draw cards before reorganizing property sets");
+  }
+
+  if (state.pendingResolution) {
+    throw new GameEngineError("MUST_RESOLVE_PENDING_ACTION", "Cannot reorganize properties while an action/payment is pending resolution");
+  }
+
   const fromSetIndex = player.propertySets.findIndex((s) => s.setId === fromSetId);
   if (fromSetIndex === -1) {
     throw new GameEngineError("PROPERTY_SET_NOT_FOUND", "Source property set not found");
@@ -209,6 +213,18 @@ export function reorganizeWildCard(
 
   validateWildColor(card, newColor);
 
+  // House and Hotel completion rule: Houses and Hotels strictly require fully completed base sets.
+  // If the fromSet has a House or Hotel, removing a card cannot cause the set's property cards to drop below setSize.
+  if (fromSet.hasHouse || fromSet.hasHotel) {
+    const remainingCardsCount = fromSet.cards.length - 1;
+    if (remainingCardsCount < fromSet.setSize) {
+      throw new GameEngineError(
+        "CANNOT_BREAK_SET_WITH_BUILDINGS",
+        "Cannot move a card away from a completed set that has a House or Hotel. Buildings strictly require a fully completed set.",
+      );
+    }
+  }
+
   const updatedCard: CardInstance = {
     ...card,
     currentColor: newColor,
@@ -219,14 +235,13 @@ export function reorganizeWildCard(
   let updatedSets = [...player.propertySets];
 
   if (fromSetRemainingCards.length === 0 && !fromSet.hasHouse && !fromSet.hasHotel) {
-    // Delete empty set if no buildings attached
+    // Delete empty set if no cards and no buildings attached
     updatedSets = updatedSets.filter((_, idx) => idx !== fromSetIndex);
   } else {
     updatedSets[fromSetIndex] = {
       ...fromSet,
       cards: fromSetRemainingCards,
       isComplete: fromSetRemainingCards.length >= fromSet.setSize,
-      // Buildings now float on the set if it becomes incomplete
       hasHouse: fromSet.hasHouse,
       hasHotel: fromSet.hasHotel,
       houseCard: fromSet.houseCard,
@@ -235,41 +250,52 @@ export function reorganizeWildCard(
   }
 
   let effectiveToSetId = toSetId;
-  if (!effectiveToSetId) {
-    const matchingIncomplete = updatedSets.find(
+  let targetSet: PropertySet;
+
+  if (effectiveToSetId) {
+    const toSetIndex = updatedSets.findIndex((s) => s.setId === effectiveToSetId);
+    if (toSetIndex === -1) {
+      throw new GameEngineError("PROPERTY_SET_NOT_FOUND", "Destination property set not found");
+    }
+
+    const toSet = updatedSets[toSetIndex]!;
+    if (toSet.color !== newColor) {
+      throw new GameEngineError(
+        "INVALID_PROPERTY_COLOR",
+        `Target set color mismatch: set is ${toSet.color}, wild changed to ${newColor}`,
+      );
+    }
+    if (toSet.isComplete) {
+      throw new GameEngineError("CANNOT_ADD_TO_COMPLETED_SET", "Cannot add card to an already completed set");
+    }
+
+    const newCards = [...toSet.cards, updatedCard];
+    targetSet = {
+      ...toSet,
+      cards: newCards,
+      isComplete: newCards.length >= toSet.setSize,
+    };
+    updatedSets[toSetIndex] = targetSet;
+  } else {
+    // Automatically find an existing incomplete property set of newColor, or create a new set
+    const matchingIncompleteIndex = updatedSets.findIndex(
       (s) => s.color === newColor && !s.isComplete,
     );
-    if (matchingIncomplete) {
-      effectiveToSetId = matchingIncomplete.setId;
+    if (matchingIncompleteIndex !== -1) {
+      const existingSet = updatedSets[matchingIncompleteIndex]!;
+      const newCards = [...existingSet.cards, updatedCard];
+      targetSet = {
+        ...existingSet,
+        cards: newCards,
+        isComplete: newCards.length >= existingSet.setSize,
+      };
+      updatedSets[matchingIncompleteIndex] = targetSet;
+    } else {
+      // Create a new set for this color starting with the wildcard!
+      targetSet = createNewPropertySet(newColor, updatedCard);
+      updatedSets.push(targetSet);
     }
   }
-
-  if (!effectiveToSetId) {
-    throw new GameEngineError(
-      "WILD_CARD_REQUIRES_EXISTING_PROPERTY",
-      `Cannot move Wild Card to ${newColor.toUpperCase()} without an existing property card of that color on your table`,
-    );
-  }
-
-  const toSetIndex = updatedSets.findIndex((s) => s.setId === effectiveToSetId);
-  if (toSetIndex === -1) {
-    throw new GameEngineError("PROPERTY_SET_NOT_FOUND", "Destination property set not found");
-  }
-
-  const toSet = updatedSets[toSetIndex]!;
-  if (toSet.color !== newColor) {
-    throw new GameEngineError(
-      "INVALID_PROPERTY_COLOR",
-      `Target set color mismatch: set is ${toSet.color}, wild changed to ${newColor}`,
-    );
-  }
-
-  const newCards = [...toSet.cards, updatedCard];
-  updatedSets[toSetIndex] = {
-    ...toSet,
-    cards: newCards,
-    isComplete: newCards.length >= toSet.setSize,
-  };
 
   const event: WildReorganizedEvent = {
     id: `event-${Date.now()}-reorg`,
@@ -278,9 +304,9 @@ export function reorganizeWildCard(
     playerId,
     card: updatedCard,
     fromSetId,
-    toSetId: effectiveToSetId!,
+    toSetId: targetSet.setId,
     newColor,
-    message: `${player.name} moved wild card ${card.name} into ${newColor} set.`,
+    message: `${player.name} shifted wild card ${card.name} into ${newColor} set.`,
   };
 
   const nextState: GameState = {

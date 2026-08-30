@@ -34,6 +34,7 @@ export type GameErrorCode =
   | "HAND_LIMIT_EXCEEDED"
   | "INVALID_DISCARD_COUNT"
   | "WILD_CARD_REQUIRES_EXISTING_PROPERTY"
+  | "CANNOT_BREAK_SET_WITH_BUILDINGS"
   | "UNKNOWN_ERROR";
 
 export class GameEngineError extends Error {
