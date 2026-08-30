@@ -2671,7 +2671,7 @@ p {
   color: #FFFFFF !important;
 }
 
-/* Top-Left & Top-Right Circular Badges with White Ring and White Content */
+/* Top-Left & Top-Right Circular Badges with Solid White Background */
 .card-header-badge-circle {
   position: absolute;
   top: 0.45em;
@@ -2679,14 +2679,13 @@ p {
   width: 2.25em;
   height: 2.25em;
   border-radius: 50%;
-  background: transparent;
-  border: 0.13em solid #FFFFFF;
+  background: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
   z-index: 3;
-  padding: 0.18em;
+  padding: 0.22em;
   box-sizing: border-box;
 }
 
@@ -2702,10 +2701,9 @@ p {
   font-weight: 900;
   letter-spacing: -0.02em;
   line-height: 1;
-  color: #FFFFFF;
+  color: var(--card-color, #F28C28);
   display: block;
   text-align: center;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .card-header-city-svg {
