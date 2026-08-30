@@ -1796,14 +1796,13 @@ p {
   }
 
   .hero-section {
-    min-height: calc(100svh - 60px);
-    max-height: calc(100svh - 60px);
-    height: calc(100svh - 60px);
-    padding: 6px 16px 12px;
-    gap: 2px;
+    min-height: calc(100svh - 56px);
+    max-height: calc(100svh - 56px);
+    height: calc(100svh - 56px);
+    padding: 8px 16px 14px;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
     overflow: hidden;
   }
@@ -1819,8 +1818,8 @@ p {
 
   .hero-badge {
     padding: 3px 12px;
-    margin-top: 4px;
-    margin-bottom: 8px;
+    margin-top: 2px;
+    margin-bottom: 6px;
     border-radius: 999px;
   }
 
@@ -1838,7 +1837,7 @@ p {
   .hero-copy .lede {
     font-size: 0.76rem;
     line-height: 1.35;
-    margin: 2px auto 4px;
+    margin: 2px auto 6px;
     max-width: 320px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -1848,9 +1847,9 @@ p {
   }
 
   .hero-showcase-wrapper {
-    min-height: 185px;
-    height: 185px;
-    max-height: 185px;
+    min-height: 180px;
+    height: 180px;
+    max-height: 190px;
     transform: scale(0.50);
     transform-origin: center center;
     margin: 0 0 -10px;
@@ -1945,6 +1944,125 @@ p {
   .footer-inner {
     flex-direction: column;
     text-align: center;
+  }
+}
+
+/* Medium Mobile Viewports (Height: 700px to 820px, e.g. iPhone 12/13/14/15/16 standard) */
+@media (max-width: 640px) and (min-height: 700px) {
+  .hero-section {
+    padding: 12px 18px 20px;
+  }
+
+  .hero-showcase-wrapper {
+    min-height: 220px;
+    height: 220px;
+    max-height: 235px;
+    transform: scale(0.58);
+    margin: 4px 0 -5px;
+  }
+
+  .hero-badge {
+    padding: 4px 14px;
+    margin-bottom: 8px;
+  }
+
+  .badge-text {
+    font-size: 0.74rem;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(1.7rem, 5.8vw, 2.05rem);
+    margin: 4px 0;
+  }
+
+  .hero-copy .lede {
+    font-size: 0.82rem;
+    line-height: 1.4;
+    margin: 4px auto 10px;
+    max-width: 350px;
+  }
+
+  .hero-actions {
+    max-width: 380px;
+    gap: 10px;
+    margin: 8px auto 4px;
+  }
+
+  .hero-actions .button--primary {
+    padding: 12px 18px;
+    font-size: 0.92rem;
+  }
+
+  .hero-actions .button--secondary,
+  .hero-actions .button--ghost {
+    padding: 9px 12px;
+    font-size: 0.82rem;
+  }
+
+  .availability {
+    font-size: 0.72rem;
+    margin-top: 4px;
+  }
+}
+
+/* Tall Mobile Viewports (Height >= 821px, e.g. iPhone 14/15/16/17 Pro & Pro Max, Galaxy Ultra, Pixel Pro) */
+@media (max-width: 640px) and (min-height: 821px) {
+  .hero-section {
+    padding: 16px 20px 28px;
+  }
+
+  .hero-showcase-wrapper {
+    min-height: 265px;
+    height: 265px;
+    max-height: 285px;
+    transform: scale(0.66);
+    margin: 12px 0 0px;
+  }
+
+  .hero-badge {
+    padding: 5px 16px;
+    margin-top: 6px;
+    margin-bottom: 12px;
+  }
+
+  .badge-text {
+    font-size: 0.78rem;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(1.95rem, 6.5vw, 2.35rem);
+    line-height: 1.15;
+    margin: 6px 0 6px;
+  }
+
+  .hero-copy .lede {
+    font-size: 0.88rem;
+    line-height: 1.45;
+    margin: 6px auto 16px;
+    max-width: 370px;
+    -webkit-line-clamp: 3;
+  }
+
+  .hero-actions {
+    max-width: 400px;
+    gap: 12px;
+    margin: 14px auto 8px;
+  }
+
+  .hero-actions .button--primary {
+    padding: 13px 20px;
+    font-size: 0.98rem;
+  }
+
+  .hero-actions .button--secondary,
+  .hero-actions .button--ghost {
+    padding: 11px 16px;
+    font-size: 0.86rem;
+  }
+
+  .availability {
+    font-size: 0.76rem;
+    margin-top: 6px;
   }
 }
 
