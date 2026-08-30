@@ -14,8 +14,22 @@ import {
 } from "../../lib/session";
 import { useGameClient } from "../../lib/use-game-client";
 import type { CardColor, CardDefinition } from "@dealopoly/shared";
-import { COLOR_CONFIG } from "@dealopoly/shared";
+import { COLOR_CONFIG, CARD_CATALOGUE } from "@dealopoly/shared";
 import { type CardInstance, type PropertySet, calculateSetRent } from "@dealopoly/game-engine";
+
+const CARD_MAP = new Map<string, CardDefinition>(CARD_CATALOGUE.map((c) => [c.id, c]));
+
+function resolveCardDef(card: CardInstance | CardDefinition | { defId?: string; id?: string } | null | undefined): CardDefinition {
+  if (!card) {
+    return CARD_CATALOGUE[0]!;
+  }
+  const defId = "defId" in card && card.defId ? card.defId : "id" in card && card.id ? card.id : "";
+  const fromCatalogue = CARD_MAP.get(defId);
+  if (fromCatalogue) {
+    return fromCatalogue;
+  }
+  return card as unknown as CardDefinition;
+}
 
 const OPPONENT_PALETTES = [
   { class: "avatar-theme--purple", badge: "🟣", hex: "#c084fc" },
@@ -664,18 +678,7 @@ export default function GamePage(props: {
                     {/* Top Card rendered as authentic pure CSS Card */}
                     <div className="game-discard-top-card">
                       <Card
-                        card={{
-                          id: gameState.discardPileTop.defId,
-                          name: gameState.discardPileTop.name,
-                          type: gameState.discardPileTop.type,
-                          primaryColor: gameState.discardPileTop.primaryColor,
-                          secondaryColor: gameState.discardPileTop.secondaryColor,
-                          value: gameState.discardPileTop.value,
-                          setSize: gameState.discardPileTop.setSize,
-                          description: gameState.discardPileTop.description,
-                          icon: gameState.discardPileTop.icon,
-                          count: 1,
-                        }}
+                        card={resolveCardDef(gameState.discardPileTop)}
                         size="xs"
                         isInteractive={false}
                       />
@@ -924,18 +927,7 @@ export default function GamePage(props: {
                       }}
                     >
                       <Card
-                        card={{
-                          id: card.defId,
-                          name: card.name,
-                          type: card.type,
-                          primaryColor: card.primaryColor,
-                          secondaryColor: card.secondaryColor,
-                          value: card.value,
-                          setSize: card.setSize,
-                          description: card.description,
-                          icon: card.icon,
-                          count: 1,
-                        }}
+                        card={resolveCardDef(card)}
                         size="sm"
                         isInteractive={isHandInteractive}
                       />
@@ -2304,19 +2296,8 @@ export default function GamePage(props: {
                     }}
                   />
                   <Card
-                    card={{
-                      id: selectedCard.defId,
-                      name: selectedCard.name,
-                      type: selectedCard.type,
-                      primaryColor: selectedCard.primaryColor,
-                      secondaryColor: selectedCard.secondaryColor,
-                      value: selectedCard.value,
-                      setSize: selectedCard.setSize,
-                      description: selectedCard.description,
-                      icon: selectedCard.icon,
-                      count: 1,
-                    }}
-                    size="sm"
+                    card={resolveCardDef(selectedCard)}
+                    size="md"
                     isInteractive={false}
                   />
                 </div>
@@ -3282,21 +3263,21 @@ export default function GamePage(props: {
 
       {/* Discard Pile Inspector Modal */}
       {isDiscardInspectorOpen && (
-        <div className="discard-inspector-modal" onClick={() => setIsDiscardInspectorOpen(false)}>
-          <div className="discard-inspector-box" onClick={(e) => e.stopPropagation()}>
-            <div className="sheet-handle" />
+        <div className="join-dialog-overlay" role="dialog" aria-modal="true">
+          <div className="dialog-scrim" onClick={() => setIsDiscardInspectorOpen(false)} />
+          <div className="discard-inspector-modal">
             <div className="discard-inspector-header">
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span className="material-symbols-outlined" style={{ color: "var(--primary)", fontSize: "22px" }}>
+                <span className="material-symbols-outlined" style={{ color: "var(--primary)" }}>
                   layers
                 </span>
-                <h3 style={{ fontSize: "1.05rem", fontWeight: 800, margin: 0 }}>
-                  Discard Pile ({gameState.discardPile?.length || (gameState.discardPileTop ? 1 : 0)} Cards)
+                <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 700 }}>
+                  Discard Pile ({gameState.discardPile?.length || (gameState.discardPileTop ? 1 : 0)})
                 </h3>
               </div>
               <button
                 type="button"
-                className="game-icon-btn"
+                className="game-round-icon-btn"
                 onClick={() => setIsDiscardInspectorOpen(false)}
                 title="Close"
               >
@@ -3311,18 +3292,7 @@ export default function GamePage(props: {
                 [...gameState.discardPile].reverse().map((c, i) => (
                   <div key={`${c.instanceId}-${i}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
                     <Card
-                      card={{
-                        id: c.defId,
-                        name: c.name,
-                        type: c.type,
-                        primaryColor: c.primaryColor,
-                        secondaryColor: c.secondaryColor,
-                        value: c.value,
-                        setSize: c.setSize,
-                        description: c.description,
-                        icon: c.icon,
-                        count: 1,
-                      }}
+                      card={resolveCardDef(c)}
                       size="xs"
                       isInteractive={false}
                     />
@@ -3334,18 +3304,7 @@ export default function GamePage(props: {
               ) : gameState.discardPileTop ? (
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
                   <Card
-                    card={{
-                      id: gameState.discardPileTop.defId,
-                      name: gameState.discardPileTop.name,
-                      type: gameState.discardPileTop.type,
-                      primaryColor: gameState.discardPileTop.primaryColor,
-                      secondaryColor: gameState.discardPileTop.secondaryColor,
-                      value: gameState.discardPileTop.value,
-                      setSize: gameState.discardPileTop.setSize,
-                      description: gameState.discardPileTop.description,
-                      icon: gameState.discardPileTop.icon,
-                      count: 1,
-                    }}
+                    card={resolveCardDef(gameState.discardPileTop)}
                     size="xs"
                     isInteractive={false}
                   />
@@ -3368,52 +3327,38 @@ export default function GamePage(props: {
         const bankPlayer =
           viewingBankPlayerId === "self" || viewingBankPlayerId === you?.id || viewingBankPlayerId === actualPlayerId
             ? you
-            : (gameState.players[viewingBankPlayerId] ||
-               Object.values(gameState.players).find((p) => p.id === viewingBankPlayerId));
+            : gameState.players[viewingBankPlayerId] ||
+              Object.values(gameState.players).find((p: { id: string }) => p.id === viewingBankPlayerId);
 
         if (!bankPlayer) return null;
-        const isSelf = bankPlayer.id === you?.id || bankPlayer.id === actualPlayerId;
 
         return (
-          <div
-            className="game-bank-modal-overlay"
-            onClick={() => setViewingBankPlayerId(null)}
-          >
-            <div
-              className="game-bank-modal-container"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="sheet-handle game-mobile-only" />
+          <div className="join-dialog-overlay" role="dialog" aria-modal="true">
+            <div className="dialog-scrim" onClick={() => setViewingBankPlayerId(null)} />
+            <div className="game-bank-modal-container">
               <div className="game-bank-modal-header">
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <div className="game-bank-modal-icon-wrap">
-                    <span
-                      className="material-symbols-outlined"
-                      style={{ fontSize: "22px", fontVariationSettings: "'FILL' 1", color: "#66df75" }}
-                    >
+                <div className="game-bank-modal-title-group">
+                  <div className="game-bank-modal-icon-badge">
+                    <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>
                       account_balance
                     </span>
                   </div>
                   <div>
                     <h3 className="game-bank-modal-title">
-                      {isSelf ? "Your Bank Vault" : `${bankPlayer.name}'s Bank Vault`}
+                      {bankPlayer.id === you?.id ? "Your Bank Vault" : `${bankPlayer.name}'s Bank Vault`}
                     </h3>
-                    <div className="game-bank-modal-subtitle">
-                      <span style={{ color: "#66df75", fontWeight: 800 }}>${bankPlayer.bankTotal}M Total Cash</span>
-                      <span>•</span>
-                      <span>{bankPlayer.bank.length} {bankPlayer.bank.length === 1 ? "Card" : "Cards"}</span>
-                    </div>
+                    <p className="game-bank-modal-sub">
+                      Total Assets: <strong>${bankPlayer.bankTotal}M</strong> ({bankPlayer.bank.length} cards banked)
+                    </p>
                   </div>
                 </div>
-
                 <button
                   type="button"
-                  className="game-icon-btn"
+                  className="game-round-icon-btn"
                   onClick={() => setViewingBankPlayerId(null)}
                   title="Close Vault"
-                  aria-label="Close"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>
                     close
                   </span>
                 </button>
@@ -3422,25 +3367,20 @@ export default function GamePage(props: {
               <div className="game-bank-modal-body">
                 {bankPlayer.bank.length === 0 ? (
                   <div className="game-bank-modal-empty">
-                    <span
-                      className="material-symbols-outlined"
-                      style={{ fontSize: "44px", color: "var(--outline)", opacity: 0.5 }}
-                    >
+                    <span className="material-symbols-outlined" style={{ fontSize: "44px", opacity: 0.4 }}>
                       savings
                     </span>
-                    <p style={{ margin: "8px 0 0", color: "var(--muted)", fontSize: "0.9rem", fontWeight: 600 }}>
-                      No cash or action cards deposited in this bank vault yet.
-                    </p>
-                    <span style={{ fontSize: "0.76rem", color: "var(--outline)", marginTop: "4px" }}>
+                    <p>Vault is completely empty</p>
+                    <span style={{ fontSize: "0.76rem", color: "var(--muted)" }}>
                       Bank money cards on your turn to protect your assets and pay rents!
                     </span>
                   </div>
                 ) : (
                   <div className="game-bank-modal-grid">
-                    {bankPlayer.bank.map((c, i) => (
+                    {bankPlayer.bank.map((c: CardInstance, i: number) => (
                       <div key={`${c.instanceId}-${i}`} className="game-bank-modal-card-item">
                         <Card
-                          card={c as unknown as CardDefinition}
+                          card={resolveCardDef(c)}
                           size="sm"
                           isInteractive={false}
                         />
