@@ -217,25 +217,70 @@ export function Card({
             card.rentTiers ? `card-body-section--tiers-${card.rentTiers.length}` : ""
           }`}
         >
-          {/* Property Card Body */}
+          {/* Property Card Body (Matching Shared Reference) */}
           {card.type === "property" && (
             <>
-              <div className="card-body-heading">RENT</div>
+              <div className="card-body-heading">
+                <span className="card-body-heading-dash">—</span>
+                <span>RENT</span>
+                <span className="card-body-heading-dash">—</span>
+              </div>
               <p className="card-body-subtitle">
                 Collect rent from the player who has this card in their hand.
               </p>
               <div className="card-rent-table-box">
-                <div className="card-rent-table-title">Rent Value Table</div>
                 <div className="card-rent-table-rows">
                   {card.rentTiers?.map((tier) => (
                     <div key={tier.setCount} className="card-rent-row">
-                      <span className="card-rent-set-label">
-                        {tier.setCount} {tier.setCount === 1 ? "SET" : "SETS"}
+                      <div className="card-rent-set-col">
+                        <span className="card-rent-set-label">
+                          {tier.setCount} {tier.setCount === 1 ? "SET" : "SETS"}
+                        </span>
                         {tier.isComplete && (
-                          <span className="card-rent-complete-badge"> (COMPLETE)</span>
+                          <span className="card-rent-complete-tag">(COMPLETE)</span>
                         )}
-                      </span>
-                      <span className="card-rent-amount">M{tier.rent}</span>
+                      </div>
+
+                      {/* Center Money Bag Icon in Card Color */}
+                      <div className="card-rent-moneybag-col">
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="card-rent-moneybag-svg"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M9.5 5.5c0-.8.7-1.5 1.5-1.5h2c.8 0 1.5.7 1.5 1.5 0 .4-.2.8-.5 1h-4c-.3-.2-.5-.6-.5-1z"
+                            fill={primaryHex}
+                          />
+                          <rect
+                            x="8.5"
+                            y="6"
+                            width="7"
+                            height="1.2"
+                            rx="0.6"
+                            fill={primaryHex}
+                          />
+                          <path
+                            d="M5.5 10c0-2 2-2.8 4-2.8h5c2 0 4 .8 4 2.8 0 4.5 1 9.5-3 10.5-1.5.4-5.5.4-7 0-4-1-3-6-3-10.5z"
+                            fill={primaryHex}
+                          />
+                          <text
+                            x="12"
+                            y="15.8"
+                            fill="#FFFFFF"
+                            fontSize="6.5"
+                            fontWeight="900"
+                            textAnchor="middle"
+                            fontFamily="system-ui, -apple-system, sans-serif"
+                          >
+                            $
+                          </text>
+                        </svg>
+                      </div>
+
+                      <div className="card-rent-amount-col">
+                        <span className="card-rent-amount">M{tier.rent}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
