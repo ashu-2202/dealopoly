@@ -1799,11 +1799,12 @@ p {
     min-height: calc(100svh - 56px);
     max-height: calc(100svh - 56px);
     height: calc(100svh - 56px);
-    padding: 8px 16px 14px;
+    padding: 6px 16px 12px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    gap: clamp(4px, 1.5vh, 12px);
     overflow: hidden;
   }
 
@@ -1818,8 +1819,7 @@ p {
 
   .hero-badge {
     padding: 3px 12px;
-    margin-top: 2px;
-    margin-bottom: 6px;
+    margin: 0 auto 4px;
     border-radius: 999px;
   }
 
@@ -1830,7 +1830,7 @@ p {
   .hero-copy h1 {
     font-size: clamp(1.4rem, 5.5vw, 1.85rem);
     line-height: 1.1;
-    margin: 3px 0 2px;
+    margin: 2px 0 2px;
     letter-spacing: -0.02em;
   }
 
@@ -1847,31 +1847,31 @@ p {
   }
 
   .hero-showcase-wrapper {
-    min-height: 180px;
-    height: 180px;
-    max-height: 190px;
-    transform: scale(0.50);
+    min-height: 165px;
+    height: 165px;
+    max-height: 175px;
+    transform: scale(0.48);
     transform-origin: center center;
-    margin: 0 0 -10px;
+    margin: 0;
     order: -1; /* Keep 3D Hero at the top in mobile view */
     width: 100%;
     overflow: visible;
   }
 
   .hero-showcase-stage {
-    margin-top: -70px;
+    margin-top: -45px;
   }
 
   .hero-platform-container {
     display: flex !important;
-    bottom: -200px;
-    width: 520px;
-    height: 220px;
+    bottom: -80px;
+    width: 480px;
+    height: 180px;
   }
 
   .hero-platform-base {
-    width: 500px;
-    height: 210px;
+    width: 460px;
+    height: 170px;
     transform: rotateX(72deg);
   }
 
@@ -1882,36 +1882,45 @@ p {
   }
 
   .hero-actions {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     width: 100%;
     max-width: 360px;
-    margin: 4px auto 2px;
+    gap: 8px;
+    margin: 6px auto 2px;
   }
 
   .hero-actions .button {
     margin: 0;
     border-radius: 999px;
     font-weight: 700;
+    white-space: nowrap;
   }
 
-  /* Primary "Create Room" button */
+  /* Primary "Create Room" button spans full width */
   .hero-actions .button--primary {
-    flex: 1 1 100%;
-    padding: 9px 16px;
-    font-size: 0.85rem;
+    grid-column: 1 / -1;
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 0.88rem;
     justify-content: center;
   }
 
-  /* Secondary "Join Room" & Ghost "Play with Bots" buttons */
-  .hero-actions .button--secondary,
+  /* Secondary "Join Room" button in Column 1 */
+  .hero-actions .button--secondary {
+    grid-column: 1;
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 0.80rem;
+    justify-content: center;
+  }
+
+  /* Ghost "Play with Bots" button in Column 2 */
   .hero-actions .button--ghost {
-    flex: 1 1 calc(50% - 4px);
-    padding: 7px 10px;
-    font-size: 0.78rem;
+    grid-column: 2;
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 0.80rem;
     justify-content: center;
   }
 
@@ -1950,20 +1959,21 @@ p {
 /* Medium Mobile Viewports (Height: 700px to 820px, e.g. iPhone 12/13/14/15/16 standard) */
 @media (max-width: 640px) and (min-height: 700px) {
   .hero-section {
-    padding: 12px 18px 20px;
+    padding: 10px 18px 16px;
+    gap: clamp(6px, 2vh, 16px);
   }
 
   .hero-showcase-wrapper {
-    min-height: 220px;
-    height: 220px;
-    max-height: 235px;
-    transform: scale(0.58);
-    margin: 4px 0 -5px;
+    min-height: 195px;
+    height: 195px;
+    max-height: 210px;
+    transform: scale(0.55);
+    margin: 0;
   }
 
   .hero-badge {
     padding: 4px 14px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .badge-text {
@@ -1978,14 +1988,14 @@ p {
   .hero-copy .lede {
     font-size: 0.82rem;
     line-height: 1.4;
-    margin: 4px auto 10px;
+    margin: 3px auto 8px;
     max-width: 350px;
   }
 
   .hero-actions {
     max-width: 380px;
     gap: 10px;
-    margin: 8px auto 4px;
+    margin: 8px auto 3px;
   }
 
   .hero-actions .button--primary {
@@ -2001,28 +2011,28 @@ p {
 
   .availability {
     font-size: 0.72rem;
-    margin-top: 4px;
+    margin-top: 3px;
   }
 }
 
 /* Tall Mobile Viewports (Height >= 821px, e.g. iPhone 14/15/16/17 Pro & Pro Max, Galaxy Ultra, Pixel Pro) */
 @media (max-width: 640px) and (min-height: 821px) {
   .hero-section {
-    padding: 16px 20px 28px;
+    padding: 14px 20px 22px;
+    gap: clamp(8px, 2.5vh, 20px);
   }
 
   .hero-showcase-wrapper {
-    min-height: 265px;
-    height: 265px;
-    max-height: 285px;
-    transform: scale(0.66);
-    margin: 12px 0 0px;
+    min-height: 235px;
+    height: 235px;
+    max-height: 250px;
+    transform: scale(0.62);
+    margin: 0;
   }
 
   .hero-badge {
     padding: 5px 16px;
-    margin-top: 6px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   .badge-text {
@@ -2038,15 +2048,15 @@ p {
   .hero-copy .lede {
     font-size: 0.88rem;
     line-height: 1.45;
-    margin: 6px auto 16px;
+    margin: 4px auto 12px;
     max-width: 370px;
     -webkit-line-clamp: 3;
   }
 
   .hero-actions {
     max-width: 400px;
-    gap: 12px;
-    margin: 14px auto 8px;
+    gap: 10px;
+    margin: 10px auto 4px;
   }
 
   .hero-actions .button--primary {
@@ -2056,13 +2066,13 @@ p {
 
   .hero-actions .button--secondary,
   .hero-actions .button--ghost {
-    padding: 11px 16px;
+    padding: 10px 14px;
     font-size: 0.86rem;
   }
 
   .availability {
     font-size: 0.76rem;
-    margin-top: 6px;
+    margin-top: 4px;
   }
 }
 
