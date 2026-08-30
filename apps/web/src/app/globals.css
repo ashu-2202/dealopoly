@@ -1561,11 +1561,23 @@ p {
     gap: 36px;
   }
   .hero-showcase-wrapper {
-    min-height: 300px;
-    transform: scale(0.72);
-    margin-top: -30px;
-    margin-bottom: -30px;
+    min-height: 380px;
+    transform: scale(0.8);
+    margin-top: -10px;
+    margin-bottom: 0px;
     order: -1; /* Move card showcase above hero copy on mobile */
+  }
+  .hero-showcase-stage {
+    margin-top: -75px;
+  }
+  .hero-platform-container {
+    bottom: -35px;
+    width: 580px;
+    height: 230px;
+  }
+  .hero-platform-base {
+    width: 540px;
+    height: 220px;
   }
   .hero-copy {
     text-align: center;
@@ -1623,6 +1635,16 @@ p {
 }
 
 @media (max-width: 640px) {
+  .hero-showcase-wrapper {
+    min-height: 350px;
+    transform: scale(0.72);
+  }
+  .hero-showcase-stage {
+    margin-top: -85px;
+  }
+  .hero-platform-container {
+    bottom: -45px;
+  }
   .hero-copy h1 {
     font-size: 2.6rem;
   }
