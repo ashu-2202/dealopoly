@@ -2671,7 +2671,7 @@ p {
   color: #FFFFFF !important;
 }
 
-/* Top-Left & Top-Right Circular Badges with Solid White Background */
+/* Top-Left & Top-Right Circular Badges with Poppy 3D Elevation & Border Shadows */
 .card-header-badge-circle {
   position: absolute;
   top: 0.45em;
@@ -2679,11 +2679,16 @@ p {
   width: 2.3em;
   height: 2.3em;
   border-radius: 50%;
-  background: #FFFFFF;
+  background: linear-gradient(145deg, #FFFFFF 0%, #FAF8F5 100%);
+  border: 0.08em solid rgba(0, 0, 0, 0.18);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.45),
+    0 1.5px 3px rgba(0, 0, 0, 0.35),
+    inset 0 1.5px 1px #FFFFFF,
+    inset 0 -1.5px 1px rgba(0, 0, 0, 0.1);
   z-index: 3;
   padding: 0.08em;
   overflow: hidden;
@@ -2705,12 +2710,14 @@ p {
   color: var(--card-color, #F28C28);
   display: block;
   text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .card-header-city-svg {
   width: 100%;
   height: 100%;
   display: block;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
 }
 
 /* Category Label with Enclosing Dash Lines */
