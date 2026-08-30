@@ -247,6 +247,42 @@ export default function GamePage(props: {
     }
   }, [you?.hand?.length, isYourTurn]);
 
+  // Automatically end turn when player has played all 3 actions and no pending resolution is in flight
+  useEffect(() => {
+    if (!gameState || gameState.status !== "in_progress") return;
+
+    const isCurrentActive = isYourTurn && gameState.turn?.activePlayerId === actualPlayerId;
+    const isActionPhase = gameState.turn?.phase === "action";
+    const allActionsUsed = gameState.turn?.actionsRemaining === 0;
+    const noPendingAction = !gameState.pendingResolution;
+
+    if (isCurrentActive && isActionPhase && allActionsUsed && noPendingAction) {
+      const timer = setTimeout(() => {
+        if (
+          gameState.status === "in_progress" &&
+          gameState.turn?.activePlayerId === actualPlayerId &&
+          gameState.turn?.phase === "action" &&
+          gameState.turn?.actionsRemaining === 0 &&
+          !gameState.pendingResolution
+        ) {
+          sendCommand({ type: "end_turn", playerId: actualPlayerId });
+          setSelectedCard(null);
+        }
+      }, 550);
+
+      return () => clearTimeout(timer);
+    }
+  }, [
+    gameState?.status,
+    gameState?.turn?.activePlayerId,
+    gameState?.turn?.phase,
+    gameState?.turn?.actionsRemaining,
+    gameState?.pendingResolution,
+    isYourTurn,
+    actualPlayerId,
+    sendCommand,
+  ]);
+
   if (!gameState) {
     return (
       <div className="game-table-shell" style={{ alignItems: "center", justifyContent: "center" }}>
@@ -703,7 +739,9 @@ export default function GamePage(props: {
                   : isYourTurn
                     ? gameState.turn.phase === "draw"
                       ? "✨ Your Turn: Draw 2 cards to begin ✨"
-                      : `⚡ Your Turn: ${gameState.turn.actionsRemaining} action${gameState.turn.actionsRemaining === 1 ? "" : "s"} left`
+                      : gameState.turn.actionsRemaining === 0
+                        ? "⚡ All 3 actions played! Ending turn..."
+                        : `⚡ Your Turn: ${gameState.turn.actionsRemaining} action${gameState.turn.actionsRemaining === 1 ? "" : "s"} left`
                     : `${activePlayer?.name} is playing their turn...`}
               </span>
             </div>
@@ -838,7 +876,7 @@ export default function GamePage(props: {
                   onClick={handleEndTurn}
                   className={`game-end-turn-btn ${gameState.turn.actionsRemaining === 0 ? "game-end-turn-btn--pulse" : ""}`}
                 >
-                  <span>End Turn</span>
+                  <span>{gameState.turn.actionsRemaining === 0 ? "Ending Turn..." : "End Turn"}</span>
                   <span style={{ fontSize: "0.85em" }}>➔</span>
                 </button>
               )}
