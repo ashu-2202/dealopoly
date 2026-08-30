@@ -2664,7 +2664,7 @@ p {
 
 .card-body-heading {
   font-family: var(--display, system-ui);
-  font-size: 0.85em; /* +21% */
+  font-size: 1.02em; /* +20% */
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -2673,11 +2673,11 @@ p {
 }
 
 .card-body-subtitle {
-  font-size: 0.58em; /* +20% */
+  font-size: 0.70em; /* +20% */
   color: #4A3B32;
   line-height: 1.28;
   max-width: 92%;
-  margin-bottom: 0.4em;
+  margin-bottom: 0.35em;
   font-weight: 500;
 }
 
@@ -2694,7 +2694,7 @@ p {
 
 .card-rent-table-title {
   font-family: var(--display, serif);
-  font-size: 0.7em; /* +20% */
+  font-size: 0.84em; /* +20% */
   font-weight: 800;
   color: #2D1A10;
   margin-bottom: 0.2em;
@@ -2710,14 +2710,14 @@ p {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 0.65em; /* +20% */
+  font-size: 0.78em; /* +20% */
   font-weight: 700;
   color: #2D1A10;
   padding: 0.1em 0;
 }
 
 .card-rent-complete-badge {
-  font-size: 0.85em;
+  font-size: 1.0em; /* +20% */
   font-weight: 600;
   opacity: 0.85;
 }
@@ -2725,7 +2725,7 @@ p {
 .card-rent-amount {
   font-family: var(--mono);
   font-weight: 900;
-  font-size: 1.25em; /* +20% */
+  font-size: 1.50em; /* +20% */
   color: #1A1A1A;
 }
 
@@ -2735,7 +2735,7 @@ p {
 }
 .card-wild-rainbow-text {
   font-family: var(--display);
-  font-size: 0.75em; /* +20% */
+  font-size: 0.90em; /* +20% */
   font-weight: 900;
   color: #6C5CE7;
   letter-spacing: 0.08em;
@@ -2747,14 +2747,14 @@ p {
 }
 .card-wild-dual-pill {
   font-family: var(--mono);
-  font-size: 0.58em; /* +20% */
+  font-size: 0.70em; /* +20% */
   font-weight: 800;
   padding: 0.25em 0.55em;
   border-radius: 0.3em;
   text-transform: uppercase;
 }
 .card-wild-dual-divider {
-  font-size: 0.8em;
+  font-size: 0.96em; /* +20% */
   color: #888;
 }
 
@@ -2784,7 +2784,7 @@ p {
   margin-bottom: 0.35em;
 }
 .card-action-description-text {
-  font-size: 0.58em; /* +20% */
+  font-size: 0.70em; /* +20% */
   color: #222;
   font-weight: 500;
   line-height: 1.35;
@@ -2792,7 +2792,7 @@ p {
 }
 .card-action-bank-val {
   font-family: var(--mono);
-  font-size: 0.55em; /* +20% */
+  font-size: 0.66em; /* +20% */
   font-weight: 800;
   color: #0055A4;
   letter-spacing: 0.05em;
@@ -2844,7 +2844,7 @@ p {
 .card-money-banknote-corner-br {
   position: absolute;
   font-family: var(--display);
-  font-size: 0.55em;
+  font-size: 0.66em; /* +20% */
   font-weight: 900;
   color: #1F8A4C;
 }
@@ -2860,13 +2860,13 @@ p {
 }
 .card-money-banknote-amount {
   font-family: var(--display);
-  font-size: 1.45em;
+  font-size: 1.74em; /* +20% */
   font-weight: 900;
   line-height: 1;
 }
 .card-money-banknote-label {
   font-family: var(--mono);
-  font-size: 0.44em;
+  font-size: 0.53em; /* +20% */
   font-weight: 800;
   letter-spacing: 0.12em;
   opacity: 0.85;
@@ -2884,7 +2884,7 @@ p {
   display: flex;
   flex-direction: column;
   gap: 0.3em;
-  font-size: 0.55em; /* +20% */
+  font-size: 0.66em; /* +20% */
   color: #333;
 }
 
