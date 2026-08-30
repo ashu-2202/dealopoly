@@ -5347,27 +5347,55 @@ p {
 
   .game-topbar {
     padding: 6px 12px;
-    height: 52px;
+    height: 50px;
+    gap: 8px;
   }
 
-  .game-topbar-brand span:last-child {
-    display: inline-block;
-    font-size: 1.05rem;
+  .game-topbar-brand {
+    font-size: 1rem;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .game-topbar-logo-text {
+    font-size: 0.95rem;
   }
 
   .game-turn-pill {
     padding: 3px 8px;
     font-size: 0.68rem;
-    gap: 3px;
+    gap: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .game-topbar-actions {
     gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .game-activity-toggle-btn {
+    padding: 6px 8px;
+    height: 34px;
+    font-size: 0.72rem;
+    gap: 4px;
+    border-radius: 999px;
+  }
+
+  .game-topbar-leave-btn {
+    padding: 6px 10px;
+    height: 34px;
+    font-size: 0.75rem;
+    gap: 4px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .game-icon-btn {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
   }
 
   .game-layout-grid {

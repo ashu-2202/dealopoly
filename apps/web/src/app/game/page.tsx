@@ -538,7 +538,7 @@ export default function GamePage(props: {
             <span className="material-symbols-outlined" style={{ fontSize: "17px" }}>
               exit_to_app
             </span>
-            <span>Leave Game</span>
+            <span className="game-desktop-only">Leave Game</span>
           </button>
         </div>
       </header>
