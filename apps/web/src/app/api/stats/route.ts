@@ -9,7 +9,7 @@ export async function GET() {
   let totalGamesPlayed = 0;
   let onlinePlayers = 0;
   let activeRooms = 0;
-  let serversOnline = false;
+  let serversOnline = true;
 
   const API_BASE =
     process.env.GAME_SERVER_URL ||

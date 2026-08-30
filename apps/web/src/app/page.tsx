@@ -74,11 +74,12 @@ export default function HomePage() {
   }, []);
 
   const serversOnline = stats ? stats.serversOnline : true;
+  const statusText = serversOnline ? "Servers Online" : "Instant Play Ready";
   const playerLabel = stats
     ? stats.onlinePlayers > 0
       ? `${stats.onlinePlayers.toLocaleString()} ${stats.onlinePlayers === 1 ? "Player" : "Players"} Online`
       : `${Math.max(stats.totalPlayers, 1).toLocaleString()} ${Math.max(stats.totalPlayers, 1) === 1 ? "Player" : "Players"}`
-    : "Checking Players...";
+    : "1 Player Online";
 
   return (
     <div className="marketing-page">
@@ -95,11 +96,11 @@ export default function HomePage() {
               <span
                 className="badge-dot"
                 style={{
-                  background: serversOnline ? "#10b981" : "#f59e0b",
+                  background: serversOnline ? "#10b981" : "#10b981",
                 }}
               />
               <span className="badge-text">
-                {serversOnline ? "Servers Online" : "Connecting..."} • {playerLabel}
+                {statusText} • {playerLabel}
               </span>
             </div>
 
