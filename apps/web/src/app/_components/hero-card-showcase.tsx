@@ -16,6 +16,7 @@ interface HeroCardData {
   resting: {
     x: number;
     y: number;
+    z: number;
     rotate: number;
     scale: number;
     zIndex: number;
@@ -100,6 +101,7 @@ const INITIAL_HERO_CARDS: HeroCardData[] = [
     resting: {
       x: -110,
       y: 20,
+      z: 10,
       rotate: -12,
       scale: 0.94,
       zIndex: 10,
@@ -133,6 +135,7 @@ const INITIAL_HERO_CARDS: HeroCardData[] = [
     resting: {
       x: 0,
       y: -10,
+      z: 50,
       rotate: 0,
       scale: 1.06,
       zIndex: 25,
@@ -160,6 +163,7 @@ const INITIAL_HERO_CARDS: HeroCardData[] = [
     resting: {
       x: 110,
       y: 25,
+      z: 10,
       rotate: 12,
       scale: 0.94,
       zIndex: 12,
@@ -203,16 +207,16 @@ export function HeroCardShowcase() {
       const newThree = pickThreeRandomCards(currentIds);
 
       const positions = [
-        { x: -110, y: 20, rotate: -12, scale: 0.94, zIndex: 10 },
-        { x: 0, y: -10, rotate: 0, scale: 1.06, zIndex: 25 },
-        { x: 110, y: 25, rotate: 12, scale: 0.94, zIndex: 12 },
+        { x: -110, y: 20, z: 10, rotate: -12, scale: 0.94, zIndex: 10 },
+        { x: 0, y: -10, z: 50, rotate: 0, scale: 1.06, zIndex: 25 },
+        { x: 110, y: 25, z: 10, rotate: 12, scale: 0.94, zIndex: 12 },
       ];
 
       const newHeroCards: HeroCardData[] = newThree.map((card, idx) => ({
         id: `${card.id}-${Date.now()}-${idx}`,
         card,
         ...getHeroCardMetadata(card),
-        resting: positions[idx] ?? { x: 0, y: 0, rotate: 0, scale: 1, zIndex: 10 },
+        resting: positions[idx] ?? { x: 0, y: 0, z: 10, rotate: 0, scale: 1, zIndex: 10 },
       }));
 
       setCards(newHeroCards);
@@ -246,6 +250,7 @@ export function HeroCardShowcase() {
           // Shuffle animation coordinates & transforms
           let animX = item.resting.x;
           let animY = item.resting.y;
+          let animZTranslate = item.resting.z;
           let animRotate = item.resting.rotate;
           let animRotateY = 0;
           let animScale = item.resting.scale;
@@ -255,6 +260,7 @@ export function HeroCardShowcase() {
             if (shuffleStep === "gather") {
               animX = 0;
               animY = 0;
+              animZTranslate = idx * 10;
               animRotate = (idx - 1) * 5;
               animScale = 1.04;
               animRotateY = 0;
@@ -262,6 +268,7 @@ export function HeroCardShowcase() {
             } else if (shuffleStep === "interleave") {
               animX = idx === 0 ? -50 : idx === 2 ? 50 : 0;
               animY = idx === 1 ? -28 : 16;
+              animZTranslate = (2 - idx) * 15;
               animRotate = (idx - 1) * 18;
               animScale = 1.08;
               animRotateY = 180;
@@ -269,6 +276,7 @@ export function HeroCardShowcase() {
             } else if (shuffleStep === "deal") {
               animX = item.resting.x;
               animY = item.resting.y;
+              animZTranslate = item.resting.z;
               animRotate = item.resting.rotate;
               animScale = item.resting.scale;
               animRotateY = 0;
@@ -277,6 +285,7 @@ export function HeroCardShowcase() {
           } else {
             animX = isHovered ? item.resting.x * 0.75 : isOtherHovered ? item.resting.x * 1.12 : item.resting.x;
             animY = isHovered ? item.resting.y - 36 : isOtherHovered ? item.resting.y + 6 : item.resting.y;
+            animZTranslate = isHovered ? 90 : isOtherHovered ? item.resting.z * 0.5 : item.resting.z;
             animRotate = isHovered ? 0 : item.resting.rotate;
             animScale = isHovered ? 1.14 : isOtherHovered ? 0.90 : item.resting.scale;
             animZ = isHovered ? 50 : item.resting.zIndex;
@@ -286,9 +295,13 @@ export function HeroCardShowcase() {
             <motion.div
               key={item.id}
               className="hero-showcase-card-container"
+              style={{
+                zIndex: animZ,
+              }}
               animate={{
                 x: animX,
                 y: animY,
+                z: animZTranslate,
                 rotate: animRotate,
                 rotateY: animRotateY,
                 scale: animScale,

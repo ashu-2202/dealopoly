@@ -496,6 +496,7 @@ p {
   justify-content: center;
   z-index: 10;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   margin-top: -55px;
 }
 
@@ -503,7 +504,8 @@ p {
   position: absolute;
   cursor: pointer;
   transform-style: preserve-3d;
-  will-change: transform;
+  -webkit-transform-style: preserve-3d;
+  will-change: transform, z-index;
 }
 
 .hero-card-glow-aura {
