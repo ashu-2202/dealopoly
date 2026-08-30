@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardBack } from "../_components/card";
 import { CardLoader } from "../_components/card-loader";
 import { GameOverSummary } from "../_components/game-over-summary";
+import { UserNav } from "../_components/user-nav";
 import {
   getStoredProfile,
   getRoomSession,
@@ -533,29 +534,10 @@ export default function GamePage(props: {
             <span>Leave Game</span>
           </button>
 
-          {/* User Profile Avatar */}
-          {(() => {
-            const userImg = authSession?.user?.image;
-            const displayName = you?.name || authSession?.user?.name || profile.name || "Player";
-            const initials = (displayName || "P").substring(0, 2).toUpperCase();
-
-            return userImg ? (
-              <img
-                src={userImg}
-                alt={displayName}
-                className="game-topbar-avatar game-desktop-only"
-                referrerPolicy="no-referrer"
-                title={displayName}
-              />
-            ) : (
-              <div
-                className="game-topbar-avatar game-topbar-avatar--fallback game-desktop-only"
-                title={displayName}
-              >
-                {initials}
-              </div>
-            );
-          })()}
+          {/* Desktop User Profile Avatar */}
+          <div className="game-desktop-only" style={{ alignItems: "center" }}>
+            <UserNav />
+          </div>
 
           {/* Mobile Menu Toggle */}
           <button

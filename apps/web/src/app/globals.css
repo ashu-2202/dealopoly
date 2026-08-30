@@ -3061,16 +3061,32 @@ p {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  display: grid;
-  place-items: center;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   color: var(--muted);
   background: var(--surface-high);
   border: 1px solid rgba(66, 71, 81, 0.3);
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
 }
 .game-icon-btn:hover {
   background: var(--surface-highest);
   color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+.game-icon-btn .material-symbols-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
 }
 
 .game-topbar-leave-btn {
