@@ -146,13 +146,13 @@ export function Card({
                 xmlns="http://www.w3.org/2000/svg"
               >
                 {/* Left Building with 45-deg angled pitched roof */}
-                <path d="M4 31V15l5-5v21H4z" fill="var(--card-color, #F28C28)" />
+                <path d="M4 31V15l5-5v21H4z" fill={primaryHex} />
                 {/* Left-mid building */}
-                <path d="M9 31V12.5h4v18.5H9z" fill="var(--card-color, #F28C28)" />
+                <path d="M9 31V12.5h4v18.5H9z" fill={primaryHex} />
                 {/* Center Tall Skyscraper with Spire Needle & Stepped Tiers */}
-                <path d="M13 31V9.5h10V31H13z" fill="var(--card-color, #F28C28)" />
-                <path d="M15 9.5V5.5h6v4h-6z" fill="var(--card-color, #F28C28)" />
-                <path d="M17 5.5V1.5h2v4h-2z" fill="var(--card-color, #F28C28)" />
+                <path d="M13 31V9.5h10V31H13z" fill={primaryHex} />
+                <path d="M15 9.5V5.5h6v4h-6z" fill={primaryHex} />
+                <path d="M17 5.5V1.5h2v4h-2z" fill={primaryHex} />
                 {/* Window Cutouts in Center Skyscraper */}
                 <rect x="14.8" y="11.5" width="2" height="2.5" fill="#FFFFFF" />
                 <rect x="19.2" y="11.5" width="2" height="2.5" fill="#FFFFFF" />
@@ -165,30 +165,35 @@ export function Card({
                 <rect x="14.8" y="27.5" width="2" height="2.5" fill="#FFFFFF" />
                 <rect x="19.2" y="27.5" width="2" height="2.5" fill="#FFFFFF" />
                 {/* Right Mid Building with Spire Antenna */}
-                <path d="M23 31V13.5h4.5V31H23z" fill="var(--card-color, #F28C28)" />
-                <path d="M24.8 13.5V7.5h1.2v6h-1.2z" fill="var(--card-color, #F28C28)" />
+                <path d="M23 31V13.5h4.5V31H23z" fill={primaryHex} />
+                <path d="M24.8 13.5V7.5h1.2v6h-1.2z" fill={primaryHex} />
                 {/* Far Right Stepped Building with Window Dots */}
-                <path d="M27.5 31V17h4.5v14h-4.5z" fill="var(--card-color, #F28C28)" />
+                <path d="M27.5 31V17h4.5v14h-4.5z" fill={primaryHex} />
                 <rect x="29" y="19.5" width="1.6" height="2.2" fill="#FFFFFF" />
                 <rect x="29" y="23.5" width="1.6" height="2.2" fill="#FFFFFF" />
                 <rect x="29" y="27.5" width="1.6" height="2.2" fill="#FFFFFF" />
                 {/* Horizontal Ground Line */}
-                <rect x="3" y="30.5" width="30" height="2" fill="var(--card-color, #F28C28)" />
+                <rect x="3" y="30.5" width="30" height="2" fill={primaryHex} />
               </svg>
             ) : (
               <span
                 className="material-symbols-outlined"
-                style={{ color: "var(--card-color, #0055A4)", fontVariationSettings: "'FILL' 1", fontSize: "1.25em" }}
+                style={{ color: primaryHex, fontVariationSettings: "'FILL' 1", fontSize: "1.25em" }}
               >
                 {coinIcon}
               </span>
             )}
           </div>
 
-          {/* Top-Right Circular Badge with Solid White Background & Card-Color Value Text */}
+          {/* Top-Right Circular Badge with Right-Half Color Value Text */}
           {card.value > 0 && (
             <div className="card-header-badge-circle card-header-badge-circle--right">
-              <span className="card-header-value-text">${card.value}M</span>
+              <span
+                className="card-header-value-text"
+                style={{ color: secondaryHex || primaryHex }}
+              >
+                ${card.value}M
+              </span>
             </div>
           )}
 
