@@ -1795,16 +1795,26 @@ p {
     height: 34px;
   }
 
+  .shell {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: 0 !important;
+  }
+
   .hero-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-inline: 0 !important;
     min-height: calc(100svh - 56px);
     height: auto;
     max-height: none;
-    padding: 8px 16px 20px;
+    padding: 8px 12px 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
     gap: 8px;
+    box-sizing: border-box;
     overflow: hidden;
   }
 
