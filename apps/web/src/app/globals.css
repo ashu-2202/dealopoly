@@ -2536,7 +2536,7 @@ p {
   z-index: 2;
 }
 
-/* ── 1. Top Arched Header Banner ────────────────────────────── */
+/* ── 1. Top Arched Header Banner (Height increased by 30%) ─────── */
 .card-arched-header {
   position: relative;
   background: var(--card-color, #8B4513);
@@ -2545,8 +2545,8 @@ p {
   margin: 0.18em 0.18em 0;
   border: 0.1em solid var(--card-color-dark, #54280B);
   border-bottom: none;
-  min-height: 5.8em; /* doubled presence for prominent card title */
-  padding: 0.9em 0.45em 1.25em;
+  min-height: 7.55em; /* +30% increased height for prominent colors and title */
+  padding: 1.1em 0.5em 1.45em;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2565,9 +2565,9 @@ p {
 /* Symmetrical Coin Badges (Top-Left Building Icon & Top-Right Money Value) */
 .card-header-coin {
   position: absolute;
-  top: 0.45em;
-  width: 1.85em;
-  height: 1.85em;
+  top: 0.6em;
+  width: 2.1em;
+  height: 2.1em;
   border-radius: 50%;
   background: #2B1810;
   border: 0.12em solid #D4AF37;
@@ -2581,16 +2581,16 @@ p {
 }
 
 .card-header-coin--left {
-  left: 0.45em;
+  left: 0.5em;
 }
 
 .card-header-coin--right {
-  right: 0.45em;
+  right: 0.5em;
 }
 
 .card-header-coin--right span {
   font-family: var(--mono);
-  font-size: 0.58em;
+  font-size: 0.62em;
   font-weight: 900;
   letter-spacing: -0.03em;
   line-height: 1;
@@ -2600,28 +2600,28 @@ p {
 }
 
 .card-header-coin--left .material-symbols-outlined {
-  font-size: 1.15em;
+  font-size: 1.25em;
   line-height: 1;
 }
 
 /* Category Label in Header */
 .card-header-category {
   font-family: var(--display, system-ui);
-  font-size: 0.6em;
+  font-size: 0.64em;
   font-weight: 800;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   opacity: 0.95;
-  margin-bottom: 0.2em;
+  margin-bottom: 0.25em;
   display: block;
 }
 
 /* Card Main Title */
 .card-header-title {
   font-family: var(--display, system-ui);
-  font-size: 1.05em;
+  font-size: 1.15em;
   font-weight: 900;
-  line-height: 1.08;
+  line-height: 1.12;
   text-transform: uppercase;
   letter-spacing: -0.01em;
   margin: 0;
@@ -2633,11 +2633,11 @@ p {
 /* Gold Star Emblem Overlapping Header Bottom */
 .card-header-star-emblem {
   position: absolute;
-  bottom: -0.7em;
+  bottom: -0.75em;
   left: 50%;
   transform: translateX(-50%);
-  width: 1.45em;
-  height: 1.45em;
+  width: 1.5em;
+  height: 1.5em;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2646,18 +2646,18 @@ p {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
 }
 .card-star-icon {
-  font-size: 1.45em !important;
+  font-size: 1.5em !important;
   color: #D4AF37 !important;
 }
 
-/* ── 2. Card Body Section (Increased Font Size ~20%) ─────────── */
+/* ── 2. Card Body Section ────────────────────────────────────── */
 .card-body-section {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0.9em 0.45em 0.35em;
+  padding: 0.7em 0.4em 0.25em;
   text-align: center;
   z-index: 2;
 }
