@@ -16,11 +16,13 @@ export type RoomStatus = "lobby" | "in_progress" | "completed";
 export interface Room {
   id?: string;
   code: string;
+  gameType: string;
+  config?: Record<string, unknown>;
   hostPlayerId: string;
   status: RoomStatus;
   seats: RoomSeat[];
   maxSeats: number;
-  gameState?: GameState;
+  gameState?: any;
   dbGameId?: string;
   nextSequenceNum?: number;
   createdAt: number;
@@ -37,6 +39,7 @@ export interface PublicRoomSeat {
 
 export interface PublicRoomInfo {
   code: string;
+  gameType: string;
   hostPlayerId: string;
   status: RoomStatus;
   seats: PublicRoomSeat[];

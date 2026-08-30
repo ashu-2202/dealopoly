@@ -128,11 +128,16 @@ export const players = pgTable("players", {
 // 2. rooms
 //    The lobby + game container. Maps to Room in rooms/types.ts.
 // ---------------------------------------------------------------------------
+// 2. rooms
+//    The lobby + game container. Maps to Room in rooms/types.ts.
+// ---------------------------------------------------------------------------
 export const rooms = pgTable(
   "rooms",
   {
     id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
     code: char("code", { length: 6 }).notNull().unique(),
+    gameType: text("game_type").notNull().default("monodeal"),
+    config: jsonb("config"),
     hostPlayerId: uuid("host_player_id")
       .notNull()
       .references(() => players.id),
@@ -184,6 +189,7 @@ export const games = pgTable(
       .notNull()
       .unique()
       .references(() => rooms.id),
+    gameType: text("game_type").notNull().default("monodeal"),
     seed: integer("seed").notNull(),
     status: text("status").notNull().default("in_progress"),
     playerOrder: uuid("player_order").array().notNull(),

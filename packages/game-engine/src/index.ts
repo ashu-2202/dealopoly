@@ -21,3 +21,4 @@ export * from "./rules/win-condition.js";
 export * from "./engine.js";
 export * from "./masking.js";
 export * from "./bot.js";
+export * from "./core.js";

@@ -4,6 +4,7 @@ import {
   createGame,
   applyCommand,
   getMaskedView,
+  getGameEngine,
   type GameCommand,
   type GameEvent,
   type GameState,
@@ -102,13 +103,14 @@ export class RoomManager {
 
   public async createRoom(
     hostName: string,
-    options?: { botCount?: number; userId?: string },
+    options?: { botCount?: number; userId?: string; gameType?: string; config?: Record<string, unknown> },
   ): Promise<{ room: Room; hostPlayerId: string; sessionToken: string }> {
     const roomId = randomUUID();
     const code = this.generateRoomCode();
     const hostPlayerId = randomUUID();
     const hostSessionToken = this.generateSessionToken();
     const displayName = hostName.trim() || "Host";
+    const gameType = options?.gameType || "monodeal";
 
     const hostSeat: RoomSeat = {
       seatIndex: 0,
@@ -151,6 +153,8 @@ export class RoomManager {
     const room: Room = {
       id: roomId,
       code,
+      gameType,
+      config: options?.config,
       hostPlayerId,
       status: "lobby",
       seats,
@@ -179,6 +183,8 @@ export class RoomManager {
       await db.insert(rooms).values({
         id: roomId,
         code,
+        gameType,
+        config: options?.config,
         hostPlayerId,
         status: "lobby",
         maxSeats: 5,
@@ -393,8 +399,10 @@ export class RoomManager {
 
     const gameId = randomUUID();
     const gameSeed = Math.floor(Math.random() * 1000000);
+    const gameType = room.gameType || "monodeal";
+    const engine = getGameEngine(gameType);
 
-    const gameState = createGame({
+    const gameState = engine.createGame({
       gameId,
       players: gamePlayers,
       seed: gameSeed,
@@ -416,6 +424,7 @@ export class RoomManager {
         await db.insert(games).values({
           id: gameId,
           roomId: room.id,
+          gameType,
           seed: gameSeed,
           status: "in_progress",
           playerOrder: gamePlayers.map((p) => p.id),
@@ -751,6 +760,7 @@ export class RoomManager {
   public getPublicRoomInfo(room: Room): PublicRoomInfo {
     return {
       code: room.code,
+      gameType: room.gameType || "monodeal",
       hostPlayerId: room.hostPlayerId,
       status: room.status,
       maxSeats: room.maxSeats,
@@ -777,9 +787,10 @@ export class RoomManager {
 
   public broadcastGameState(room: Room, events?: GameEvent[]): void {
     if (!room.gameState) return;
+    const engine = getGameEngine(room.gameType || "monodeal");
 
     for (const seat of room.seats) {
-      const masked = getMaskedView(room.gameState, seat.playerId);
+      const masked = engine.getMaskedView(room.gameState, seat.playerId);
       this.sendToSeat(seat, {
         type: "GAME_STATE",
         state: masked,
@@ -851,6 +862,8 @@ export class RoomManager {
           const roomObj: Room = {
             id: r.id,
             code: r.code,
+            gameType: r.gameType || "monodeal",
+            config: r.config as Record<string, unknown> | undefined,
             hostPlayerId: r.hostPlayerId,
             status: r.status as RoomStatus,
             seats,
