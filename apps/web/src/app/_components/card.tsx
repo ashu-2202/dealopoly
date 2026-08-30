@@ -172,9 +172,13 @@ export function Card({
         </div>
 
         {/* ============================================================ */}
-        {/* 2. CARD BODY SECTION                                         */}
+        {/* 2. CARD BODY SECTION (Dynamic Sizing Based on Tiers)         */}
         {/* ============================================================ */}
-        <div className="card-body-section">
+        <div
+          className={`card-body-section card-body-section--${card.type} ${
+            card.rentTiers ? `card-body-section--tiers-${card.rentTiers.length}` : ""
+          }`}
+        >
           {/* Property Card Body */}
           {card.type === "property" && (
             <>
