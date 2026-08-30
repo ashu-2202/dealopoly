@@ -305,17 +305,19 @@ export default function GamePage(props: {
 
   // Actions
   const handleDraw = () => {
-    if (!isYourTurn || gameState.turn.phase !== "draw") return;
+    if (!isYourTurn || gameState.turn.phase !== "draw" || gameState.pendingResolution) return;
     triggerDrawAnimation(2);
     sendCommand({ type: "draw_cards", playerId: actualPlayerId });
   };
 
   const handleBankCard = (card: CardInstance) => {
+    if (gameState.pendingResolution) return;
     sendCommand({ type: "bank_card", playerId: actualPlayerId, cardInstanceId: card.instanceId });
     setSelectedCard(null);
   };
 
   const handlePlayProperty = (card: CardInstance, chosenColor?: CardColor, targetSetId?: string) => {
+    if (gameState.pendingResolution) return;
     sendCommand({
       type: "play_property",
       playerId: actualPlayerId,
@@ -333,6 +335,7 @@ export default function GamePage(props: {
     targetCardInstanceId?: string,
     offeredCardInstanceId?: string,
   ) => {
+    if (gameState.pendingResolution) return;
     sendCommand({
       type: "play_action",
       playerId: actualPlayerId,
@@ -353,6 +356,7 @@ export default function GamePage(props: {
     targetPlayerId?: string,
     doubleRentCardInstanceId?: string,
   ) => {
+    if (gameState.pendingResolution) return;
     sendCommand({
       type: "play_rent",
       playerId: actualPlayerId,
@@ -367,6 +371,7 @@ export default function GamePage(props: {
   };
 
   const handleEndTurn = () => {
+    if (gameState.pendingResolution) return;
     sendCommand({ type: "end_turn", playerId: actualPlayerId });
     setSelectedCard(null);
   };
@@ -617,13 +622,13 @@ export default function GamePage(props: {
                 ref={drawPileRef}
                 className="game-draw-pile"
                 onClick={handleDraw}
-                title={isYourTurn && gameState.turn.phase === "draw" ? "Click to Draw 2 Cards" : "Draw Pile"}
+                title={isYourTurn && gameState.turn.phase === "draw" && !gameState.pendingResolution ? "Click to Draw 2 Cards" : "Draw Pile"}
               >
                 <div className="game-draw-card-layer" />
                 <div className="game-draw-card-layer" />
                 <div
                   className={`game-draw-card-top ${
-                    isYourTurn && gameState.turn.phase === "draw" ? "game-draw-pile-pulse" : ""
+                    isYourTurn && gameState.turn.phase === "draw" && !gameState.pendingResolution ? "game-draw-pile-pulse" : ""
                   }`}
                 >
                   <span className="game-draw-title">
@@ -631,7 +636,7 @@ export default function GamePage(props: {
                   </span>
                   <span className="game-draw-count-badge">{gameState.deckCount}</span>
                   <span className="game-draw-subtitle">
-                    {isYourTurn && gameState.turn.phase === "draw" ? "TAP TO DRAW" : "CARDS"}
+                    {isYourTurn && gameState.turn.phase === "draw" && !gameState.pendingResolution ? "TAP TO DRAW" : "CARDS"}
                   </span>
                 </div>
               </div>
@@ -682,14 +687,24 @@ export default function GamePage(props: {
             {/* Action Prompt Banner */}
             <div className="game-action-prompt-banner">
               <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
-                {isYourTurn ? "play_circle" : "hourglass_top"}
+                {gameState.pendingResolution
+                  ? "hourglass_top"
+                  : isYourTurn
+                    ? "play_circle"
+                    : "hourglass_top"}
               </span>
               <span>
-                {isYourTurn
-                  ? gameState.turn.phase === "draw"
-                    ? "✨ Your Turn: Draw 2 cards to begin ✨"
-                    : `⚡ Your Turn: ${gameState.turn.actionsRemaining} action${gameState.turn.actionsRemaining === 1 ? "" : "s"} left`
-                  : `${activePlayer?.name} is playing their turn...`}
+                {gameState.pendingResolution
+                  ? gameState.pendingResolution.type === "payment"
+                    ? `⏳ Waiting for ${gameState.players[gameState.pendingResolution.debtorPlayerId]?.name || "player"} to pay $${gameState.pendingResolution.amountDue}M rent...`
+                    : gameState.pendingResolution.type === "reaction_window"
+                      ? `⏳ Waiting for ${gameState.players[gameState.pendingResolution.waitingForPlayerId]?.name || "player"} to respond...`
+                      : `⏳ Waiting for ${gameState.players[gameState.pendingResolution.playerId]?.name || "player"} to discard cards...`
+                  : isYourTurn
+                    ? gameState.turn.phase === "draw"
+                      ? "✨ Your Turn: Draw 2 cards to begin ✨"
+                      : `⚡ Your Turn: ${gameState.turn.actionsRemaining} action${gameState.turn.actionsRemaining === 1 ? "" : "s"} left`
+                    : `${activePlayer?.name} is playing their turn...`}
               </span>
             </div>
 
@@ -817,7 +832,7 @@ export default function GamePage(props: {
                 </span>
               </div>
 
-              {isYourTurn && gameState.turn.phase === "action" && (
+              {isYourTurn && gameState.turn.phase === "action" && !gameState.pendingResolution && (
                 <button
                   type="button"
                   onClick={handleEndTurn}
@@ -834,6 +849,7 @@ export default function GamePage(props: {
               <div className="game-hand-cards-row">
                 {you?.hand?.map((card, idx) => {
                   const isSelected = selectedCard?.instanceId === card.instanceId;
+                  const isHandInteractive = isYourTurn && gameState.turn.phase === "action" && !gameState.pendingResolution;
 
                   return (
                     <div
@@ -841,7 +857,7 @@ export default function GamePage(props: {
                       className={`game-hand-card-wrapper ${isSelected ? "game-hand-card-wrapper--selected" : ""}`}
                       style={{ zIndex: isSelected ? 50 : idx + 10 }}
                       onClick={() => {
-                        if (isYourTurn && gameState.turn.phase === "action") {
+                        if (isHandInteractive) {
                           setSelectedCard(isSelected ? null : card);
                         }
                       }}
@@ -860,7 +876,7 @@ export default function GamePage(props: {
                           count: 1,
                         }}
                         size="sm"
-                        isInteractive={isYourTurn && gameState.turn.phase === "action"}
+                        isInteractive={isHandInteractive}
                       />
                     </div>
                   );

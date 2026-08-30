@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createGame, applyCommand, type CardInstance } from "../src/index.js";
+import { createGame, applyCommand, type CardInstance, BotController } from "../src/index.js";
 
 describe("Rent and Debt Payments", () => {
   it("should charge rent and allow debtor to pay using bank money", () => {
@@ -127,5 +127,94 @@ describe("Rent and Debt Payments", () => {
     expect(res2.nextState.pendingResolution).toBeNull();
     expect(res2.nextState.players["p2"]!.bank.length).toBe(0);
     expect(res2.nextState.players["p1"]!.bank.length).toBe(1);
+  });
+
+  it("should generate valid bot payment when debtor is a bot with house/hotel and insufficient cash", () => {
+    const game = createGame({
+      seed: 400,
+      players: [
+        { id: "p1", name: "Player", isBot: false },
+        { id: "bot-1", name: "Bot Atlas", isBot: true },
+      ],
+    });
+
+    const houseCard: CardInstance = {
+      instanceId: "house-1",
+      defId: "action-house",
+      name: "House",
+      type: "action",
+      value: 3,
+    };
+
+    // Bot has a set with a house ($1M + $1M + $3M house = $5M total)
+    game.players["bot-1"]!.propertySets = [
+      {
+        setId: "bot-brown-set",
+        color: "brown",
+        cards: [
+          { instanceId: "br-1", defId: "prop-mediterranean-avenue", name: "Mediterranean Avenue", type: "property", value: 1 },
+          { instanceId: "br-2", defId: "prop-baltic-avenue", name: "Baltic Avenue", type: "property", value: 1 },
+        ],
+        hasHouse: true,
+        houseCard,
+        hasHotel: false,
+        isComplete: true,
+        setSize: 2,
+        rentTiers: [1, 2],
+      },
+    ];
+    game.players["bot-1"]!.bank = [];
+    game.players["bot-1"]!.hand = [];
+
+    // Pending resolution: rent for $4M
+    game.pendingResolution = {
+      type: "payment",
+      creditorPlayerId: "p1",
+      debtorPlayerId: "bot-1",
+      amountDue: 4,
+      remainingDebtors: [],
+      reason: "Rent for blue properties ($4M)",
+    };
+
+    const botAction = BotController.getNextBotAction(game, "bot-1");
+
+    expect(botAction).not.toBeNull();
+    expect(botAction?.type).toBe("submit_payment");
+
+    // Applying bot's generated payment must succeed without throwing
+    const res = applyCommand(game, botAction!);
+    expect(res.nextState.pendingResolution).toBeNull();
+  });
+
+  it("should generate valid bot payment when debtor has 0 table assets", () => {
+    const game = createGame({
+      seed: 400,
+      players: [
+        { id: "p1", name: "Player", isBot: false },
+        { id: "bot-1", name: "Bot Atlas", isBot: true },
+      ],
+    });
+
+    game.players["bot-1"]!.propertySets = [];
+    game.players["bot-1"]!.bank = [];
+    game.players["bot-1"]!.hand = [];
+
+    game.pendingResolution = {
+      type: "payment",
+      creditorPlayerId: "p1",
+      debtorPlayerId: "bot-1",
+      amountDue: 5,
+      remainingDebtors: [],
+      reason: "Debt Collector ($5M)",
+    };
+
+    const botAction = BotController.getNextBotAction(game, "bot-1");
+
+    expect(botAction).not.toBeNull();
+    expect(botAction?.type).toBe("submit_payment");
+    expect(botAction?.paymentCardInstanceIds).toEqual([]);
+
+    const res = applyCommand(game, botAction!);
+    expect(res.nextState.pendingResolution).toBeNull();
   });
 });

@@ -94,47 +94,83 @@ export function useGameClient({
       clearTimeout(botTimerRef.current);
     }
 
-    const delay = botDifficulty === "easy" ? 1100 : botDifficulty === "hard" ? 450 : 750;
+    const raw = localGameRef.current;
+    const hasPendingAction = !!raw?.pendingResolution;
+    // Faster response (350ms) for reactions/payments/discards so turns feel snappy
+    const defaultDelay = botDifficulty === "easy" ? 1100 : botDifficulty === "hard" ? 450 : 750;
+    const delay = hasPendingAction ? 350 : defaultDelay;
 
     botTimerRef.current = setTimeout(() => {
-      const raw = localGameRef.current;
-      if (!raw || raw.status !== "in_progress") return;
+      const currentRaw = localGameRef.current;
+      if (!currentRaw || currentRaw.status !== "in_progress") return;
 
       // Determine which bot needs to act
       let targetBotId: string | null = null;
 
-      if (raw.pendingResolution?.type === "reaction_window") {
-        const waitingId = raw.pendingResolution.waitingForPlayerId;
-        if (raw.players[waitingId]?.isBot) {
+      if (currentRaw.pendingResolution?.type === "reaction_window") {
+        const waitingId = currentRaw.pendingResolution.waitingForPlayerId;
+        if (currentRaw.players[waitingId]?.isBot) {
           targetBotId = waitingId;
         }
-      } else if (raw.pendingResolution?.type === "payment") {
-        const debtorId = raw.pendingResolution.debtorPlayerId;
-        if (raw.players[debtorId]?.isBot) {
+      } else if (currentRaw.pendingResolution?.type === "payment") {
+        const debtorId = currentRaw.pendingResolution.debtorPlayerId;
+        if (currentRaw.players[debtorId]?.isBot) {
           targetBotId = debtorId;
         }
-      } else if (raw.pendingResolution?.type === "discard") {
-        const pId = raw.pendingResolution.playerId;
-        if (raw.players[pId]?.isBot) {
+      } else if (currentRaw.pendingResolution?.type === "discard") {
+        const pId = currentRaw.pendingResolution.playerId;
+        if (currentRaw.players[pId]?.isBot) {
           targetBotId = pId;
         }
-      } else if (raw.players[raw.turn.activePlayerId]?.isBot) {
-        targetBotId = raw.turn.activePlayerId;
+      } else if (currentRaw.players[currentRaw.turn.activePlayerId]?.isBot) {
+        targetBotId = currentRaw.turn.activePlayerId;
       }
 
       if (!targetBotId) return;
 
-      const botCommand = BotController.getNextBotAction(raw, targetBotId);
+      const botCommand = BotController.getNextBotAction(currentRaw, targetBotId);
       if (botCommand) {
         try {
-          const result = applyCommand(raw, botCommand);
+          const result = applyCommand(currentRaw, botCommand);
           localGameRef.current = result.nextState;
           setGameState(getMaskedView(result.nextState, playerId));
 
           // Chain next bot step
           triggerLocalBotStep();
-        } catch {
-          // Bot command error
+        } catch (err) {
+          console.error("Local bot command execution failed:", err, botCommand);
+          // Fallback auto-recovery: if bot failed to submit payment, auto-surrender table assets
+          if (currentRaw.pendingResolution?.type === "payment" && currentRaw.pendingResolution.debtorPlayerId === targetBotId) {
+            try {
+              const debtor = currentRaw.players[targetBotId];
+              const fallbackCards = debtor ? [...debtor.bank, ...debtor.propertySets.flatMap((s) => s.cards)].filter((c) => c.value > 0).map((c) => c.instanceId) : [];
+              const fallbackCmd: GameCommand = {
+                type: "submit_payment",
+                playerId: targetBotId,
+                paymentCardInstanceIds: fallbackCards,
+              };
+              const result = applyCommand(currentRaw, fallbackCmd);
+              localGameRef.current = result.nextState;
+              setGameState(getMaskedView(result.nextState, playerId));
+              triggerLocalBotStep();
+            } catch (fallbackErr) {
+              console.error("Fallback bot payment error:", fallbackErr);
+            }
+          } else if (currentRaw.pendingResolution?.type === "reaction_window" && currentRaw.pendingResolution.waitingForPlayerId === targetBotId) {
+            try {
+              const fallbackCmd: GameCommand = {
+                type: "submit_reaction",
+                playerId: targetBotId,
+                action: "pass",
+              };
+              const result = applyCommand(currentRaw, fallbackCmd);
+              localGameRef.current = result.nextState;
+              setGameState(getMaskedView(result.nextState, playerId));
+              triggerLocalBotStep();
+            } catch (fallbackErr) {
+              console.error("Fallback bot reaction error:", fallbackErr);
+            }
+          }
         }
       }
     }, delay);

@@ -1,6 +1,7 @@
 import type { CardColor } from "@dealopoly/shared";
 import type { GameState } from "./types/state.js";
 import type { GameCommand } from "./types/commands.js";
+import { getPlayerTableAssets, calculateTotalAssetValue } from "./rules/payment.js";
 
 export class BotController {
   /**
@@ -34,18 +35,43 @@ export class BotController {
     // 2. Handle Pending Payment
     if (state.pendingResolution?.type === "payment") {
       if (state.pendingResolution.debtorPlayerId === botPlayerId) {
-        const tableCards = [
-          ...bot.bank,
-          ...bot.propertySets.flatMap((s) => s.cards),
-        ];
+        const tableAssets = getPlayerTableAssets(bot);
+        const totalTableValue = calculateTotalAssetValue(tableAssets);
+        const amountDue = state.pendingResolution.amountDue;
 
-        const selectedCards: string[] = [];
-        let total = 0;
-        for (const card of tableCards) {
-          selectedCards.push(card.instanceId);
-          total += card.value;
-          if (total >= state.pendingResolution.amountDue) {
-            break;
+        let selectedCards: string[] = [];
+        if (totalTableValue <= amountDue) {
+          // If total assets <= amountDue, debtor must surrender all cards on table
+          selectedCards = tableAssets.map((c) => c.instanceId);
+        } else {
+          // Prioritize bank cards (ascending by value),
+          // then incomplete property sets, then houses/hotels, then complete property sets.
+          const sortedAssets = [...tableAssets].sort((a, b) => {
+            const aInBank = bot.bank.some((c) => c.instanceId === a.instanceId);
+            const bInBank = bot.bank.some((c) => c.instanceId === b.instanceId);
+            if (aInBank && !bInBank) return -1;
+            if (!aInBank && bInBank) return 1;
+
+            const aSet = bot.propertySets.find(
+              (s) => s.cards.some((c) => c.instanceId === a.instanceId) || s.houseCard?.instanceId === a.instanceId || s.hotelCard?.instanceId === a.instanceId,
+            );
+            const bSet = bot.propertySets.find(
+              (s) => s.cards.some((c) => c.instanceId === b.instanceId) || s.houseCard?.instanceId === b.instanceId || s.hotelCard?.instanceId === b.instanceId,
+            );
+            const aComplete = aSet?.isComplete ? 1 : 0;
+            const bComplete = bSet?.isComplete ? 1 : 0;
+            if (aComplete !== bComplete) return aComplete - bComplete;
+
+            return a.value - b.value;
+          });
+
+          let currentTotal = 0;
+          for (const card of sortedAssets) {
+            selectedCards.push(card.instanceId);
+            currentTotal += card.value;
+            if (currentTotal >= amountDue) {
+              break;
+            }
           }
         }
 
