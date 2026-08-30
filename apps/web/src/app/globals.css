@@ -2702,14 +2702,16 @@ p {
   transform-style: preserve-3d;
 }
 
-.monopoly-card--interactive:hover {
-  transform: translateY(-0.6em) perspective(800px) rotateX(3deg) scale(1.025);
-  box-shadow:
-    0 1.4em 3.2em rgba(0, 0, 0, 0.6),
-    0 0.5em 1em rgba(0, 0, 0, 0.35),
-    0 0 0 0.15em var(--card-color, #A8C8FF),
-    inset 0 2px 1px rgba(255, 255, 255, 0.9);
-  cursor: pointer;
+@media (hover: hover) and (pointer: fine) {
+  .monopoly-card--interactive:hover {
+    transform: translateY(-0.6em) perspective(800px) rotateX(3deg) scale(1.025);
+    box-shadow:
+      0 1.4em 3.2em rgba(0, 0, 0, 0.6),
+      0 0.5em 1em rgba(0, 0, 0, 0.35),
+      0 0 0 0.15em var(--card-color, #A8C8FF),
+      inset 0 2px 1px rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+  }
 }
 
 /* ── Size Variants ──────────────────────────────────────────── */
@@ -4949,9 +4951,12 @@ p {
 .game-hand-card-wrapper:first-child {
   margin-left: 0;
 }
-.game-hand-card-wrapper:hover {
-  transform: translateY(-28px) scale(1.08);
-  z-index: 40 !important;
+
+@media (hover: hover) and (pointer: fine) {
+  .game-hand-card-wrapper:hover {
+    transform: translateY(-28px) scale(1.08);
+    z-index: 40 !important;
+  }
 }
 
 .game-hand-card-wrapper--selected {
@@ -5568,17 +5573,29 @@ p {
 
   .game-hand-card-wrapper {
     margin-left: -32px;
+    touch-action: pan-x;
   }
   .game-hand-card-wrapper:first-child {
     margin-left: 0;
   }
 
-  .game-hand-card-wrapper:hover {
-    transform: translateY(-16px) scale(1.02);
+  @media (hover: hover) and (pointer: fine) {
+    .game-hand-card-wrapper:hover {
+      transform: translateY(-16px) scale(1.02);
+    }
+  }
+
+  @media (hover: none) or (pointer: coarse) {
+    .game-hand-card-wrapper,
+    .game-hand-card-wrapper:hover,
+    .game-hand-card-wrapper .monopoly-card,
+    .game-hand-card-wrapper .monopoly-card--interactive:hover {
+      transform: none !important;
+    }
   }
 
   .game-hand-card-wrapper--selected {
-    transform: translateY(-22px) scale(1.04) !important;
+    transform: translateY(-12px) scale(1.03) !important;
   }
 
   /* Scaled Card for Mobile Phones (<= 600px) */
