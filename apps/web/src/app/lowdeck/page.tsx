@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { fetchStatsApi, type ServerStats } from "../../lib/api";
 import { MarketingNav } from "../_components/marketing-nav";
+import { MarketingFooter } from "../_components/marketing-footer";
 import { JoinRoomDialog } from "../_components/join-room-dialog";
 import { PlayBotsDialog } from "../_components/play-bots-dialog";
 import { LeastCountHeroShowcase } from "../_components/least-count-hero-showcase";
@@ -189,6 +190,9 @@ export default function LowdeckPage() {
           </div>
         </section>
       </main>
+
+      {/* Footer */}
+      <MarketingFooter game="lowdeck" />
 
       {/* Join Room Modal */}
       <JoinRoomDialog isOpen={isJoinOpen} onClose={() => setIsJoinOpen(false)} />

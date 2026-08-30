@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { MarketingNav } from "../../_components/marketing-nav";
+import { MarketingFooter } from "../../_components/marketing-footer";
 import { useState, useMemo } from "react";
 import { createLeastCountDeck, type LeastCountCard } from "@dealopoly/game-engine";
 import { StandardCard } from "../../_components/standard-card";
@@ -130,6 +131,9 @@ export default function LowdeckCardCataloguePage() {
           ))}
         </div>
       </main>
+
+      {/* Footer */}
+      <MarketingFooter game="lowdeck" />
     </div>
   );
 }

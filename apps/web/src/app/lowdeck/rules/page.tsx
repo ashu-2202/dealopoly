@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { MarketingNav } from "../../_components/marketing-nav";
+import { MarketingFooter } from "../../_components/marketing-footer";
 import { BackButton } from "../../_components/back-button";
 import { StandardCard } from "../../_components/standard-card";
 
@@ -222,6 +223,9 @@ export default function LowdeckRulesPage() {
           </div>
         </section>
       </main>
+
+      {/* Footer */}
+      <MarketingFooter game="lowdeck" />
     </div>
   );
 }

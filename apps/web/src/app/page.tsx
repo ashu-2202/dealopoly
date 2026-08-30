@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { fetchStatsApi, type ServerStats } from "../lib/api";
 import { MarketingNav } from "./_components/marketing-nav";
+import { MarketingFooter } from "./_components/marketing-footer";
 import { JoinRoomDialog } from "./_components/join-room-dialog";
 import { PlayBotsDialog } from "./_components/play-bots-dialog";
 import { SkyscraperBackdrop } from "./_components/skyscraper-backdrop";
@@ -70,22 +71,42 @@ export default function ArcadeLauncherPage() {
       {/* Main Content */}
       <main>
         {/* Hero Section */}
-        <section className="hero-section shell hero-pattern" style={{ textAlign: "center", padding: "48px 16px 36px" }}>
-          <div style={{ maxWidth: "860px", margin: "0 auto" }}>
-            <div className="hero-badge" style={{ margin: "0 auto 16px" }}>
+        <section
+          className="hero-section hero-section--launcher shell hero-pattern"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            minHeight: "auto",
+            padding: "64px 16px 44px",
+          }}
+        >
+          <div
+            style={{
+              maxWidth: "860px",
+              margin: "0 auto",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+            }}
+          >
+            <div className="hero-badge" style={{ margin: "0 auto 18px" }}>
               <span className="badge-dot" style={{ background: "#10b981" }} />
               <span className="badge-text">{statusText} • {playerLabel}</span>
             </div>
 
-            <h1 className="text-glow" style={{ fontSize: "clamp(2.4rem, 6vw, 3.8rem)", fontWeight: 900, lineHeight: 1.1, margin: "0 0 16px" }}>
+            <h1 className="text-glow" style={{ fontSize: "clamp(2.4rem, 6vw, 3.8rem)", fontWeight: 900, lineHeight: 1.1, margin: "0 0 18px", textAlign: "center" }}>
               The Real-Time <span className="glow-word">Card Arcade</span>
             </h1>
 
-            <p className="lede" style={{ maxWidth: "680px", margin: "0 auto 28px", fontSize: "1.1rem", color: "#cbd5e1" }}>
+            <p className="lede" style={{ maxWidth: "680px", margin: "0 auto 28px", fontSize: "1.1rem", color: "#cbd5e1", textAlign: "center" }}>
               Instant-play multiplayer card battles with friends and smart AI bots. No downloads or sign-ups required. Select a game below to jump straight in!
             </p>
 
-            <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", width: "100%" }}>
               <a href="#games" className="button button--primary" style={{ padding: "12px 28px", fontSize: "1rem" }}>
                 <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>sports_esports</span>
                 Browse Games
@@ -297,6 +318,9 @@ export default function ArcadeLauncherPage() {
           </div>
         </section>
       </main>
+
+      {/* Footer with Skyline Vector */}
+      <MarketingFooter game="arcade" />
 
       {/* Join Room Modal Dialog */}
       <JoinRoomDialog isOpen={isJoinOpen} onClose={() => setIsJoinOpen(false)} />

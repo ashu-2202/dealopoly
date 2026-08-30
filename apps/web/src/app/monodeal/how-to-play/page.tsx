@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { MarketingNav } from "../../_components/marketing-nav";
+import { MarketingFooter } from "../../_components/marketing-footer";
 import { BackButton } from "../../_components/back-button";
 import { Card } from "../../_components/card";
 import { CARD_CATALOGUE, type CardDefinition } from "@dealopoly/shared";
@@ -425,6 +426,9 @@ export default function MonodealHowToPlayPage() {
           </div>
         </section>
       </main>
+
+      {/* Footer */}
+      <MarketingFooter game="monodeal" />
     </div>
   );
 }
