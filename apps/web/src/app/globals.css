@@ -1613,26 +1613,27 @@ p {
     gap: 36px;
   }
   .hero-showcase-wrapper {
-    min-height: 380px;
-    transform: scale(0.8);
+    min-height: 410px;
+    transform: scale(0.78);
     margin-top: -10px;
-    margin-bottom: 0px;
+    margin-bottom: 10px;
     order: -1; /* Move card showcase above hero copy on mobile */
   }
   .hero-showcase-stage {
-    margin-top: -75px;
+    margin-top: -95px;
   }
   .hero-shuffle-badge {
     display: none !important;
   }
   .hero-platform-container {
-    bottom: -35px;
-    width: 580px;
-    height: 230px;
+    bottom: -70px;
+    width: 620px;
+    height: 260px;
   }
   .hero-platform-base {
-    width: 540px;
-    height: 220px;
+    width: 580px;
+    height: 240px;
+    transform: rotateX(70deg);
   }
   .hero-copy {
     text-align: center;
@@ -1691,14 +1692,23 @@ p {
 
 @media (max-width: 640px) {
   .hero-showcase-wrapper {
-    min-height: 350px;
+    min-height: 390px;
     transform: scale(0.72);
+    margin-top: -15px;
+    margin-bottom: 10px;
   }
   .hero-showcase-stage {
-    margin-top: -85px;
+    margin-top: -105px;
   }
   .hero-platform-container {
-    bottom: -45px;
+    bottom: -80px;
+    width: 640px;
+    height: 260px;
+  }
+  .hero-platform-base {
+    width: 600px;
+    height: 240px;
+    transform: rotateX(68deg);
   }
   .hero-copy h1 {
     font-size: 2.6rem;
