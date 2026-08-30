@@ -5150,9 +5150,121 @@ p {
     transform: translateY(-22px) scale(1.04) !important;
   }
 
-  /* Scaled Card for Mobile — single font-size knob scales everything */
-  .monopoly-card--sm {
-    font-size: 6.267px;  /* 94px wide = 94/15em */
+  /* Scaled Card for Mobile Phones (<= 600px) */
+  @media (max-width: 600px) {
+    .monopoly-card--sm {
+      font-size: 6.267px;  /* 94px wide = 94/15em */
+    }
+  }
+
+  /* Enhanced Proportions for Tablet Portrait & Large Tablets (601px to 1024px) */
+  @media (min-width: 601px) and (max-width: 1024px) {
+    .monopoly-card--sm {
+      font-size: 9.333px;  /* ~140px wide × 205px tall */
+    }
+
+    .game-hand-fanned-container {
+      min-height: 225px;
+      padding-top: 16px;
+      padding-bottom: 8px;
+    }
+
+    .game-hand-card-wrapper {
+      margin-left: -36px;
+    }
+
+    .game-hand-card-wrapper:hover {
+      transform: translateY(-24px) scale(1.06);
+    }
+
+    .game-hand-card-wrapper--selected {
+      transform: translateY(-32px) scale(1.08) !important;
+    }
+
+    /* Center Arena Enlargement for Tablets */
+    .game-draw-pile,
+    .game-discard-pile {
+      width: 104px;
+      height: 150px;
+      border-radius: 14px;
+    }
+
+    .game-draw-card-layer,
+    .game-draw-card-top,
+    .game-discard-layer,
+    .game-discard-stack-wrapper {
+      border-radius: 14px;
+    }
+
+    .game-draw-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+    }
+
+    .game-draw-count-badge {
+      font-size: 1.3rem;
+    }
+
+    .game-draw-subtitle {
+      font-size: 0.62rem;
+    }
+
+    .game-discard-card-name {
+      font-size: 0.72rem;
+    }
+
+    .game-discard-card-val {
+      font-size: 0.65rem;
+    }
+
+    .game-discard-top-card .monopoly-card--xs {
+      font-size: 6.8px !important;
+    }
+
+    .game-action-prompt-banner {
+      margin-top: 14px;
+      padding: 6px 18px;
+      font-size: 0.84rem;
+      border-radius: 999px;
+    }
+
+    /* Assets Row Tablet Scaling */
+    .game-bank-panel {
+      min-width: 120px;
+      max-width: 130px;
+      height: 88px;
+      padding: 8px 12px;
+      border-radius: 14px;
+    }
+
+    .game-bank-title {
+      font-size: 0.70rem;
+    }
+
+    .game-bank-count-pill {
+      font-size: 0.64rem;
+      padding: 1px 6px;
+    }
+
+    .game-bank-total {
+      font-size: 1.45rem;
+    }
+
+    .game-properties-panel {
+      padding: 8px 14px;
+      border-radius: 14px;
+    }
+
+    .game-properties-sets-grid {
+      gap: 8px;
+      padding-block: 4px;
+    }
+
+    .game-property-set-box {
+      min-width: 90px;
+      padding: 6px 8px;
+      border-radius: 8px;
+    }
   }
 
   /* On mobile, hide inline floating popover; use dedicated bottom sheet instead */
