@@ -2671,21 +2671,22 @@ p {
   color: #FFFFFF !important;
 }
 
-/* Top-Left Circular White Badge with City Silhouette in Card Color */
+/* Top-Left & Top-Right Circular Badges with White Ring and White Content */
 .card-header-badge-circle {
   position: absolute;
   top: 0.45em;
   left: 0.45em;
-  width: 2.15em;
-  height: 2.15em;
+  width: 2.25em;
+  height: 2.25em;
   border-radius: 50%;
-  background: #FFFFFF;
+  background: transparent;
+  border: 0.13em solid #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   z-index: 3;
-  padding: 0.25em;
+  padding: 0.18em;
   box-sizing: border-box;
 }
 
@@ -2697,19 +2698,19 @@ p {
 
 .card-header-value-text {
   font-family: var(--display, Impact, "Arial Black", system-ui);
-  font-size: 0.78em;
+  font-size: 0.82em;
   font-weight: 900;
   letter-spacing: -0.02em;
   line-height: 1;
-  color: var(--card-color, #F28C28);
+  color: #FFFFFF;
   display: block;
   text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .card-header-city-svg {
-  width: 100%;
-  height: 100%;
-  fill: var(--card-color, #F28C28);
+  width: 90%;
+  height: 90%;
 }
 
 /* Category Label with Enclosing Dash Lines */
