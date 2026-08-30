@@ -457,12 +457,12 @@ export default function GamePage(props: {
       {/* Top App Bar */}
       <header className="game-topbar">
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <Link href="/" className="game-topbar-brand" aria-label="Dealopoly Home">
+          <div className="game-topbar-brand" aria-label="Dealopoly">
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1", fontSize: "24px" }}>
               playing_cards
             </span>
             <span className="game-topbar-logo-text">dealopoly</span>
-          </Link>
+          </div>
 
           {/* Turn & Action Pill */}
           <div className="game-turn-pill">
@@ -495,13 +495,6 @@ export default function GamePage(props: {
             </span>
           </div>
 
-          {/* Card Catalogue Link */}
-          <Link href="/cards" className="game-icon-btn game-desktop-only" title="Card Catalogue">
-            <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
-              menu_book
-            </span>
-          </Link>
-
           {/* Activity Drawer Toggle */}
           <button
             type="button"
@@ -521,10 +514,10 @@ export default function GamePage(props: {
             )}
           </button>
 
-          {/* Desktop Full Red Leave Game Button */}
+          {/* Red Leave Game Button */}
           <button
             type="button"
-            className="game-topbar-leave-btn game-desktop-only"
+            className="game-topbar-leave-btn"
             title="Leave Match"
             onClick={() => setIsExitDialogOpen(true)}
           >
@@ -532,23 +525,6 @@ export default function GamePage(props: {
               exit_to_app
             </span>
             <span>Leave Game</span>
-          </button>
-
-          {/* Desktop User Profile Avatar */}
-          <div className="game-desktop-only" style={{ alignItems: "center" }}>
-            <UserNav />
-          </div>
-
-          {/* Mobile Menu Toggle */}
-          <button
-            type="button"
-            className="game-icon-btn game-mobile-only"
-            onClick={() => setIsMobileMenuOpen(true)}
-            title="Menu"
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>
-              menu
-            </span>
           </button>
         </div>
       </header>
@@ -2234,24 +2210,16 @@ export default function GamePage(props: {
                 </div>
               </div>
 
-              {/* Navigation Links */}
-              <Link
-                href="/cards"
-                className="button button--secondary button--full"
-                style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "10px", fontSize: "0.82rem" }}
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>menu_book</span>
-                Card Catalogue
-              </Link>
-
-              <Link
-                href="/lobby"
-                className="button button--secondary button--full"
-                style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "10px", fontSize: "0.82rem" }}
-              >
-                <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>meeting_room</span>
-                Room Lobby
-              </Link>
+              {/* Match Details Box */}
+              <div style={{ padding: "12px", background: "var(--surface)", borderRadius: "10px", border: "1px solid var(--outline-variant)", display: "flex", flexDirection: "column", gap: "6px" }}>
+                <span style={{ fontSize: "0.72rem", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>Current Match</span>
+                <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text)" }}>
+                  {isLocal ? "🤖 Offline Bot Match" : `Multiplayer Room: ${urlRoomCode}`}
+                </span>
+                <span style={{ fontSize: "0.75rem", color: isConnected ? "var(--green)" : "#f59e0b" }}>
+                  ● {isConnected ? "Connected & Active" : "Reconnecting..."}
+                </span>
+              </div>
 
               <button
                 type="button"
