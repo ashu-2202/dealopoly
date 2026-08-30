@@ -22,3 +22,4 @@ export * from "./engine.js";
 export * from "./masking.js";
 export * from "./bot.js";
 export * from "./core.js";
+export * from "./games/least-count/index.js";

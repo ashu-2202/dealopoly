@@ -61,11 +61,14 @@ export class MonodealEngine implements IGameEngine<GameState, MaskedGameState, G
   }
 }
 
+import { LeastCountEngine } from "./games/least-count/engine.js";
+
 /**
  * Central Game Engine Registry
  */
 const ENGINES: Record<string, IGameEngine<any, any, any, any, any>> = {
   monodeal: new MonodealEngine(),
+  least_count: new LeastCountEngine(),
 };
 
 /**
