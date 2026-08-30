@@ -7,6 +7,7 @@ import { getStoredProfile, saveProfileName } from "../../lib/session";
 type PlayBotsDialogProps = {
   isOpen: boolean;
   onClose: () => void;
+  defaultGame?: "monodeal" | "least_count";
 };
 
 type BotDifficulty = "easy" | "medium" | "hard";
@@ -35,7 +36,7 @@ const DIFFICULTIES: {
     badge: "BALANCED",
     badgeColor: "#ffd700",
     icon: "smart_toy",
-    desc: "Tactical gameplay & standard Dealopoly strategy",
+    desc: "Tactical gameplay & standard strategy",
   },
   {
     id: "hard",
@@ -43,12 +44,13 @@ const DIFFICULTIES: {
     badge: "CHALLENGING",
     badgeColor: "#ff7d7d",
     icon: "bolt",
-    desc: "Aggressive steals, double rent & fast turns",
+    desc: "Aggressive, fast-paced turns",
   },
 ];
 
-export function PlayBotsDialog({ isOpen, onClose }: PlayBotsDialogProps) {
+export function PlayBotsDialog({ isOpen, onClose, defaultGame = "monodeal" }: PlayBotsDialogProps) {
   const router = useRouter();
+  const [gameType, setGameType] = useState<"monodeal" | "least_count">(defaultGame);
   const [playerName, setPlayerName] = useState("");
   const [botCount, setBotCount] = useState<number>(2);
   const [difficulty, setDifficulty] = useState<BotDifficulty>("medium");
@@ -56,13 +58,14 @@ export function PlayBotsDialog({ isOpen, onClose }: PlayBotsDialogProps) {
 
   useEffect(() => {
     if (isOpen) {
+      setGameType(defaultGame);
       const profile = getStoredProfile();
       setPlayerName(profile.name || "Guest Player");
       setTimeout(() => {
         inputRef.current?.focus();
       }, 50);
     }
-  }, [isOpen]);
+  }, [isOpen, defaultGame]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -83,6 +86,7 @@ export function PlayBotsDialog({ isOpen, onClose }: PlayBotsDialogProps) {
 
     const query = new URLSearchParams();
     query.set("mode", "bot");
+    query.set("game", gameType);
     query.set("bots", botCount.toString());
     query.set("difficulty", difficulty);
     query.set("player", finalName);
@@ -136,6 +140,29 @@ export function PlayBotsDialog({ isOpen, onClose }: PlayBotsDialogProps) {
 
         {/* Body Form */}
         <form onSubmit={handleSubmit} className="dialog-body">
+          {/* Game Selection */}
+          <div className="dialog-field">
+            <label className="dialog-label">Choose Game</label>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+              <button
+                type="button"
+                onClick={() => setGameType("monodeal")}
+                className={`bot-count-btn ${gameType === "monodeal" ? "bot-count-btn--active" : ""}`}
+                style={{ padding: "8px 12px", fontSize: "0.85rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+              >
+                <span>🃏</span> Monodeal
+              </button>
+              <button
+                type="button"
+                onClick={() => setGameType("least_count")}
+                className={`bot-count-btn ${gameType === "least_count" ? "bot-count-btn--active" : ""}`}
+                style={{ padding: "8px 12px", fontSize: "0.85rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+              >
+                <span>🎯</span> Least Count
+              </button>
+            </div>
+          </div>
+
           {/* 1. Display Name of the Current Player */}
           <div className="dialog-field">
             <label htmlFor="botPlayerName" className="dialog-label">

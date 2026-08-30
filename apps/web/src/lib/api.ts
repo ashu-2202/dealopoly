@@ -45,11 +45,19 @@ export async function createRoomApi(params: {
   hostName?: string;
   botCount?: number;
   userId?: string;
+  gameType?: string;
+  config?: Record<string, unknown>;
 }): Promise<CreateRoomResponse> {
   const res = await fetch(`${API_BASE}/api/rooms`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(params),
+    body: JSON.stringify({
+      hostName: params.hostName || "Host",
+      botCount: params.botCount ?? 0,
+      userId: params.userId,
+      gameType: params.gameType || "monodeal",
+      config: params.config,
+    }),
   });
 
   if (!res.ok) {

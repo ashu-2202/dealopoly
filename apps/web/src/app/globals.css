@@ -8322,6 +8322,304 @@ p {
   pointer-events: none;
 }
 
+/* ==========================================================================
+   STANDARD PLAYING CARDS (LEAST COUNT / SUIT CARDS)
+   ========================================================================== */
+
+.standard-card {
+  position: relative;
+  width: 110px;
+  height: 154px;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #182234 0%, #0d1522 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px;
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .standard-card:not(.standard-card--disabled):hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6), 0 0 12px var(--suit-color, rgba(56, 189, 248, 0.4));
+    border-color: var(--suit-color, rgba(56, 189, 248, 0.6));
+    z-index: 10;
+  }
+}
+
+.standard-card--selected {
+  transform: translateY(-14px) !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.7), 0 12px 28px rgba(0, 0, 0, 0.8) !important;
+  z-index: 20 !important;
+}
+
+.standard-card--sm {
+  width: 72px;
+  height: 100px;
+  border-radius: 7px;
+  padding: 5px;
+}
+
+.standard-card--lg {
+  width: 145px;
+  height: 204px;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.standard-card--facedown {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.standard-card-back-pattern {
+  width: 85%;
+  height: 85%;
+  border-radius: 6px;
+  border: 1px dashed rgba(56, 189, 248, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+}
+
+.standard-card-back-logo {
+  font-family: var(--display, sans-serif);
+  font-weight: 900;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  color: #38bdf8;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+}
+
+.standard-card-index {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  font-family: var(--mono, monospace);
+  font-weight: 800;
+}
+
+.standard-card-index--top {
+  align-self: flex-start;
+}
+
+.standard-card-index--bottom {
+  align-self: flex-end;
+  transform: rotate(180deg);
+}
+
+.standard-card-rank {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--suit-color, #ffffff);
+}
+
+.standard-card--sm .standard-card-rank {
+  font-size: 0.85rem;
+}
+
+.standard-card--lg .standard-card-rank {
+  font-size: 1.35rem;
+}
+
+.standard-card-suit {
+  font-size: 0.95rem;
+  color: var(--suit-color, #ffffff);
+}
+
+.standard-card--sm .standard-card-suit {
+  font-size: 0.70rem;
+}
+
+.standard-card-center-art {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.standard-card-large-suit {
+  font-size: 2.8rem;
+  color: var(--suit-color, #ffffff);
+  opacity: 0.25;
+}
+
+.standard-card--sm .standard-card-large-suit {
+  font-size: 1.6rem;
+}
+
+.standard-card--lg .standard-card-large-suit {
+  font-size: 3.8rem;
+}
+
+.standard-card-special-icon {
+  position: absolute;
+  font-size: 1.4rem;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+}
+
+.standard-card--sm .standard-card-special-icon {
+  font-size: 0.9rem;
+}
+
+.standard-card--lg .standard-card-special-icon {
+  font-size: 1.8rem;
+}
+
+.standard-card-points-badge {
+  align-self: center;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  font-family: var(--mono, monospace);
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+  z-index: 2;
+}
+
+.standard-card--sm .standard-card-points-badge {
+  font-size: 0.52rem;
+  padding: 1px 4px;
+}
+
+.standard-card-points-badge--king {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%) !important;
+  color: #0f172a !important;
+  border-color: #fef08a !important;
+  font-weight: 900 !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+}
+
+.standard-card--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   LEAST COUNT GAME BOARD UI
+   ========================================================================== */
+
+.least-count-board {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.least-count-center-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  position: relative;
+  padding: 16px;
+}
+
+.least-count-pile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.least-count-pile-label {
+  font-family: var(--mono, monospace);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--muted, #94a3b8);
+  text-transform: uppercase;
+}
+
+.least-count-discard-stack {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: -24px;
+}
+
+.least-count-discard-stack .standard-card {
+  margin-left: -20px;
+  transition: transform 0.2s ease;
+}
+
+.least-count-discard-stack .standard-card:first-child {
+  margin-left: 0;
+}
+
+.least-count-points-counter {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(56, 189, 248, 0.35);
+  border-radius: 999px;
+  padding: 6px 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  z-index: 20;
+}
+
+.least-count-points-text {
+  font-family: var(--mono, monospace);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.least-count-points-value {
+  color: #38bdf8;
+  font-size: 1.05rem;
+}
+
+.least-count-show-btn {
+  background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%) !important;
+  color: #0f172a !important;
+  font-weight: 900 !important;
+  border-radius: 999px !important;
+  padding: 6px 16px !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.04em !important;
+  box-shadow: 0 0 16px rgba(234, 179, 8, 0.6) !important;
+  animation: pulse-show-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-show-glow {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(234, 179, 8, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(234, 179, 8, 0.9);
+  }
+}
+
+
 
 
 

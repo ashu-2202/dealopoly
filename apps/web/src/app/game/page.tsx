@@ -8,6 +8,7 @@ import { Card, CardBack } from "../_components/card";
 import { CardLoader } from "../_components/card-loader";
 import { GameOverSummary } from "../_components/game-over-summary";
 import { UserNav } from "../_components/user-nav";
+import { LeastCountGameView } from "../_components/least-count-game-view";
 import {
   getStoredProfile,
   getRoomSession,
@@ -41,6 +42,7 @@ const OPPONENT_PALETTES = [
 export default function GamePage(props: {
   searchParams?: Promise<{
     room?: string;
+    game?: string;
     mode?: string;
     bots?: string;
     difficulty?: "easy" | "medium" | "hard";
@@ -49,6 +51,7 @@ export default function GamePage(props: {
   }>;
 }) {
   const searchParams = props.searchParams ? use(props.searchParams) : undefined;
+  const gameType = searchParams?.game || "monodeal";
   const urlRoomCode = searchParams?.room;
   const urlPlayerId = searchParams?.player;
   const isBotMode = searchParams?.mode === "bot" || !urlRoomCode || urlRoomCode === "solo";
@@ -61,6 +64,18 @@ export default function GamePage(props: {
   const session = urlRoomCode ? getRoomSession(urlRoomCode, urlPlayerId) : null;
   const playerId = session?.playerId || urlPlayerId || profile.id;
   const sessionToken = session?.token;
+
+  if (gameType === "least_count") {
+    return (
+      <LeastCountGameView
+        roomCode={urlRoomCode}
+        isBotMode={isBotMode}
+        botCount={botCount}
+        playerName={customPlayerName}
+        playerId={playerId}
+      />
+    );
+  }
 
   const [selectedCard, setSelectedCard] = useState<CardInstance | null>(null);
   const [selectedWildRentColor, setSelectedWildRentColor] = useState<CardColor | null>(null);

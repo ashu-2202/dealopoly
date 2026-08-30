@@ -7,6 +7,7 @@ import { MarketingNav } from "./_components/marketing-nav";
 import { JoinRoomDialog } from "./_components/join-room-dialog";
 import { PlayBotsDialog } from "./_components/play-bots-dialog";
 import { HeroCardShowcase } from "./_components/hero-card-showcase";
+import { LeastCountHeroShowcase } from "./_components/least-count-hero-showcase";
 import { SkyscraperBackdrop } from "./_components/skyscraper-backdrop";
 
 const features = [
@@ -29,11 +30,11 @@ const features = [
     boxModifier: "feature-icon-box--green",
   },
   {
-    icon: "menu_book",
-    tag: "CLASSIC DEAL",
-    title: "Standard Rules",
+    icon: "style",
+    tag: "MULTI-GAME ARCADE",
+    title: "Multiple Card Games",
     description:
-      "Familiar mechanics with a modern twist. If you know the physical game, you're ready.",
+      "Play Monodeal property trading or Least Count point-shedding bluffing, all in one place.",
     themeClass: "feature-card--amber",
     boxModifier: "feature-icon-box--amber",
   },
@@ -44,23 +45,24 @@ const howToPlaySteps = [
     number: "1",
     title: "Draw Cards",
     description:
-      "Start your turn by drawing 2 cards from the central deck to replenish your hand.",
+      "Start your turn by drawing from the central deck or discard pile to strengthen your hand.",
   },
   {
     number: "2",
-    title: "Play up to 3 Actions",
+    title: "Play Actions & Discard",
     description:
-      "Lay down properties, bank cash, or play action cards to disrupt your opponents.",
+      "Lay down properties, build runs/sets, bank cash, or shed points with matching pairs.",
   },
   {
     number: "3",
-    title: "Collect 3 Sets",
+    title: "Claim Victory",
     description:
-      "Be the first player to complete 3 full property sets to instantly win the game.",
+      "Complete 3 full sets in Monodeal, or call SHOW with lowest hand count to win!",
   },
 ];
 
 export default function HomePage() {
+  const [activeGame, setActiveGame] = useState<"monodeal" | "least_count">("monodeal");
   const [isJoinOpen, setIsJoinOpen] = useState(false);
   const [isBotsOpen, setIsBotsOpen] = useState(false);
   const [stats, setStats] = useState<ServerStats | null>(null);
@@ -90,8 +92,39 @@ export default function HomePage() {
       <main>
         {/* Hero Section */}
         <section className="hero-section shell hero-pattern" aria-labelledby="page-title">
-          {/* Hero Copy & 3 Actions */}
+          {/* Hero Copy & Actions */}
           <div className="hero-copy">
+            {/* Game Selector Switcher */}
+            <div
+              style={{
+                display: "inline-flex",
+                gap: "6px",
+                margin: "0 auto 8px",
+                background: "rgba(15, 23, 42, 0.85)",
+                padding: "3px",
+                borderRadius: "999px",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setActiveGame("monodeal")}
+                className={`button button--sm ${activeGame === "monodeal" ? "button--primary" : "button--ghost"}`}
+                style={{ borderRadius: "999px", padding: "4px 12px", fontSize: "0.76rem" }}
+              >
+                🃏 Monodeal
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveGame("least_count")}
+                className={`button button--sm ${activeGame === "least_count" ? "button--primary" : "button--ghost"}`}
+                style={{ borderRadius: "999px", padding: "4px 12px", fontSize: "0.76rem" }}
+              >
+                🎯 Least Count
+              </button>
+            </div>
+
             <div className="hero-badge">
               <span
                 className="badge-dot"
@@ -104,26 +137,39 @@ export default function HomePage() {
               </span>
             </div>
 
-            <h1 id="page-title" className="text-glow">
-              Deal Your Way to <span className="glow-word">Victory</span>
-            </h1>
-
-            <p className="lede">
-              Experience the ruthless, fast-paced card game where properties change
-              hands, debt collectors knock, and sly deals win the day. No setup required.
-            </p>
+            {activeGame === "monodeal" ? (
+              <>
+                <h1 id="page-title" className="text-glow">
+                  Deal Your Way to <span className="glow-word">Victory</span>
+                </h1>
+                <p className="lede">
+                  Experience the ruthless, fast-paced property trading card game where properties change
+                  hands, debt collectors knock, and sly deals win the day.
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 id="page-title" className="text-glow">
+                  Shed Your Points to <span className="glow-word">Victory</span>
+                </h1>
+                <p className="lede">
+                  The ultimate bluffing & point-shedding card showdown. Drop pairs and sequences,
+                  hold 0-point Kings, and declare SHOW to outsmart your opponents.
+                </p>
+              </>
+            )}
 
             {/* 3 Hero Action Buttons */}
             <div className="hero-actions">
               {/* Action 1: Create Room */}
-              <Link className="button button--primary" href="/lobby">
+              <Link className="button button--primary" href={`/lobby?game=${activeGame}`}>
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1", fontSize: "22px" }}>
                   add_circle
                 </span>
                 Create Room
               </Link>
 
-              {/* Action 2: Join Room (Modal / Bottom Sheet trigger) */}
+              {/* Action 2: Join Room */}
               <button
                 type="button"
                 onClick={() => setIsJoinOpen(true)}
@@ -154,7 +200,7 @@ export default function HomePage() {
           </div>
 
           {/* Hero Interactive 3D Card Showcase */}
-          <HeroCardShowcase />
+          {activeGame === "monodeal" ? <HeroCardShowcase /> : <LeastCountHeroShowcase />}
         </section>
 
         {/* Features Section */}

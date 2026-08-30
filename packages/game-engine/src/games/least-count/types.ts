@@ -69,6 +69,7 @@ export interface MaskedLeastCountGameState {
   lastDiscardedCards: LeastCountCard[];
   showThreshold: number;
   maxScore: number;
+  wrongShowPenalty: number;
   winnerId?: string;
   lastShowResult?: ShowResult;
 }

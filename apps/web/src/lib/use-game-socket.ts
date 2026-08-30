@@ -18,6 +18,8 @@ export interface PublicRoomInfo {
   seats: PublicRoomSeat[];
   maxSeats: number;
   isStarted: boolean;
+  gameType?: string;
+  config?: Record<string, unknown>;
 }
 
 export interface UseGameSocketOptions {

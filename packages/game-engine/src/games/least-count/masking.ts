@@ -50,6 +50,7 @@ export function getMaskedLeastCountView(
     lastDiscardedCards: state.lastDiscardedCards,
     showThreshold: state.showThreshold,
     maxScore: state.maxScore,
+    wrongShowPenalty: state.wrongShowPenalty,
     winnerId: state.winnerId,
     lastShowResult: state.lastShowResult,
   };

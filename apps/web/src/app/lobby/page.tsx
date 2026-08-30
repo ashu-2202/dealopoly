@@ -16,7 +16,7 @@ import { useGameSocket } from "../../lib/use-game-socket";
 import { BackButton } from "../_components/back-button";
 
 export default function LobbyPage(props: {
-  searchParams?: Promise<{ room?: string; player?: string; code?: string }>;
+  searchParams?: Promise<{ room?: string; player?: string; code?: string; game?: string }>;
 }) {
   const searchParams = props.searchParams ? use(props.searchParams) : undefined;
   const router = useRouter();
@@ -24,6 +24,7 @@ export default function LobbyPage(props: {
 
   const urlRoomCode = searchParams?.room || searchParams?.code;
   const urlPlayerName = searchParams?.player;
+  const urlGame = searchParams?.game || "monodeal";
 
   const [roomCode, setRoomCode] = useState<string>(urlRoomCode || "");
   const [playerId, setPlayerId] = useState<string>("");
@@ -69,12 +70,13 @@ export default function LobbyPage(props: {
           hostName: playerName,
           botCount: 0,
           userId,
+          gameType: urlGame,
         });
         saveRoomSession(createRes.roomCode, createRes.hostPlayerId, createRes.sessionToken);
         setRoomCode(createRes.roomCode);
         setPlayerId(createRes.hostPlayerId);
         setSessionToken(createRes.sessionToken);
-        router.replace(`/lobby?room=${createRes.roomCode}`);
+        router.replace(`/lobby?room=${createRes.roomCode}&game=${urlGame}`);
       } catch (err: unknown) {
         setInitError(err instanceof Error ? err.message : "Failed to create room");
       }
@@ -103,7 +105,7 @@ export default function LobbyPage(props: {
       playerId,
       sessionToken,
       onGameStarted: () => {
-        router.push(`/game?room=${roomCode}&player=${playerId}`);
+        router.push(`/game?room=${roomCode}&player=${playerId}&game=${roomInfo?.gameType || urlGame}`);
       },
     });
 
