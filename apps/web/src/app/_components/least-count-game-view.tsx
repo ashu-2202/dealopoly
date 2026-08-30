@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLeastCountClient } from "../../lib/use-least-count-client";
 import { LeastCountBoard } from "./least-count-board";
+import { CardLoader } from "./card-loader";
 import { UserNav } from "./user-nav";
 import { getStoredProfile } from "../../lib/session";
 
@@ -51,10 +52,7 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
   if (!gameState) {
     return (
       <div className="game-table-shell" style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: "2rem", marginBottom: "12px" }}>🎯</div>
-          <div style={{ fontWeight: 800, color: "#38bdf8" }}>Loading Least Count Table...</div>
-        </div>
+        <CardLoader game="lowdeck" size="lg" text="Entering Lowdeck Table..." />
       </div>
     );
   }

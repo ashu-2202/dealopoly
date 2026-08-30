@@ -167,7 +167,7 @@ export default function LobbyPage(props: {
     return (
       <AppShell active="lobby">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", minHeight: "60vh" }}>
-          <CardLoader size="sm" text="Entering lobby..." />
+          <CardLoader game={urlGame === "least_count" ? "lowdeck" : urlGame === "monodeal" ? "monodeal" : "arcade"} size="sm" text="Entering lobby..." />
         </div>
       </AppShell>
     );
