@@ -1811,13 +1811,13 @@ p {
   }
 
   .hero-showcase-wrapper {
-    min-height: 165px;
-    height: 165px;
-    max-height: 165px;
-    transform: scale(0.48);
+    min-height: 175px;
+    height: 175px;
+    max-height: 175px;
+    transform: scale(0.50);
     transform-origin: center center;
-    margin: -10px 0 -15px;
-    order: 0;
+    margin: -5px 0 -15px;
+    order: -1; /* Keep 3D Hero at the top in mobile view */
     width: 100%;
     overflow: visible;
   }
