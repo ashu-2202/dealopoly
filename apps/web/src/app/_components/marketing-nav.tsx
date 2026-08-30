@@ -7,51 +7,101 @@ import { Brand } from "./brand";
 import { UserNav } from "./user-nav";
 
 export interface MarketingNavProps {
-  activeTab?: "cards" | "lobby" | "home" | "history" | "profile" | "rules" | "how-to-play";
+  game?: "arcade" | "monodeal" | "lowdeck";
+  activeTab?: "cards" | "lobby" | "home" | "history" | "profile" | "rules" | "how-to-play" | "games";
 }
 
-export function MarketingNav({ activeTab }: MarketingNavProps) {
+export function MarketingNav({ game = "arcade", activeTab }: MarketingNavProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: session } = useSession();
+
+  const isGameHub = game === "monodeal" || game === "lowdeck";
+
+  const cardsHref = game === "monodeal" ? "/monodeal/cards" : game === "lowdeck" ? "/lowdeck/cards" : "/cards";
+  const howToPlayHref = game === "monodeal" ? "/monodeal/how-to-play" : game === "lowdeck" ? "/lowdeck/how-to-play" : "/how-to-play";
+  const rulesHref = game === "monodeal" ? "/monodeal/rules" : game === "lowdeck" ? "/lowdeck/rules" : "/rules";
+  const lobbyHref = game === "lowdeck" ? "/lobby?game=least_count" : game === "monodeal" ? "/lobby?game=monodeal" : "/lobby";
 
   return (
     <>
       <header className="marketing-nav">
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <Brand />
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <Brand game={game} />
+          {isGameHub && (
+            <Link
+              href="/"
+              className="desktop-only-action"
+              style={{
+                fontSize: "0.74rem",
+                color: "#94a3b8",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "3px",
+                textDecoration: "none",
+                padding: "3px 8px",
+                borderRadius: "6px",
+                background: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.08)",
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>arrow_back</span>
+              Arcade Hub
+            </Link>
+          )}
         </div>
 
         {/* Desktop Center Links */}
         <nav className="marketing-nav-center" aria-label="Main navigation">
-          <Link
-            href="/cards"
-            className={activeTab === "cards" ? "active" : ""}
-            style={activeTab === "cards" ? { color: "var(--primary)" } : undefined}
-          >
-            Card Catalogue
-          </Link>
-          <Link
-            href="/how-to-play"
-            className={activeTab === "how-to-play" ? "active" : ""}
-            style={activeTab === "how-to-play" ? { color: "var(--primary)" } : undefined}
-          >
-            How to play
-          </Link>
-          <Link
-            href="/rules"
-            className={activeTab === "rules" ? "active" : ""}
-            style={activeTab === "rules" ? { color: "var(--primary)" } : undefined}
-          >
-            Rules
-          </Link>
-          <Link href="/#features">About</Link>
+          {game === "arcade" ? (
+            <>
+              <Link href="/#games" className={activeTab === "games" ? "active" : ""}>
+                🎮 Arcade Games
+              </Link>
+              <Link href="/monodeal" className={activeTab === "home" ? "active" : ""}>
+                🃏 Monodeal
+              </Link>
+              <Link href="/lowdeck" className={activeTab === "home" ? "active" : ""}>
+                🎯 Lowdeck
+              </Link>
+              <Link href="/lobby">
+                Lobby
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href={cardsHref}
+                className={activeTab === "cards" ? "active" : ""}
+                style={activeTab === "cards" ? { color: "var(--primary)" } : undefined}
+              >
+                {game === "lowdeck" ? "Deck Cards (52)" : "Card Catalogue (110)"}
+              </Link>
+              <Link
+                href={howToPlayHref}
+                className={activeTab === "how-to-play" ? "active" : ""}
+                style={activeTab === "how-to-play" ? { color: "var(--primary)" } : undefined}
+              >
+                How to Play
+              </Link>
+              <Link
+                href={rulesHref}
+                className={activeTab === "rules" ? "active" : ""}
+                style={activeTab === "rules" ? { color: "var(--primary)" } : undefined}
+              >
+                Official Rules
+              </Link>
+              <Link href={lobbyHref} style={{ color: "var(--primary)", fontWeight: 700 }}>
+                Play Game ➔
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* Actions (Desktop & Mobile) */}
         <div className="marketing-nav-actions">
           {/* Desktop-only Quick Icons */}
           <Link
-            href="/how-to-play"
+            href={howToPlayHref}
             className="nav-action-btn desktop-only-action"
             aria-label="Help & Rules"
             title="How to Play & Rules"
