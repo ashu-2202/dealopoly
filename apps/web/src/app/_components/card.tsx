@@ -146,31 +146,34 @@ export function Card({
                 xmlns="http://www.w3.org/2000/svg"
               >
                 {/* Left Building with 45-deg angled pitched roof */}
-                <path d="M7 26V15.5l3.5-3.5v14H7z" fill="var(--card-color, #F28C28)" />
+                <path d="M4 31V15l5-5v21H4z" fill="var(--card-color, #F28C28)" />
                 {/* Left-mid building */}
-                <path d="M10.5 26V13.5h3v12.5h-3z" fill="var(--card-color, #F28C28)" />
+                <path d="M9 31V12.5h4v18.5H9z" fill="var(--card-color, #F28C28)" />
                 {/* Center Tall Skyscraper with Spire Needle & Stepped Tiers */}
-                <path d="M13.5 26V10.5h9V26h-9z" fill="var(--card-color, #F28C28)" />
-                <path d="M15.5 10.5V7h5v3.5h-5z" fill="var(--card-color, #F28C28)" />
-                <path d="M17.2 7V3h1.6V7h-1.6z" fill="var(--card-color, #F28C28)" />
+                <path d="M13 31V9.5h10V31H13z" fill="var(--card-color, #F28C28)" />
+                <path d="M15 9.5V5.5h6v4h-6z" fill="var(--card-color, #F28C28)" />
+                <path d="M17 5.5V1.5h2v4h-2z" fill="var(--card-color, #F28C28)" />
                 {/* Window Cutouts in Center Skyscraper */}
-                <rect x="15.2" y="12" width="1.8" height="2.2" fill="#FFFFFF" />
-                <rect x="19" y="12" width="1.8" height="2.2" fill="#FFFFFF" />
-                <rect x="15.2" y="15.5" width="1.8" height="2.2" fill="#FFFFFF" />
-                <rect x="19" y="15.5" width="1.8" height="2.2" fill="#FFFFFF" />
-                <rect x="15.2" y="19" width="1.8" height="2.2" fill="#FFFFFF" />
-                <rect x="19" y="19" width="1.8" height="2.2" fill="#FFFFFF" />
-                <rect x="15.2" y="22.5" width="1.8" height="2.2" fill="#FFFFFF" />
-                <rect x="19" y="22.5" width="1.8" height="2.2" fill="#FFFFFF" />
-                {/* Right Mid Building with Spire */}
-                <path d="M22.5 26V14h3.5v12h-3.5z" fill="var(--card-color, #F28C28)" />
-                <path d="M24 14V9.5h0.8V14H24z" fill="var(--card-color, #F28C28)" />
+                <rect x="14.8" y="11.5" width="2" height="2.5" fill="#FFFFFF" />
+                <rect x="19.2" y="11.5" width="2" height="2.5" fill="#FFFFFF" />
+                <rect x="14.8" y="15.5" width="2" height="2.5" fill="#FFFFFF" />
+                <rect x="19.2" y="15.5" width="2" height="2.5" fill="#FFFFFF" />
+                <rect x="14.8" y="19.5" width="2" height="2.5" fill="#FFFFFF" />
+                <rect x="19.2" y="19.5" width="2" height="2.5" fill="#FFFFFF" />
+                <rect x="14.8" y="23.5" width="2" height="2.5" fill="#FFFFFF" />
+                <rect x="19.2" y="23.5" width="2" height="2.5" fill="#FFFFFF" />
+                <rect x="14.8" y="27.5" width="2" height="2.5" fill="#FFFFFF" />
+                <rect x="19.2" y="27.5" width="2" height="2.5" fill="#FFFFFF" />
+                {/* Right Mid Building with Spire Antenna */}
+                <path d="M23 31V13.5h4.5V31H23z" fill="var(--card-color, #F28C28)" />
+                <path d="M24.8 13.5V7.5h1.2v6h-1.2z" fill="var(--card-color, #F28C28)" />
                 {/* Far Right Stepped Building with Window Dots */}
-                <path d="M26 26V17h3.5v9H26z" fill="var(--card-color, #F28C28)" />
-                <rect x="27.2" y="19" width="1.2" height="1.8" fill="#FFFFFF" />
-                <rect x="27.2" y="22" width="1.2" height="1.8" fill="#FFFFFF" />
+                <path d="M27.5 31V17h4.5v14h-4.5z" fill="var(--card-color, #F28C28)" />
+                <rect x="29" y="19.5" width="1.6" height="2.2" fill="#FFFFFF" />
+                <rect x="29" y="23.5" width="1.6" height="2.2" fill="#FFFFFF" />
+                <rect x="29" y="27.5" width="1.6" height="2.2" fill="#FFFFFF" />
                 {/* Horizontal Ground Line */}
-                <rect x="6" y="25.5" width="24" height="1.5" fill="var(--card-color, #F28C28)" />
+                <rect x="3" y="30.5" width="30" height="2" fill="var(--card-color, #F28C28)" />
               </svg>
             ) : (
               <span

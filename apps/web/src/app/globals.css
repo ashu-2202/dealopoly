@@ -2676,8 +2676,8 @@ p {
   position: absolute;
   top: 0.45em;
   left: 0.45em;
-  width: 2.25em;
-  height: 2.25em;
+  width: 2.3em;
+  height: 2.3em;
   border-radius: 50%;
   background: #FFFFFF;
   display: flex;
@@ -2685,7 +2685,8 @@ p {
   justify-content: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
   z-index: 3;
-  padding: 0.22em;
+  padding: 0.08em;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -2697,7 +2698,7 @@ p {
 
 .card-header-value-text {
   font-family: var(--display, Impact, "Arial Black", system-ui);
-  font-size: 0.82em;
+  font-size: 0.85em;
   font-weight: 900;
   letter-spacing: -0.02em;
   line-height: 1;
@@ -2707,8 +2708,9 @@ p {
 }
 
 .card-header-city-svg {
-  width: 90%;
-  height: 90%;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /* Category Label with Enclosing Dash Lines */
