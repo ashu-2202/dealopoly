@@ -589,9 +589,6 @@ p {
   animation: pulse 1.8s infinite ease-in-out;
 }
 
-/* Feature Strip */
-.features-section {
-  padding-block: 64px;
 /* Features Section */
 .features-section {
   padding-block: 72px;
