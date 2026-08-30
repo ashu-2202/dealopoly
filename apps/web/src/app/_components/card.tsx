@@ -158,6 +158,13 @@ export function Card({
             )}
           </div>
 
+          {/* Top-Right Circular White Badge with Money Value in Card Color */}
+          {card.value > 0 && (
+            <div className="card-header-badge-circle card-header-badge-circle--right">
+              <span className="card-header-value-text">${card.value}M</span>
+            </div>
+          )}
+
           {/* Category Tag with Dash Accents (e.g. — PROPERTY —) */}
           <span className="card-header-category">{categoryLabel}</span>
 

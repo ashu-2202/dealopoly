@@ -2663,6 +2663,23 @@ p {
   box-sizing: border-box;
 }
 
+.card-header-badge-circle--right {
+  left: auto;
+  right: 0.45em;
+  padding: 0;
+}
+
+.card-header-value-text {
+  font-family: var(--display, Impact, "Arial Black", system-ui);
+  font-size: 0.78em;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--card-color, #F28C28);
+  display: block;
+  text-align: center;
+}
+
 .card-header-city-svg {
   width: 100%;
   height: 100%;
