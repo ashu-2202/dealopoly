@@ -53,20 +53,7 @@ export function MarketingNav({ game = "arcade", activeTab }: MarketingNavProps) 
         {/* Desktop Center Links */}
         <nav className="marketing-nav-center" aria-label="Main navigation">
           {game === "arcade" ? (
-            <>
-              <Link href="/#games" className={activeTab === "games" ? "active" : ""}>
-                🎮 Arcade Games
-              </Link>
-              <Link href="/monodeal" className={activeTab === "home" ? "active" : ""}>
-                🃏 Monodeal
-              </Link>
-              <Link href="/lowdeck" className={activeTab === "home" ? "active" : ""}>
-                🎯 Lowdeck
-              </Link>
-              <Link href="/lobby">
-                Lobby
-              </Link>
-            </>
+            <></>
           ) : (
             <>
               <Link
