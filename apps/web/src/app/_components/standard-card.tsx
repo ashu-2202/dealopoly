@@ -328,7 +328,7 @@ export const StandardCard: React.FC<StandardCardProps> = ({
 
   return (
     <div
-      className={`standard-card standard-card--${size} ${isRed ? "standard-card--red" : "standard-card--black"} ${
+      className={`standard-card monopoly-card monopoly-card--${size} standard-card--${size} ${isRed ? "standard-card--red" : "standard-card--black"} ${
         isSelected ? "standard-card--selected" : ""
       } ${disabled ? "standard-card--disabled" : ""} ${className}`}
       onClick={disabled ? undefined : onClick}

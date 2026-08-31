@@ -8792,3 +8792,10 @@ p {
 
 
 
+
+/* Fix for Lowdeck discard pile card scaling */
+.game-discard-top-card .standard-card {
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+}

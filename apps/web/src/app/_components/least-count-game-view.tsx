@@ -324,16 +324,12 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
                   className={`game-draw-card-top ${
                     isMyTurn && isDrawPhase ? "game-draw-pile-pulse" : ""
                   }`}
-                  style={{
-                    background: "linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)",
-                    border: "2px solid #38bdf8",
-                  }}
                 >
-                  <span className="game-draw-title" style={{ color: "#38bdf8" }}>
-                    LOWDECK
+                  <span className="game-draw-title">
+                    DEALOPOLY
                   </span>
                   <span className="game-draw-count-badge">{gameState.drawPileCount}</span>
-                  <span className="game-draw-subtitle" style={{ color: isMyTurn && isDrawPhase ? "#facc15" : "#94a3b8" }}>
+                  <span className="game-draw-subtitle">
                     {isMyTurn && isDrawPhase ? "TAP TO DRAW" : "CARDS"}
                   </span>
                 </div>
@@ -594,20 +590,14 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
       {/* 4. Activity Log Drawer (Right Side) */}
       <AnimatePresence>
         {isActivityDrawerOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="game-modal-overlay"
-              onClick={() => setIsActivityDrawerOpen(false)}
-            />
+          <div className="game-activity-drawer-backdrop" onClick={() => setIsActivityDrawerOpen(false)} style={{ zIndex: 300 }}>
             <motion.aside
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="game-activity-drawer"
+              className="game-activity-drawer-panel"
+              onClick={(e) => e.stopPropagation()}
               style={{
                 position: "fixed",
                 top: 0,
@@ -617,7 +607,6 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
                 maxWidth: "100vw",
                 background: "rgba(11, 17, 32, 0.98)",
                 borderLeft: "1px solid rgba(56, 189, 248, 0.2)",
-                zIndex: 200,
                 display: "flex",
                 flexDirection: "column",
                 boxShadow: "-10px 0 30px rgba(0,0,0,0.8)",
@@ -686,110 +675,124 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
                 ))}
               </div>
             </motion.aside>
-          </>
+          </div>
         )}
       </AnimatePresence>
 
       {/* 5. Discard Pile Inspector Modal */}
-      <AnimatePresence>
-        {isDiscardInspectorOpen && (
-          <div className="game-modal-overlay" onClick={() => setIsDiscardInspectorOpen(false)}>
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="game-modal-container"
-              onClick={(e) => e.stopPropagation()}
-              style={{ maxWidth: "560px", padding: "24px", textAlign: "center" }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, margin: 0 }}>Discard Pile ({gameState.discardPileCount} Cards)</h3>
-                <button onClick={() => setIsDiscardInspectorOpen(false)} className="button button--icon button--sm">
-                  <span className="material-symbols-outlined">close</span>
-                </button>
+      {isDiscardInspectorOpen && (
+        <div className="join-dialog-overlay" role="dialog" aria-modal="true" style={{ zIndex: 300 }}>
+          <div className="dialog-scrim" onClick={() => setIsDiscardInspectorOpen(false)} />
+          <div className="discard-inspector-modal">
+            <div className="discard-inspector-header">
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span className="material-symbols-outlined" style={{ color: "var(--primary)" }}>
+                  layers
+                </span>
+                <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 700 }}>
+                  Discard Pile ({gameState.discardPileCount} Cards)
+                </h3>
               </div>
+              <button
+                type="button"
+                className="game-round-icon-btn"
+                onClick={() => setIsDiscardInspectorOpen(false)}
+                title="Close"
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+                  close
+                </span>
+              </button>
+            </div>
 
-              {gameState.discardPileTop ? (
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
-                  <StandardCard card={gameState.discardPileTop} size="lg" showPointsBadge={true} />
-                  <p style={{ fontSize: "0.85rem", color: "var(--muted)" }}>
-                    Top of discard pile. When drawing, you can pick up this card instead of drawing from the deck.
-                  </p>
+            <div className="discard-inspector-grid">
+              {gameState.lastDiscardedCards && gameState.lastDiscardedCards.length > 0 ? (
+                [...gameState.lastDiscardedCards].reverse().map((c, i) => (
+                  <div key={`${c.instanceId}-${i}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+                    <StandardCard card={c} size="xs" showPointsBadge={false} disabled={false} />
+                  </div>
+                ))
+              ) : gameState.discardPileTop ? (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+                  <StandardCard card={gameState.discardPileTop} size="xs" showPointsBadge={false} disabled={false} />
                 </div>
               ) : (
-                <p style={{ color: "var(--muted)" }}>The discard pile is currently empty.</p>
+                <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "40px", color: "var(--muted)" }}>
+                  Discard pile is empty.
+                </div>
               )}
-            </motion.div>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
 
       {/* 6. Opponent Inspection Modal */}
-      <AnimatePresence>
-        {viewingOpponent && (
-          <div className="game-modal-overlay" onClick={() => setViewingOpponent(null)}>
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="game-modal-container"
-              onClick={(e) => e.stopPropagation()}
-              style={{ maxWidth: "480px", padding: "24px" }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, margin: 0 }}>
-                  {viewingOpponent.name} {viewingOpponent.isBot && "(AI Bot)"}
-                </h3>
-                <button onClick={() => setViewingOpponent(null)} className="button button--icon button--sm">
-                  <span className="material-symbols-outlined">close</span>
-                </button>
-              </div>
+      {viewingOpponent && (
+        <div className="join-dialog-overlay" role="dialog" aria-modal="true" style={{ zIndex: 300 }}>
+          <div className="dialog-scrim" onClick={() => setViewingOpponent(null)} />
+          <div className="dialog-panel dialog-panel--table">
+            <div className="texture-overlay" />
+            <div className="sheet-handle" />
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "20px" }}>
-                <div style={{ background: "rgba(255,255,255,0.04)", padding: "12px", borderRadius: "12px", textAlign: "center" }}>
-                  <div style={{ fontSize: "1.4rem", fontWeight: 900, color: "#38bdf8" }}>{viewingOpponent.handCount}</div>
-                  <div style={{ fontSize: "0.72rem", color: "var(--muted)" }}>Cards in Hand</div>
-                </div>
-                <div style={{ background: "rgba(255,255,255,0.04)", padding: "12px", borderRadius: "12px", textAlign: "center" }}>
-                  <div style={{ fontSize: "1.4rem", fontWeight: 900, color: viewingOpponent.score >= 70 ? "#ef4444" : "#facc15" }}>
-                    {viewingOpponent.score}/{gameState.maxScore}
-                  </div>
-                  <div style={{ fontSize: "0.72rem", color: "var(--muted)" }}>Match Penalty Points</div>
+            <div className="dialog-header">
+              <div>
+                <h2 style={{ fontSize: "1.1rem", margin: "0 0 4px" }}>{viewingOpponent.name}&apos;s Stats {viewingOpponent.isBot && "(Bot)"}</h2>
+                <div className="game-opponent-metrics" style={{ fontSize: "0.8rem" }}>
+                  <span>{viewingOpponent.handCount} Cards in Hand (Hidden)</span>
+                  <span>•</span>
+                  <span style={{ color: viewingOpponent.score >= 70 ? "#ef4444" : "#38bdf8" }}>Penalty: {viewingOpponent.score}/{gameState.maxScore} PTS</span>
                 </div>
               </div>
-
-              <button onClick={() => setViewingOpponent(null)} className="button button--secondary" style={{ width: "100%" }}>
-                Close
+              <button
+                type="button"
+                className="dialog-close-btn"
+                onClick={() => setViewingOpponent(null)}
+                aria-label="Close dialog"
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>close</span>
               </button>
-            </motion.div>
+            </div>
+
+            <div className="dialog-content" style={{ padding: "16px 20px 40px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "20px" }}>
+                <div style={{ background: "rgba(255,255,255,0.04)", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
+                  <div style={{ fontSize: "1.8rem", fontWeight: 900, color: "#38bdf8" }}>{viewingOpponent.handCount}</div>
+                  <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>Cards in Hand</div>
+                </div>
+                <div style={{ background: "rgba(255,255,255,0.04)", padding: "16px", borderRadius: "12px", textAlign: "center" }}>
+                  <div style={{ fontSize: "1.8rem", fontWeight: 900, color: viewingOpponent.score >= 70 ? "#ef4444" : "#facc15" }}>
+                    {viewingOpponent.score}
+                  </div>
+                  <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>Penalty / {gameState.maxScore}</div>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
 
       {/* 7. Round End & Showdown Results Modal */}
-      <AnimatePresence>
-        {(isRoundEnd || isGameOver) && gameState.lastShowResult && (
-          <div className="game-modal-overlay">
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="game-modal-container"
-              style={{ maxWidth: "680px", padding: "28px", width: "95vw" }}
-            >
-              <div style={{ textAlign: "center", marginBottom: "20px" }}>
-                <h2 style={{ fontSize: "1.8rem", fontWeight: 900, margin: "0 0 6px", color: gameState.lastShowResult.isSuccessful ? "#facc15" : "#f43f5e" }}>
-                  {gameState.lastShowResult.isSuccessful ? "🎉 SUCCESSFUL SHOW!" : "💥 WRONG SHOW COUNTERED!"}
-                </h2>
-                <p style={{ fontSize: "0.9rem", color: "#94a3b8", margin: 0 }}>
-                  {gameState.lastShowResult.isSuccessful
-                    ? `${gameState.players[gameState.lastShowResult.callerPlayerId]?.name} had the lowest hand count (${gameState.lastShowResult.callerScore} pts) and scored 0 penalty!`
-                    : `${gameState.players[gameState.lastShowResult.callerPlayerId]?.name} called SHOW with ${gameState.lastShowResult.callerScore} pts, but was beaten by ${
-                        gameState.players[gameState.lastShowResult.winnerPlayerId]?.name
-                      } (${gameState.lastShowResult.lowestScore} pts)! +${gameState.wrongShowPenalty} penalty applied!`}
-                </p>
-              </div>
+      {(isRoundEnd || isGameOver) && gameState.lastShowResult && (
+        <div className="join-dialog-overlay" role="dialog" aria-modal="true" style={{ zIndex: 300 }}>
+          <div className="dialog-scrim" />
+          <div className="dialog-panel dialog-panel--table" style={{ maxWidth: "680px", width: "95vw" }}>
+            <div className="texture-overlay" />
+            <div className="sheet-handle" />
 
+            <div className="dialog-header" style={{ flexDirection: "column", alignItems: "center", textAlign: "center", paddingBottom: "10px" }}>
+              <h2 style={{ fontSize: "1.6rem", fontWeight: 900, margin: "0 0 6px", color: gameState.lastShowResult.isSuccessful ? "#facc15" : "#f43f5e" }}>
+                {gameState.lastShowResult.isSuccessful ? "🎉 SUCCESSFUL SHOW!" : "💥 WRONG SHOW COUNTERED!"}
+              </h2>
+              <p style={{ fontSize: "0.85rem", color: "var(--muted)", margin: 0, lineHeight: 1.4 }}>
+                {gameState.lastShowResult.isSuccessful
+                  ? `${gameState.players[gameState.lastShowResult.callerPlayerId]?.name} had the lowest hand count (${gameState.lastShowResult.callerScore} pts) and scored 0 penalty!`
+                  : `${gameState.players[gameState.lastShowResult.callerPlayerId]?.name} called SHOW with ${gameState.lastShowResult.callerScore} pts, but was beaten by ${
+                      gameState.players[gameState.lastShowResult.winnerPlayerId]?.name
+                    } (${gameState.lastShowResult.lowestScore} pts)! +${gameState.wrongShowPenalty} penalty applied!`}
+              </p>
+            </div>
+
+            <div className="dialog-content" style={{ padding: "16px 20px 24px" }}>
               {/* Showdown Hand Reveal of All Players */}
               <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxHeight: "300px", overflowY: "auto", marginBottom: "24px" }}>
                 {gameState.playerOrder.map((pid) => {
@@ -874,15 +877,16 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
                   Exit to Hub
                 </button>
               </div>
-            </motion.div>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
 
       {/* 8. Exit Confirmation Dialog */}
       {isExitDialogOpen && (
-        <div className="game-modal-overlay">
-          <div className="game-modal-container" style={{ maxWidth: "400px", padding: "24px", textAlign: "center" }}>
+        <div className="join-dialog-overlay" role="dialog" aria-modal="true" style={{ zIndex: 300 }}>
+          <div className="dialog-scrim" />
+          <div className="dialog-panel" style={{ maxWidth: "400px", padding: "24px", textAlign: "center" }}>
             <h3 style={{ fontSize: "1.2rem", fontWeight: 800, margin: "0 0 8px" }}>Leave Match?</h3>
             <p style={{ fontSize: "0.85rem", color: "#94a3b8", margin: "0 0 20px" }}>
               Are you sure you want to exit? Your current match progress will be forfeited.
@@ -899,6 +903,7 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
                 type="button"
                 className="button button--primary"
                 onClick={handleLeave}
+                style={{ background: "#f43f5e", borderColor: "#e11d48" }}
               >
                 Confirm Exit
               </button>
