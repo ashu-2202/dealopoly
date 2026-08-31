@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Brand } from "./brand";
-import { SkyscraperBackdrop } from "./skyscraper-backdrop";
 
 export interface MarketingFooterProps {
   game?: "arcade" | "monodeal" | "lowdeck";
@@ -9,11 +8,6 @@ export interface MarketingFooterProps {
 export function MarketingFooter({ game = "arcade" }: MarketingFooterProps) {
   return (
     <footer className="marketing-footer">
-      {/* Full-width skyscraper skyline backdrop */}
-      <div className="footer-skyscraper-backdrop">
-        <SkyscraperBackdrop />
-      </div>
-
       <div className="shell" style={{ position: "relative", zIndex: 5, width: "100%" }}>
         <div className="footer-inner">
           <div className="footer-brand-wrap">
