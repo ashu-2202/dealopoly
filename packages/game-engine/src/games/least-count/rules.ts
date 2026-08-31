@@ -140,9 +140,8 @@ export function createLeastCountGame(options: {
     };
   }
 
-  // First card of draw pile starts the discard pile
-  const firstDiscard = deck.shift()!;
-  const discardPile = [firstDiscard];
+  // Game starts with an empty discard pile. The first player must discard a card.
+  const discardPile: CardInstance[] = [];
 
   return {
     id: gameId,
@@ -156,7 +155,7 @@ export function createLeastCountGame(options: {
     players: playerStates,
     drawPile: deck,
     discardPile,
-    lastDiscardedCards: [firstDiscard],
+    lastDiscardedCards: [],
     showThreshold,
     maxScore,
     wrongShowPenalty,
@@ -499,7 +498,6 @@ export function handleStartNextRound(
     };
   }
 
-  const firstDiscard = deck.shift()!;
   const nextRoundNumber = state.roundNumber + 1;
 
   const nextState: LeastCountGameState = {
@@ -513,8 +511,8 @@ export function handleStartNextRound(
       : remainingPlayers[0]!,
     players: updatedPlayers,
     drawPile: deck,
-    discardPile: [firstDiscard],
-    lastDiscardedCards: [firstDiscard],
+    discardPile: [],
+    lastDiscardedCards: [],
     lastShowResult: undefined,
   };
 
