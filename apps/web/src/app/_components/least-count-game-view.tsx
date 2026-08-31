@@ -277,13 +277,15 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
                       <span className="game-opponent-name">
                         {opp.name} {opp.isBot && "(Bot)"}
                       </span>
-                      {isOppActive && (
+                      {opp.isEliminated ? (
+                        <span className="game-opponent-turn-tag" style={{ background: "#ef4444", color: "white" }}>ELIMINATED</span>
+                      ) : isOppActive ? (
                         <span className="game-opponent-turn-tag">THINKING...</span>
-                      )}
+                      ) : null}
                     </div>
 
                     <div className="game-opponent-metrics">
-                      <span style={{ color: opp.score >= 70 ? "#ef4444" : "#38bdf8", fontWeight: 800 }}>
+                      <span style={{ color: opp.isEliminated ? "#ef4444" : (opp.score >= 70 ? "#ef4444" : "#38bdf8"), fontWeight: 800 }}>
                         🏆 {opp.score}/{gameState.maxScore} PTS
                       </span>
                       <span style={{ color: "var(--muted)", fontSize: "0.68rem" }}>
@@ -453,6 +455,11 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
                   <span style={{ fontSize: "0.72rem", color: "var(--muted)", fontFamily: "var(--mono)" }}>
                     (Match: {localPlayer?.score || 0} pts)
                   </span>
+                  {localPlayer?.isEliminated && (
+                    <div style={{ marginTop: "6px", background: "#ef4444", color: "white", fontSize: "0.75rem", fontWeight: 900, padding: "2px 8px", borderRadius: "12px", textAlign: "center" }}>
+                      ELIMINATED
+                    </div>
+                  )}
                 </div>
 
                 {canDeclareShow ? (
