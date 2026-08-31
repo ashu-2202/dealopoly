@@ -463,21 +463,40 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
                 </div>
 
                 {canDeclareShow ? (
-                  <button
+                  <motion.button
                     type="button"
                     onClick={declareShow}
-                    className="button button--primary button--sm"
+                    whileHover={{ scale: 1.03, filter: "brightness(1.15)" }}
+                    whileTap={{ scale: 0.96, y: 4, boxShadow: "0 0px 0 #713f12, 0 4px 8px rgba(202, 138, 4, 0.4)" }}
                     style={{
                       width: "100%",
-                      marginTop: "6px",
-                      background: "linear-gradient(135deg, #facc15 0%, #ca8a04 100%)",
-                      color: "#0f172a",
+                      marginTop: "10px",
+                      background: "linear-gradient(180deg, #facc15 0%, #a16207 100%)",
+                      border: "1.5px solid #fef08a",
+                      borderRadius: "12px",
+                      color: "#ffffff",
                       fontWeight: 900,
-                      boxShadow: "0 0 16px rgba(250, 204, 21, 0.6)",
+                      fontSize: "0.85rem",
+                      textShadow: "0 1px 3px rgba(0,0,0,0.7)",
+                      padding: "10px 8px",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "2px",
+                      boxShadow: "0 4px 0 #713f12, 0 8px 16px rgba(202, 138, 4, 0.4)",
+                      cursor: "pointer",
+                      outline: "none",
                     }}
                   >
-                    ⭐ DECLARE SHOW ({handScore} PTS)
-                  </button>
+                    <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>campaign</span>
+                      DECLARE SHOW
+                    </span>
+                    <span style={{ fontSize: "0.65rem", color: "#fef08a", fontWeight: 700, textShadow: "none" }}>
+                      ({handScore} PTS)
+                    </span>
+                  </motion.button>
                 ) : (
                   <div style={{ fontSize: "0.68rem", color: "var(--muted)", marginTop: "4px" }}>
                     SHOW Target: ≤ {gameState.showThreshold} pts
