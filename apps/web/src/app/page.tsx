@@ -7,7 +7,7 @@ import { MarketingNav } from "./_components/marketing-nav";
 import { MarketingFooter } from "./_components/marketing-footer";
 import { JoinRoomDialog } from "./_components/join-room-dialog";
 import { PlayBotsDialog } from "./_components/play-bots-dialog";
-import { SkyscraperBackdrop } from "./_components/skyscraper-backdrop";
+import { FloatingCardsBackdrop } from "./_components/floating-cards-backdrop";
 
 const platformFeatures = [
   {
@@ -79,10 +79,13 @@ export default function ArcadeLauncherPage() {
             alignItems: "center",
             justifyContent: "center",
             textAlign: "center",
-            minHeight: "auto",
-            padding: "64px 16px 44px",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
+          {/* 3D Floating Cards Interactive Backdrop */}
+          <FloatingCardsBackdrop />
+
           <div
             style={{
               maxWidth: "860px",
@@ -91,6 +94,8 @@ export default function ArcadeLauncherPage() {
               flexDirection: "column",
               alignItems: "center",
               textAlign: "center",
+              position: "relative",
+              zIndex: 5,
             }}
           >
             <div className="hero-badge" style={{ margin: "0 auto 18px" }}>
