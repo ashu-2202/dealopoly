@@ -9110,8 +9110,10 @@ p {
 .hero-section--launcher {
   position: relative;
   overflow: hidden;
-  min-height: 520px;
-  padding: 84px 16px 72px;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 540px;
+  padding: 84px 20px 72px;
 }
 
 .hero-floating-backdrop {

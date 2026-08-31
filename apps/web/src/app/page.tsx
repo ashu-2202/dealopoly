@@ -70,9 +70,9 @@ export default function ArcadeLauncherPage() {
 
       {/* Main Content */}
       <main>
-        {/* Hero Section */}
+        {/* Hero Section - Full Width Edge-to-Edge Canvas */}
         <section
-          className="hero-section hero-section--launcher shell hero-pattern"
+          className="hero-section hero-section--launcher hero-pattern"
           style={{
             display: "flex",
             flexDirection: "column",
@@ -81,6 +81,8 @@ export default function ArcadeLauncherPage() {
             textAlign: "center",
             position: "relative",
             overflow: "hidden",
+            width: "100%",
+            maxWidth: "100vw",
           }}
         >
           {/* 3D Floating Cards Interactive Backdrop */}
