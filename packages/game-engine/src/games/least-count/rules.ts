@@ -149,7 +149,7 @@ export function createLeastCountGame(options: {
     status: "in_progress",
     roundNumber: 1,
     turnNumber: 1,
-    turnPhase: "discard",
+    turnPhase: "draw",
     activePlayerId: playerOrder[0]!,
     playerOrder,
     players: playerStates,
@@ -203,6 +203,11 @@ export function handleDiscardCards(
     roundScore: calculateHandScore(nextHand),
   };
 
+  // Advance turn to next active (non-eliminated) player
+  const activePlayers = state.playerOrder.filter((id) => !state.players[id]?.isEliminated);
+  const currentIndex = activePlayers.indexOf(playerId);
+  const nextPlayerId = activePlayers[(currentIndex + 1) % activePlayers.length]!;
+
   const nextState: LeastCountGameState = {
     ...state,
     players: {
@@ -212,6 +217,8 @@ export function handleDiscardCards(
     discardPile: nextDiscardPile,
     lastDiscardedCards: cardsToDiscard,
     turnPhase: "draw",
+    turnNumber: state.turnNumber + 1,
+    activePlayerId: nextPlayerId,
   };
 
   const discardNames = cardsToDiscard.map((c) => `${c.rank}${c.suit.charAt(0).toUpperCase()}`).join(", ");
@@ -289,11 +296,6 @@ export function handleDrawCard(
     roundScore: calculateHandScore(nextHand),
   };
 
-  // Advance turn to next active (non-eliminated) player
-  const activePlayers = state.playerOrder.filter((id) => !state.players[id]?.isEliminated);
-  const currentIndex = activePlayers.indexOf(playerId);
-  const nextPlayerId = activePlayers[(currentIndex + 1) % activePlayers.length]!;
-
   const nextState: LeastCountGameState = {
     ...state,
     players: {
@@ -303,8 +305,6 @@ export function handleDrawCard(
     drawPile: nextDrawPile,
     discardPile: nextDiscardPile,
     turnPhase: "discard",
-    turnNumber: state.turnNumber + 1,
-    activePlayerId: nextPlayerId,
   };
 
   events.push({
@@ -331,8 +331,8 @@ export function handleDeclareShow(
   if (state.activePlayerId !== playerId) {
     throw new Error("You can only declare Show on your turn");
   }
-  if (state.turnPhase !== "discard") {
-    throw new Error("You can only declare Show at the beginning of your turn before discarding");
+  if (state.turnPhase !== "draw") {
+    throw new Error("You can only declare Show at the beginning of your turn before drawing");
   }
 
   const caller = state.players[playerId];
@@ -512,10 +512,10 @@ export function handleStartNextRound(
     status: "in_progress",
     roundNumber: nextRoundNumber,
     turnNumber: 1,
-    turnPhase: "discard",
+    turnPhase: "draw",
     activePlayerId: state.lastShowResult?.winnerPlayerId && !state.players[state.lastShowResult.winnerPlayerId]?.isEliminated
       ? state.lastShowResult.winnerPlayerId
-      : remainingPlayers[0]!,
+      : state.playerOrder.filter(id => !state.players[id]?.isEliminated)[0]!,
     players: updatedPlayers,
     drawPile: deck,
     discardPile: [],

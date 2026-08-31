@@ -32,8 +32,8 @@ export class LeastCountBotController {
     const bot = state.players[botPlayerId];
     if (!bot || bot.isEliminated) return null;
 
-    // 1. Discard Phase
-    if (state.turnPhase === "discard") {
+    // 1. Draw Phase (Bot can either Declare Show or Draw)
+    if (state.turnPhase === "draw") {
       const handScore = calculateHandScore(bot.hand);
 
       // A. If hand score <= showThreshold (e.g. <= 7), declare Show!
@@ -44,17 +44,6 @@ export class LeastCountBotController {
         };
       }
 
-      // B. Find best discard combination to maximize points shed
-      const bestDiscard = this.findBestDiscard(bot.hand);
-      return {
-        type: "discard_cards",
-        playerId: botPlayerId,
-        cardInstanceIds: bestDiscard.map((c) => c.instanceId),
-      };
-    }
-
-    // 2. Draw Phase
-    if (state.turnPhase === "draw") {
       const discardTop = state.discardPile.length > 0
         ? state.discardPile[state.discardPile.length - 1]
         : undefined;
@@ -78,6 +67,17 @@ export class LeastCountBotController {
         type: "draw_card",
         playerId: botPlayerId,
         source: "deck",
+      };
+    }
+
+    // 2. Discard Phase
+    if (state.turnPhase === "discard") {
+      // Find best discard combination to maximize points shed
+      const bestDiscard = this.findBestDiscard(bot.hand);
+      return {
+        type: "discard_cards",
+        playerId: botPlayerId,
+        cardInstanceIds: bestDiscard.map((c) => c.instanceId),
       };
     }
 

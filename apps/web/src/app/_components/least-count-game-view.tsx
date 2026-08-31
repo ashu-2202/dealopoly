@@ -107,7 +107,7 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
     return validateDiscardCombination(selectedCards);
   }, [selectedCards]);
 
-  const canDeclareShow = isMyTurn && isDiscardPhase && gameState && handScore <= gameState.showThreshold;
+  const canDeclareShow = isMyTurn && isDrawPhase && gameState && handScore <= gameState.showThreshold;
 
   const toggleSelectCard = (instanceId: string) => {
     if (!isMyTurn || !isDiscardPhase) return;
@@ -397,11 +397,11 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
               </span>
               <span>
                 {isMyTurn
-                  ? isDiscardPhase
+                  ? isDrawPhase
                     ? canDeclareShow
-                      ? "⭐ Your Hand Count is ≤ 7! You can declare SHOW or discard cards."
-                      : "✨ Your Turn: Select 1–3 cards to discard (Rank pair or Same-suit sequence) ✨"
-                    : "🎴 Your Turn: Draw 1 card from the Draw Deck or Take the Discarded Card 🎴"
+                      ? "⭐ Your Hand Count is ≤ 7! You can declare SHOW or Draw a card."
+                      : "🎴 Your Turn: Draw 1 card from the Draw Deck or Take the Discarded Card 🎴"
+                    : "✨ Your Turn: Select 1–3 cards to discard (Rank pair or Same-suit sequence) ✨"
                   : `${activePlayer?.name || "Opponent"} is thinking...`}
               </span>
             </div>
