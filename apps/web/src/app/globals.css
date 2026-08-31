@@ -8372,17 +8372,21 @@ p {
 }
 
 /* ==========================================================================
-   STANDARD PLAYING CARDS (LEAST COUNT / SUIT CARDS)
+   STANDARD PLAYING CARDS (3D EMBOSSED LOWDECK / SUIT CARDS)
    ========================================================================== */
 
 .standard-card {
   position: relative;
-  width: 110px;
-  height: 154px;
-  border-radius: 10px;
-  background: linear-gradient(145deg, #182234 0%, #0d1522 100%);
-  border: 1.5px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  width: 140px;
+  height: 202px;
+  border-radius: 12px;
+  background: radial-gradient(circle at 50% 30%, #fffdfa 0%, #f6edd9 80%, #ebe0c5 100%);
+  border: 2px solid #dfd3b8;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 -1px 2px rgba(0, 0, 0, 0.12) inset,
+    0 12px 28px rgba(0, 0, 0, 0.45),
+    0 2px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -8397,157 +8401,272 @@ p {
 @media (hover: hover) and (pointer: fine) {
   .standard-card:not(.standard-card--disabled):hover {
     transform: translateY(-8px) scale(1.03);
-    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6), 0 0 12px var(--suit-color, rgba(56, 189, 248, 0.4));
-    border-color: var(--suit-color, rgba(56, 189, 248, 0.6));
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 1) inset,
+      0 20px 36px rgba(0, 0, 0, 0.65),
+      0 0 16px rgba(212, 163, 75, 0.5);
+    border-color: #d4a34b;
     z-index: 10;
   }
 }
 
 .standard-card--selected {
   transform: translateY(-14px) !important;
-  border-color: #38bdf8 !important;
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.7), 0 12px 28px rgba(0, 0, 0, 0.8) !important;
+  border-color: #facc15 !important;
+  box-shadow:
+    0 0 0 2px #facc15,
+    0 0 24px rgba(250, 204, 21, 0.8),
+    0 16px 32px rgba(0, 0, 0, 0.85) !important;
   z-index: 20 !important;
 }
 
+/* ── Wallpaper Background Mini-Suit Watermark ───────────────── */
+.standard-card-wallpaper {
+  position: absolute;
+  inset: 8px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px 12px;
+  opacity: 0.14;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wallpaper-pip {
+  font-size: 14px;
+  color: #b48530;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Ornate Gold Contoured Border ───────────────────────────── */
+.standard-card-contour-border {
+  position: absolute;
+  inset: 6px;
+  border: 2px solid #cca14e;
+  border-radius: 9px;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    0 0 0 1px rgba(180, 133, 48, 0.35);
+}
+
+/* ── Sizes ─────────────────────────────────────────────────── */
+.standard-card--xs {
+  width: 64px;
+  height: 92px;
+  border-radius: 6px;
+  padding: 4px;
+}
 .standard-card--sm {
-  width: 72px;
-  height: 100px;
-  border-radius: 7px;
+  width: 88px;
+  height: 128px;
+  border-radius: 8px;
   padding: 5px;
 }
-
-.standard-card--lg {
-  width: 145px;
-  height: 204px;
+.standard-card--md {
+  width: 140px;
+  height: 202px;
   border-radius: 12px;
+}
+.standard-card--lg {
+  width: 190px;
+  height: 274px;
+  border-radius: 16px;
   padding: 12px;
 }
+.standard-card--xl {
+  width: 260px;
+  height: 374px;
+  border-radius: 20px;
+  padding: 16px;
+}
 
+/* ── Facedown Card Back ─────────────────────────────────────── */
 .standard-card--facedown {
   background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
-  border: 1.5px solid rgba(56, 189, 248, 0.35);
+  border: 2px solid #38bdf8;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .standard-card-back-pattern {
-  width: 85%;
-  height: 85%;
-  border-radius: 6px;
-  border: 1px dashed rgba(56, 189, 248, 0.4);
+  width: 86%;
+  height: 86%;
+  border-radius: 8px;
+  border: 1.5px dashed rgba(56, 189, 248, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
 }
 
 .standard-card-back-logo {
   font-family: var(--display, sans-serif);
   font-weight: 900;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   letter-spacing: 0.1em;
   color: #38bdf8;
   text-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
 }
 
+/* ── Indices ───────────────────────────────────────────────── */
 .standard-card-index {
+  position: absolute;
+  z-index: 5;
   display: flex;
   flex-direction: column;
   align-items: center;
-  line-height: 1;
-  font-family: var(--mono, monospace);
-  font-weight: 800;
+  font-family: serif, "Times New Roman", Georgia;
+  line-height: 0.95;
 }
 
 .standard-card-index--top {
-  align-self: flex-start;
+  top: 10px;
+  left: 12px;
 }
 
 .standard-card-index--bottom {
-  align-self: flex-end;
+  bottom: 10px;
+  right: 12px;
   transform: rotate(180deg);
 }
 
 .standard-card-rank {
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   font-weight: 900;
-  color: var(--suit-color, #ffffff);
+  color: var(--suit-color);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.9);
 }
 
 .standard-card--sm .standard-card-rank {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
 }
-
 .standard-card--lg .standard-card-rank {
-  font-size: 1.35rem;
+  font-size: 1.8rem;
+}
+.standard-card--xl .standard-card-rank {
+  font-size: 2.4rem;
 }
 
 .standard-card-suit {
-  font-size: 0.95rem;
-  color: var(--suit-color, #ffffff);
+  font-size: 1.15rem;
+  color: var(--suit-color);
+  margin-top: 2px;
 }
 
 .standard-card--sm .standard-card-suit {
-  font-size: 0.70rem;
+  font-size: 0.80rem;
+}
+.standard-card--lg .standard-card-suit {
+  font-size: 1.5rem;
+}
+.standard-card--xl .standard-card-suit {
+  font-size: 2.1rem;
 }
 
-.standard-card-center-art {
+/* ── Center Art Frame ──────────────────────────────────────── */
+.standard-card-art-frame {
   position: absolute;
-  inset: 0;
+  inset: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
+}
+
+.character-art-svg {
+  width: 90%;
+  height: 85%;
+  max-height: 155px;
+  pointer-events: none;
+}
+
+.standard-card--sm .character-art-svg {
+  max-height: 95px;
+}
+.standard-card--lg .character-art-svg {
+  max-height: 215px;
+}
+.standard-card--xl .character-art-svg {
+  max-height: 300px;
+}
+
+/* ── Pip Grid for Number Cards ─────────────────────────────── */
+.standard-card-pip-grid {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
+  gap: 6px;
 }
 
-.standard-card-large-suit {
-  font-size: 2.8rem;
-  color: var(--suit-color, #ffffff);
-  opacity: 0.25;
+.standard-card-pip-symbol {
+  font-size: 3.4rem;
+  font-family: serif, "Times New Roman", Georgia;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-.standard-card--sm .standard-card-large-suit {
-  font-size: 1.6rem;
+.standard-card--sm .standard-card-pip-symbol {
+  font-size: 2rem;
+}
+.standard-card--lg .standard-card-pip-symbol {
+  font-size: 4.6rem;
+}
+.standard-card--xl .standard-card-pip-symbol {
+  font-size: 6.4rem;
 }
 
-.standard-card--lg .standard-card-large-suit {
-  font-size: 3.8rem;
-}
-
-.standard-card-special-icon {
-  position: absolute;
-  font-size: 1.4rem;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
-}
-
-.standard-card--sm .standard-card-special-icon {
-  font-size: 0.9rem;
-}
-
-.standard-card--lg .standard-card-special-icon {
-  font-size: 1.8rem;
-}
-
-.standard-card-points-badge {
-  align-self: center;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #94a3b8;
+.standard-card-pip-count-tag {
+  font-size: 0.82rem;
   font-family: var(--mono, monospace);
-  font-size: 0.62rem;
-  font-weight: 800;
-  padding: 2px 6px;
+  font-weight: 900;
+  background: rgba(212, 163, 75, 0.2);
+  padding: 2px 10px;
   border-radius: 999px;
-  letter-spacing: 0.04em;
-  z-index: 2;
+  border: 1px solid rgba(212, 163, 75, 0.45);
 }
 
-.standard-card--sm .standard-card-points-badge {
-  font-size: 0.52rem;
-  padding: 1px 4px;
+/* ── 3D Embossed CARD VALUE Shield Badge ────────────────────── */
+.card-value-shield {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 82px;
+  height: 78px;
+  z-index: 10;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.65));
+}
+
+.card-value-shield-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.standard-card--sm .card-value-shield {
+  width: 54px;
+  height: 52px;
+  bottom: 4px;
+}
+
+.standard-card--lg .card-value-shield {
+  width: 110px;
+  height: 105px;
+  bottom: 12px;
+}
+
+.standard-card--xl .card-value-shield {
+  width: 150px;
+  height: 144px;
+  bottom: 18px;
 }
 
 .standard-card-points-badge--king {
@@ -8555,7 +8674,7 @@ p {
   color: #0f172a !important;
   border-color: #fef08a !important;
   font-weight: 900 !important;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.8);
 }
 
 .standard-card--disabled {
