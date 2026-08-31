@@ -24,10 +24,10 @@ interface LeastCountGameViewProps {
 }
 
 const OPPONENT_PALETTES = [
-  { class: "avatar-rose", color: "#f43f5e" },
-  { class: "avatar-cyan", color: "#06b6d4" },
-  { class: "avatar-amber", color: "#f59e0b" },
-  { class: "avatar-violet", color: "#8b5cf6" },
+  { class: "avatar-theme--purple", color: "#c084fc" },
+  { class: "avatar-theme--orange", color: "#fb923c" },
+  { class: "avatar-theme--emerald", color: "#34d399" },
+  { class: "avatar-theme--amber", color: "#fbbf24" },
 ];
 
 export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
@@ -143,6 +143,9 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
 
   return (
     <div className="game-table-shell">
+      {/* Texture Noise Overlay */}
+      <div className="texture-overlay" style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }} />
+
       {/* 1. Top App Navigation Bar */}
       <header className="game-topbar">
         <div className="game-topbar-brand">
@@ -561,20 +564,25 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
             </div>
 
             {/* Player Hand Carousel */}
-            <div className="game-hand-section">
-              <div className="game-hand-cards-container">
-                {handCards.map((card) => {
+            <div className="game-hand-fanned-container">
+              <div className="game-hand-cards-row">
+                {handCards.map((card, idx) => {
                   const isSelected = selectedCardIds.includes(card.instanceId);
                   return (
-                    <StandardCard
-                      key={card.instanceId}
-                      card={card}
-                      isSelected={isSelected}
-                      onClick={() => toggleSelectCard(card.instanceId)}
-                      size="md"
-                      showPointsBadge={true}
-                      disabled={!isMyTurn || !isDiscardPhase}
-                    />
+                    <div 
+                      key={card.instanceId} 
+                      className={`game-hand-card-wrapper ${isSelected ? "game-hand-card-wrapper--selected" : ""}`}
+                      style={{ zIndex: isSelected ? 50 : idx + 10 }}
+                    >
+                      <StandardCard
+                        card={card}
+                        isSelected={isSelected}
+                        onClick={() => toggleSelectCard(card.instanceId)}
+                        size="md"
+                        showPointsBadge={true}
+                        disabled={!isMyTurn || !isDiscardPhase}
+                      />
+                    </div>
                   );
                 })}
               </div>
