@@ -3711,7 +3711,7 @@ export default function GamePage(props: {
         if (!bankPlayer) return null;
 
         return (
-          <div className="join-dialog-overlay" role="dialog" aria-modal="true">
+          <div className="join-dialog-overlay" role="dialog" aria-modal="true" style={{ zIndex: 400 }}>
             <div className="dialog-scrim" onClick={() => setViewingBankPlayerId(null)} />
             <div className="game-bank-modal-container">
               <div className="game-bank-modal-header">
