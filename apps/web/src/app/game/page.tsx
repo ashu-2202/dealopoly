@@ -156,6 +156,10 @@ export default function GamePage(props: {
     playerName: customPlayerName,
   });
 
+  const you = gameState?.players?.[playerId] || (gameState?.players ? Object.values(gameState.players).find((p) => !p.isBot) || Object.values(gameState.players)[0] : undefined);
+  const actualPlayerId = you?.id || playerId;
+  const isYourTurn = gameState?.turn?.activePlayerId === actualPlayerId;
+
   useEffect(() => {
     if (!gameState?.history || gameState.history.length === 0) return;
     const historyLen = gameState.history.length;
@@ -295,10 +299,6 @@ export default function GamePage(props: {
 
     return () => clearTimeout(timer);
   }, [liveReelEvent]);
-
-  const you = gameState?.players?.[playerId] || (gameState?.players ? Object.values(gameState.players).find((p) => !p.isBot) || Object.values(gameState.players)[0] : undefined);
-  const actualPlayerId = you?.id || playerId;
-  const isYourTurn = gameState?.turn?.activePlayerId === actualPlayerId;
 
   const triggerDrawAnimation = (count: number = 2) => {
     if (!drawPileRef.current || !handContainerRef.current) return;
