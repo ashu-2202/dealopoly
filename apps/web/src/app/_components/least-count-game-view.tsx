@@ -787,34 +787,38 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
             <div className="sheet-handle" />
 
             <div className="dialog-header" style={{ flexDirection: "column", alignItems: "center", textAlign: "center", paddingBottom: "10px" }}>
-              <h2 style={{ fontSize: "1.6rem", fontWeight: 900, margin: "0 0 6px", color: gameState.lastShowResult.isSuccessful ? "#facc15" : "#f43f5e" }}>
-                {gameState.lastShowResult.isSuccessful ? "🎉 SUCCESSFUL SHOW!" : "💥 WRONG SHOW COUNTERED!"}
+              <h2 style={{ fontSize: "1.6rem", fontWeight: 900, margin: "0 0 6px", color: isGameOver ? "#38bdf8" : (gameState.lastShowResult.isSuccessful ? "#facc15" : "#f43f5e") }}>
+                {isGameOver ? "🏆 MATCH COMPLETE!" : (gameState.lastShowResult.isSuccessful ? "🎉 SUCCESSFUL SHOW!" : "💥 WRONG SHOW COUNTERED!")}
               </h2>
               <p style={{ fontSize: "0.85rem", color: "var(--muted)", margin: 0, lineHeight: 1.4 }}>
-                {gameState.lastShowResult.isSuccessful
-                  ? `${gameState.players[gameState.lastShowResult.callerPlayerId]?.name} had the lowest hand count (${gameState.lastShowResult.callerScore} pts) and scored 0 penalty!`
-                  : `${gameState.players[gameState.lastShowResult.callerPlayerId]?.name} called SHOW with ${gameState.lastShowResult.callerScore} pts, but was beaten by ${
-                      gameState.players[gameState.lastShowResult.winnerPlayerId]?.name
-                    } (${gameState.lastShowResult.lowestScore} pts)! +${gameState.wrongShowPenalty} penalty applied!`}
+                {isGameOver
+                  ? `Match ended! ${gameState.players[gameState.winnerId!]?.name || "A player"} wins the game with the lowest penalty!`
+                  : (gameState.lastShowResult.isSuccessful
+                    ? `${gameState.players[gameState.lastShowResult.callerPlayerId]?.name} had the lowest hand count (${gameState.lastShowResult.callerScore} pts) and scored 0 penalty!`
+                    : `${gameState.players[gameState.lastShowResult.callerPlayerId]?.name} called SHOW with ${gameState.lastShowResult.callerScore} pts, but was beaten by ${
+                        gameState.players[gameState.lastShowResult.winnerPlayerId]?.name
+                      } (${gameState.lastShowResult.lowestScore} pts)! +${gameState.wrongShowPenalty} penalty applied!`)
+                }
               </p>
             </div>
 
             <div className="dialog-content" style={{ padding: "16px 20px 24px" }}>
               {/* Showdown Hand Reveal of All Players */}
               <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxHeight: "300px", overflowY: "auto", marginBottom: "24px" }}>
-                {gameState.playerOrder.map((pid) => {
+                {(isGameOver ? [...gameState.playerOrder].sort((a,b) => gameState.players[a]!.score - gameState.players[b]!.score) : gameState.playerOrder).map((pid, idx) => {
                   const p = gameState.players[pid];
                   if (!p) return null;
                   const res = gameState.lastShowResult?.playerScores[pid];
-                  const isWinner = pid === gameState.lastShowResult?.winnerPlayerId;
+                  const isRoundWinner = pid === gameState.lastShowResult?.winnerPlayerId;
                   const isCaller = pid === gameState.lastShowResult?.callerPlayerId;
+                  const isOverallWinner = isGameOver && pid === gameState.winnerId;
 
                   return (
                     <div
                       key={pid}
                       style={{
-                        background: isWinner ? "rgba(34, 197, 94, 0.12)" : "rgba(255, 255, 255, 0.04)",
-                        border: isWinner ? "1.5px solid #22c55e" : "1px solid rgba(255, 255, 255, 0.08)",
+                        background: (isGameOver ? isOverallWinner : isRoundWinner) ? "rgba(34, 197, 94, 0.12)" : "rgba(255, 255, 255, 0.04)",
+                        border: (isGameOver ? isOverallWinner : isRoundWinner) ? "1.5px solid #22c55e" : "1px solid rgba(255, 255, 255, 0.08)",
                         borderRadius: "14px",
                         padding: "12px 16px",
                       }}
@@ -822,27 +826,33 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                           <span style={{ fontWeight: 800, fontSize: "0.95rem", color: "#f8fafc" }}>
+                            {isGameOver && <span style={{ marginRight: "6px", color: "var(--muted)" }}>#{idx + 1}</span>}
                             {p.name} {pid === activePlayerId && "(You)"}
                           </span>
-                          {isWinner && (
+                          {!isGameOver && isRoundWinner && (
                             <span style={{ background: "#22c55e", color: "#052e16", fontSize: "0.68rem", fontWeight: 900, padding: "2px 8px", borderRadius: "999px" }}>
                               👑 ROUND WINNER (+0 PTS)
                             </span>
                           )}
-                          {isCaller && !gameState.lastShowResult?.isSuccessful && (
+                          {!isGameOver && isCaller && !gameState.lastShowResult?.isSuccessful && (
                             <span style={{ background: "#ef4444", color: "#ffffff", fontSize: "0.68rem", fontWeight: 900, padding: "2px 8px", borderRadius: "999px" }}>
                               ⚠️ COUNTERED (+{gameState.wrongShowPenalty} PTS)
                             </span>
                           )}
+                          {isOverallWinner && (
+                            <span style={{ background: "#38bdf8", color: "#0f172a", fontSize: "0.68rem", fontWeight: 900, padding: "2px 8px", borderRadius: "999px" }}>
+                              🏆 MATCH WINNER
+                            </span>
+                          )}
                         </div>
 
-                        <div style={{ fontFamily: "var(--mono)", fontWeight: 800, fontSize: "0.85rem", color: "#facc15" }}>
+                        <div style={{ fontFamily: "var(--mono)", fontWeight: 800, fontSize: "0.85rem", color: (isGameOver && isOverallWinner) ? "#38bdf8" : "#facc15" }}>
                           Total Match: {res?.totalScore ?? p.score} pts
                         </div>
                       </div>
 
                       {/* Revealed Cards */}
-                      {p.hand && (
+                      {!isGameOver && p.hand && (
                         <div style={{ display: "flex", gap: "8px", overflowX: "auto", padding: "4px 0" }}>
                           {p.hand.map((card) => (
                             <StandardCard key={card.instanceId} card={card} size="sm" showPointsBadge={true} />

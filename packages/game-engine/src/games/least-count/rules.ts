@@ -116,7 +116,7 @@ export function createLeastCountGame(options: {
   }
 
   const showThreshold = config?.showThreshold ?? 7;
-  const maxScore = config?.maxScore ?? 100;
+  const maxScore = config?.maxScore ?? 200;
   const wrongShowPenalty = config?.wrongShowPenalty ?? 40;
 
   // Deck scaling: 1 deck for 2 players, 2 decks for 3-6 players
@@ -407,14 +407,21 @@ export function handleDeclareShow(
     };
   }
 
-  // Check for remaining active players
-  const remainingPlayers = state.playerOrder.filter((id) => !updatedPlayers[id]?.isEliminated);
+  // Check for game over (any player crosses maxScore)
+  const anyPlayerEliminated = state.playerOrder.some((id) => updatedPlayers[id]?.isEliminated);
   let isGameCompleted = false;
   let overallWinnerId: string | undefined;
 
-  if (remainingPlayers.length <= 1) {
+  if (anyPlayerEliminated) {
     isGameCompleted = true;
-    overallWinnerId = remainingPlayers[0] || minPlayerId;
+    // Find player with the lowest score
+    let lowestScore = Infinity;
+    for (const pid of state.playerOrder) {
+      if (updatedPlayers[pid]!.score < lowestScore) {
+        lowestScore = updatedPlayers[pid]!.score;
+        overallWinnerId = pid;
+      }
+    }
   }
 
   const showResult: ShowResult = {
@@ -473,8 +480,8 @@ export function handleStartNextRound(
     throw new Error("Game is not in round_end state");
   }
 
-  const remainingPlayers = state.playerOrder.filter((id) => !state.players[id]?.isEliminated);
-  if (remainingPlayers.length <= 1) {
+  const anyPlayerEliminated = state.playerOrder.some((id) => state.players[id]?.isEliminated);
+  if (anyPlayerEliminated) {
     throw new Error("Game is already completed");
   }
 
