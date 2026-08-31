@@ -148,12 +148,14 @@ export const LeastCountGameView: React.FC<LeastCountGameViewProps> = ({
 
       {/* 1. Top App Navigation Bar */}
       <header className="game-topbar">
-        <div className="game-topbar-brand">
-          <Link href="/lowdeck" className="game-brand-pill" title="Back to Lowdeck Hub">
-            <span className="game-brand-icon" style={{ background: "linear-gradient(135deg, #1e3a8a 0%, #0284c7 100%)", color: "#ffffff" }}>
-              LC
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <Link href="/" className="game-topbar-brand" aria-label="Dealopoly" style={{ textDecoration: "none" }}>
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1", fontSize: "24px" }}>
+              playing_cards
             </span>
-            <span className="game-brand-name">Lowdeck</span>
+            <span className="game-topbar-logo-text" style={{ fontWeight: 900, fontFamily: "Montserrat, sans-serif", fontSize: "1.2rem", letterSpacing: "-0.03em" }}>
+              dealopoly
+            </span>
           </Link>
 
           {/* Turn Indicator Pill */}

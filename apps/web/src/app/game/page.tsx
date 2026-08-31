@@ -486,12 +486,12 @@ export default function GamePage(props: {
       {/* Top App Bar */}
       <header className="game-topbar">
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div className="game-topbar-brand" aria-label="Dealopoly">
+          <Link href="/" className="game-topbar-brand" aria-label="Dealopoly" style={{ textDecoration: "none" }}>
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1", fontSize: "24px" }}>
               playing_cards
             </span>
             <span className="game-topbar-logo-text">dealopoly</span>
-          </div>
+          </Link>
 
           {/* Turn & Action Pill */}
           <div className="game-turn-pill">
