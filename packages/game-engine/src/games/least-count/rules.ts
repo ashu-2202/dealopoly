@@ -141,7 +141,7 @@ export function createLeastCountGame(options: {
   }
 
   // Game starts with an empty discard pile. The first player must discard a card.
-  const discardPile: CardInstance[] = [];
+  const discardPile: LeastCountCard[] = [];
 
   return {
     id: gameId,
