@@ -125,169 +125,214 @@ export default function ArcadeLauncherPage() {
         </section>
 
         {/* Multi-Game Launcher Showcase Grid */}
-        <section id="games" className="shell" style={{ padding: "32px 16px 48px" }}>
-          <div className="section-header" style={{ textAlign: "center", marginBottom: "36px" }}>
+        <section id="games" className="shell" style={{ padding: "32px 16px 56px" }}>
+          <div className="section-header" style={{ textAlign: "center", marginBottom: "40px" }}>
             <p className="kicker">SELECT YOUR GAME</p>
-            <h2 style={{ fontSize: "2.2rem", fontWeight: 900 }}>Arcade Game Launcher</h2>
-            <p style={{ color: "#94a3b8" }}>Pick a card game to view its full game hub, cards, rules, or start playing immediately.</p>
+            <h2 style={{ fontSize: "2.4rem", fontWeight: 900 }}>Arcade Game Launcher</h2>
+            <p style={{ color: "#94a3b8", maxWidth: "600px", margin: "0 auto" }}>
+              Choose a card game below to jump straight into live bot matches, multiplayer rooms, or explore official rules and card catalogues.
+            </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "28px" }}>
+          <div className="arcade-launcher-grid">
             {/* Game Card 1: Monodeal */}
-            <div
-              className="game-launcher-card"
-              style={{
-                background: "linear-gradient(145deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%)",
-                border: "1.5px solid rgba(56, 189, 248, 0.35)",
-                borderRadius: "20px",
-                padding: "28px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                boxShadow: "0 16px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.15)",
-                position: "relative",
-                overflow: "hidden",
-                transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              }}
-            >
-              <div style={{ position: "absolute", top: "18px", right: "18px" }}>
-                <span className="badge" style={{ background: "rgba(56, 189, 248, 0.18)", color: "#38bdf8", border: "1px solid rgba(56, 189, 248, 0.4)", fontWeight: 800 }}>
-                  2–5 PLAYERS
-                </span>
+            <div className="arcade-launcher-card arcade-launcher-card--monodeal">
+              {/* Media Header with Game Table Preview */}
+              <div className="arcade-card-media">
+                <img
+                  src="/games/monodeal-preview.png"
+                  alt="Monodeal Game Table Preview"
+                  className="arcade-card-img"
+                />
+                <div className="arcade-card-media-overlay" />
+
+                {/* Top Floating Badges */}
+                <div className="arcade-card-top-badges">
+                  <span className="arcade-player-badge arcade-player-badge--blue">
+                    <span className="material-symbols-outlined" style={{ fontSize: "15px" }}>group</span>
+                    2–5 PLAYERS
+                  </span>
+                  <span className="arcade-status-badge">
+                    <span className="badge-dot" style={{ background: "#10b981", width: "6px", height: "6px" }} />
+                    LIVE MATCH
+                  </span>
+                </div>
               </div>
 
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                  <span style={{ fontSize: "2.4rem" }}>🃏</span>
-                  <div>
-                    <h3 style={{ fontSize: "1.6rem", fontWeight: 900, color: "#f8fafc", margin: 0 }}>Monodeal</h3>
-                    <span style={{ fontSize: "0.80rem", color: "#38bdf8", fontWeight: 700, letterSpacing: "0.04em" }}>
-                      Deal Your Way to Victory
-                    </span>
+              {/* Card Body */}
+              <div className="arcade-card-body">
+                <div>
+                  <div className="arcade-card-header">
+                    <div className="arcade-card-title-wrap">
+                      <div className="arcade-card-icon-bubble arcade-card-icon-bubble--blue">
+                        <span>🃏</span>
+                      </div>
+                      <div>
+                        <h3 className="arcade-card-title">Monodeal</h3>
+                        <div className="arcade-card-tagline arcade-card-tagline--blue">
+                          Deal Your Way to Victory
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="arcade-card-desc">
+                    The authentic real-estate card trading game. Collect 3 full property sets, charge ruthless rent, and steal monopolies with Deal Breakers!
+                  </p>
+
+                  <div className="arcade-card-specs">
+                    <span className="arcade-spec-chip">⏱️ 10–15 Mins</span>
+                    <span className="arcade-spec-chip">🎴 110 Cards</span>
+                    <span className="arcade-spec-chip">🏆 3 Property Sets</span>
+                    <span className="arcade-spec-chip">🏢 Real Estate Strategy</span>
                   </div>
                 </div>
 
-                <p style={{ fontSize: "0.90rem", color: "#94a3b8", lineHeight: 1.6, margin: "14px 0 18px" }}>
-                  The authentic real-estate card trading game. Collect 3 full property sets, charge ruthless rent, and steal properties with Deal Breakers!
-                </p>
-
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "24px" }}>
-                  <span style={{ fontSize: "0.74rem", background: "rgba(255,255,255,0.06)", padding: "4px 10px", borderRadius: "6px", color: "#cbd5e1" }}>⏱️ 10–15 Mins</span>
-                  <span style={{ fontSize: "0.74rem", background: "rgba(255,255,255,0.06)", padding: "4px 10px", borderRadius: "6px", color: "#cbd5e1" }}>🎴 110 Cards</span>
-                  <span style={{ fontSize: "0.74rem", background: "rgba(255,255,255,0.06)", padding: "4px 10px", borderRadius: "6px", color: "#cbd5e1" }}>🏢 Real Estate Strategy</span>
-                </div>
-              </div>
-
-              <div>
-                <Link
-                  href="/monodeal"
-                  className="button button--primary button--full"
-                  style={{ justifyContent: "center", marginBottom: "10px", padding: "12px 18px" }}
-                >
-                  Enter Monodeal Hub ➔
-                </Link>
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-                  <button
-                    type="button"
-                    onClick={() => handleOpenBots("monodeal")}
-                    className="button button--ghost button--sm"
-                    style={{ justifyContent: "center" }}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>smart_toy</span>
-                    Play Bots
-                  </button>
+                {/* Action Buttons */}
+                <div className="arcade-card-actions">
                   <Link
-                    href="/lobby?game=monodeal"
-                    className="button button--secondary button--sm"
-                    style={{ justifyContent: "center" }}
+                    href="/monodeal"
+                    className="arcade-primary-btn arcade-primary-btn--blue"
                   >
-                    <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>add_circle</span>
-                    Create Room
+                    <span>Enter Monodeal Hub</span>
+                    <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>arrow_forward</span>
                   </Link>
+
+                  <div className="arcade-sub-actions-grid">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenBots("monodeal")}
+                      className="button button--ghost arcade-sub-btn"
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: "16px", color: "#38bdf8" }}>smart_toy</span>
+                      Play Solo Bots
+                    </button>
+                    <Link
+                      href="/lobby?game=monodeal"
+                      className="button button--secondary arcade-sub-btn"
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>add_circle</span>
+                      Create Room
+                    </Link>
+                  </div>
+
+                  <div className="arcade-quick-links">
+                    <Link href="/monodeal/how-to-play" className="arcade-quick-link">
+                      <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>menu_book</span>
+                      How to Play
+                    </Link>
+                    <span style={{ color: "rgba(255,255,255,0.15)", fontSize: "0.8rem" }}>•</span>
+                    <Link href="/monodeal/cards" className="arcade-quick-link">
+                      <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>style</span>
+                      Card Catalogue
+                    </Link>
+                    <span style={{ color: "rgba(255,255,255,0.15)", fontSize: "0.8rem" }}>•</span>
+                    <Link href="/monodeal/rules" className="arcade-quick-link">
+                      <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>gavel</span>
+                      Rules
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Game Card 2: Lowdeck */}
-            <div
-              className="game-launcher-card"
-              style={{
-                background: "linear-gradient(145deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%)",
-                border: "1.5px solid rgba(234, 179, 8, 0.4)",
-                borderRadius: "20px",
-                padding: "28px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                boxShadow: "0 16px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(234, 179, 8, 0.15)",
-                position: "relative",
-                overflow: "hidden",
-                transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              }}
-            >
-              <div style={{ position: "absolute", top: "18px", right: "18px" }}>
-                <span className="badge" style={{ background: "rgba(234, 179, 8, 0.18)", color: "#facc15", border: "1px solid rgba(234, 179, 8, 0.4)", fontWeight: 800 }}>
-                  2–6 PLAYERS
-                </span>
+            <div className="arcade-launcher-card arcade-launcher-card--lowdeck">
+              {/* Media Header with Game Table Preview */}
+              <div className="arcade-card-media">
+                <img
+                  src="/games/lowdeck-preview.png"
+                  alt="Lowdeck Game Table Preview"
+                  className="arcade-card-img"
+                />
+                <div className="arcade-card-media-overlay" />
+
+                {/* Top Floating Badges */}
+                <div className="arcade-card-top-badges">
+                  <span className="arcade-player-badge arcade-player-badge--gold">
+                    <span className="material-symbols-outlined" style={{ fontSize: "15px" }}>group</span>
+                    2–6 PLAYERS
+                  </span>
+                  <span className="arcade-status-badge" style={{ color: "#facc15", background: "rgba(234, 179, 8, 0.15)", borderColor: "rgba(234, 179, 8, 0.35)" }}>
+                    <span className="badge-dot" style={{ background: "#facc15", width: "6px", height: "6px" }} />
+                    LIVE MATCH
+                  </span>
+                </div>
               </div>
 
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-                  <span style={{ fontSize: "2.4rem" }}>🎯</span>
-                  <div>
-                    <h3 style={{ fontSize: "1.6rem", fontWeight: 900, color: "#f8fafc", margin: 0 }}>Lowdeck</h3>
-                    <span style={{ fontSize: "0.80rem", color: "#facc15", fontWeight: 700, letterSpacing: "0.04em" }}>
-                      Less Points. More Glory.
-                    </span>
+              {/* Card Body */}
+              <div className="arcade-card-body">
+                <div>
+                  <div className="arcade-card-header">
+                    <div className="arcade-card-title-wrap">
+                      <div className="arcade-card-icon-bubble arcade-card-icon-bubble--gold">
+                        <span>🎯</span>
+                      </div>
+                      <div>
+                        <h3 className="arcade-card-title">Lowdeck</h3>
+                        <div className="arcade-card-tagline arcade-card-tagline--gold">
+                          Less Points. More Glory.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="arcade-card-desc">
+                    The ultimate point-shedding and bluffing showdown. Discard pairs & runs, hold 0-point Kings, and call SHOW when hand total ≤ 7!
+                  </p>
+
+                  <div className="arcade-card-specs">
+                    <span className="arcade-spec-chip">⏱️ 5–10 Mins</span>
+                    <span className="arcade-spec-chip">🎴 52 Standard Cards</span>
+                    <span className="arcade-spec-chip">👑 King = 0 Pts</span>
+                    <span className="arcade-spec-chip">💥 +40 Penalty</span>
                   </div>
                 </div>
 
-                <p style={{ fontSize: "0.90rem", color: "#94a3b8", lineHeight: 1.6, margin: "14px 0 18px" }}>
-                  The ultimate point-shedding and bluffing showdown. Discard pairs & runs, hold 0-point Kings, and call SHOW when hand total ≤ 7!
-                </p>
-
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "24px" }}>
-                  <span style={{ fontSize: "0.74rem", background: "rgba(255,255,255,0.06)", padding: "4px 10px", borderRadius: "6px", color: "#cbd5e1" }}>⏱️ 5–10 Mins</span>
-                  <span style={{ fontSize: "0.74rem", background: "rgba(255,255,255,0.06)", padding: "4px 10px", borderRadius: "6px", color: "#cbd5e1" }}>👑 King = 0 pts</span>
-                  <span style={{ fontSize: "0.74rem", background: "rgba(255,255,255,0.06)", padding: "4px 10px", borderRadius: "6px", color: "#cbd5e1" }}>💥 +40 Penalty</span>
-                </div>
-              </div>
-
-              <div>
-                <Link
-                  href="/lowdeck"
-                  className="button button--primary button--full"
-                  style={{
-                    justifyContent: "center",
-                    marginBottom: "10px",
-                    padding: "12px 18px",
-                    background: "linear-gradient(135deg, #eab308 0%, #ca8a04 100%)",
-                    color: "#0f172a",
-                    fontWeight: 900,
-                  }}
-                >
-                  Enter Lowdeck Hub ➔
-                </Link>
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-                  <button
-                    type="button"
-                    onClick={() => handleOpenBots("least_count")}
-                    className="button button--ghost button--sm"
-                    style={{ justifyContent: "center" }}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>smart_toy</span>
-                    Play Bots
-                  </button>
+                {/* Action Buttons */}
+                <div className="arcade-card-actions">
                   <Link
-                    href="/lobby?game=least_count"
-                    className="button button--secondary button--sm"
-                    style={{ justifyContent: "center" }}
+                    href="/lowdeck"
+                    className="arcade-primary-btn arcade-primary-btn--gold"
                   >
-                    <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>add_circle</span>
-                    Create Room
+                    <span>Enter Lowdeck Hub</span>
+                    <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>arrow_forward</span>
                   </Link>
+
+                  <div className="arcade-sub-actions-grid">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenBots("least_count")}
+                      className="button button--ghost arcade-sub-btn"
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: "16px", color: "#facc15" }}>smart_toy</span>
+                      Play Solo Bots
+                    </button>
+                    <Link
+                      href="/lobby?game=least_count"
+                      className="button button--secondary arcade-sub-btn"
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: "16px" }}>add_circle</span>
+                      Create Room
+                    </Link>
+                  </div>
+
+                  <div className="arcade-quick-links">
+                    <Link href="/lowdeck/how-to-play" className="arcade-quick-link arcade-quick-link--gold">
+                      <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>menu_book</span>
+                      How to Play
+                    </Link>
+                    <span style={{ color: "rgba(255,255,255,0.15)", fontSize: "0.8rem" }}>•</span>
+                    <Link href="/lowdeck/cards" className="arcade-quick-link arcade-quick-link--gold">
+                      <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>style</span>
+                      Deck Cards
+                    </Link>
+                    <span style={{ color: "rgba(255,255,255,0.15)", fontSize: "0.8rem" }}>•</span>
+                    <Link href="/lowdeck/rules" className="arcade-quick-link arcade-quick-link--gold">
+                      <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>gavel</span>
+                      Rules
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
