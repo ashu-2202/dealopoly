@@ -27,27 +27,7 @@ export function MarketingNav({ game = "arcade", activeTab }: MarketingNavProps) 
       <header className="marketing-nav">
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <Brand game={game} />
-          {isGameHub && (
-            <Link
-              href="/"
-              className="desktop-only-action"
-              style={{
-                fontSize: "0.74rem",
-                color: "#94a3b8",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "3px",
-                textDecoration: "none",
-                padding: "3px 8px",
-                borderRadius: "6px",
-                background: "rgba(255, 255, 255, 0.05)",
-                border: "1px solid rgba(255, 255, 255, 0.08)",
-              }}
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>arrow_back</span>
-              Arcade Hub
-            </Link>
-          )}
+
         </div>
 
         {/* Desktop Center Links */}
