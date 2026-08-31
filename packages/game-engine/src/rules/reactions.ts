@@ -195,6 +195,13 @@ export function handleReaction(
     const targetSet = targetPlayer.propertySets.find((s) => s.setId === reaction.targetPropertySetId);
 
     if (targetSet) {
+      const stolenCards = [...targetSet.cards];
+      if (targetSet.houseCard) stolenCards.push(targetSet.houseCard);
+      if (targetSet.hotelCard) stolenCards.push(targetSet.hotelCard);
+      resolvedEvent.stolenCards = stolenCards;
+      resolvedEvent.initiatorPlayerId = reaction.initiatorPlayerId;
+      resolvedEvent.targetPlayerId = reaction.targetPlayerId;
+
       const remainingSets = targetPlayer.propertySets.filter((s) => s.setId !== reaction.targetPropertySetId);
       const newSets = [...initiator.propertySets, targetSet];
 
@@ -230,6 +237,10 @@ export function handleReaction(
           stolenCard = setWithCard.cards.find((c) => c.instanceId === reaction.targetCardInstanceId)!;
           setRemainingCards = setWithCard.cards.filter((c) => c.instanceId !== reaction.targetCardInstanceId);
       }
+
+      resolvedEvent.stolenCards = [stolenCard];
+      resolvedEvent.initiatorPlayerId = reaction.initiatorPlayerId;
+      resolvedEvent.targetPlayerId = reaction.targetPlayerId;
 
       let opponentSets = [...targetPlayer.propertySets];
       if (setRemainingCards.length === 0 && !keptHouse && !keptHotel) {
@@ -327,6 +338,11 @@ export function handleReaction(
           targetCard = targetSet.cards.find((c) => c.instanceId === reaction.targetCardInstanceId)!;
           targetRemainingCards = targetSet.cards.filter((c) => c.instanceId !== reaction.targetCardInstanceId);
       }
+
+      resolvedEvent.stolenCards = [targetCard];
+      resolvedEvent.swappedCard = offeredCard;
+      resolvedEvent.initiatorPlayerId = reaction.initiatorPlayerId;
+      resolvedEvent.targetPlayerId = reaction.targetPlayerId;
 
       const newPlayerSets = initiator.propertySets
         .map((s) => {

@@ -104,6 +104,20 @@ export default function GamePage(props: {
     card: CardInstance;
     fromSet: PropertySet;
   } | null>(null);
+  const [moveBuildingTarget, setMoveBuildingTarget] = useState<{
+    buildingType: "house" | "hotel";
+    fromSet: PropertySet;
+  } | null>(null);
+  const [stolenAlert, setStolenAlert] = useState<{
+    id: string;
+    attackerName: string;
+    actionName: string;
+    actionDefId: string;
+    actionCard?: CardInstance;
+    stolenCards: CardInstance[];
+    swappedCard?: CardInstance;
+    type: "deal_breaker" | "sly_deal" | "forced_deal";
+  } | null>(null);
   const [viewingOpponentId, setViewingOpponentId] = useState<string | null>(null);
   const [viewingBankPlayerId, setViewingBankPlayerId] = useState<string | null>(null);
 
@@ -210,8 +224,67 @@ export default function GamePage(props: {
           description: latestNotable.message,
         });
       }
+
+      // Check for targeted steal actions where the local player (actualPlayerId) is the victim
+      for (const evt of newEvents) {
+        if (evt.type === "action_played" || evt.type === "action_resolved") {
+          const actionEvt = evt as unknown as {
+            playerId?: string;
+            initiatorPlayerId?: string;
+            targetPlayerId?: string;
+            actionCard?: CardInstance;
+            stolenCards?: CardInstance[];
+            swappedCard?: CardInstance;
+          };
+
+          const targetPlayerId = actionEvt.targetPlayerId;
+          const attackerId = actionEvt.playerId || actionEvt.initiatorPlayerId;
+
+          // Only trigger alert if the local player is the target/victim and not the initiator
+          if (targetPlayerId === actualPlayerId && attackerId && attackerId !== actualPlayerId) {
+            const defId = actionEvt.actionCard?.defId;
+            if (
+              defId === "action-deal-breaker" ||
+              defId === "action-sly-deal" ||
+              defId === "action-forced-deal" ||
+              defId === "action-force-deal"
+            ) {
+              const isPendingReaction = gameState?.pendingResolution?.type === "reaction_window";
+              // If reaction window is open, the player sees the reaction prompt first.
+              // Pop up the stolen notification if no reaction window is active or after action resolves.
+              if (evt.type === "action_resolved" || !isPendingReaction) {
+                const attackerName = gameState.players[attackerId]?.name || "Opponent";
+                const actionType =
+                  defId === "action-deal-breaker"
+                    ? "deal_breaker"
+                    : defId === "action-sly-deal"
+                    ? "sly_deal"
+                    : "forced_deal";
+
+                const actionName =
+                  actionType === "deal_breaker"
+                    ? "Deal Breaker"
+                    : actionType === "sly_deal"
+                    ? "Sly Deal"
+                    : "Forced Deal";
+
+                setStolenAlert({
+                  id: evt.id,
+                  attackerName,
+                  actionName,
+                  actionDefId: defId,
+                  actionCard: actionEvt.actionCard,
+                  stolenCards: actionEvt.stolenCards || [],
+                  swappedCard: actionEvt.swappedCard,
+                  type: actionType,
+                });
+              }
+            }
+          }
+        }
+      }
     }
-  }, [gameState?.history, isActivityDrawerOpen]);
+  }, [gameState?.history, gameState?.pendingResolution, isActivityDrawerOpen, actualPlayerId, gameState?.players]);
 
   // Auto-dismiss liveReelEvent after 1 second
   useEffect(() => {
@@ -879,8 +952,62 @@ export default function GamePage(props: {
                                 </div>
                               );
                             })}
-                            {set.hasHouse && <span style={{ color: "#66df75", fontWeight: 700 }}>🏠 House (+$3M)</span>}
-                            {set.hasHotel && <span style={{ color: "#ffb77d", fontWeight: 700 }}>🏨 Hotel (+$4M)</span>}
+                            {set.hasHouse && (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  fontSize: "0.75rem",
+                                  gap: "4px",
+                                }}
+                              >
+                                <span style={{ color: "#66df75", fontWeight: 700 }}>🏠 House (+$3M)</span>
+                                {isYourTurn && gameState.turn.phase === "action" && !gameState.pendingResolution && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setMoveBuildingTarget({ buildingType: "house", fromSet: set });
+                                    }}
+                                    className="game-wild-switch-btn"
+                                    title="Move House to another completed set (Free Action)"
+                                    style={{ padding: "2px 6px", fontSize: "0.68rem" }}
+                                  >
+                                    <span>🔄</span>
+                                    <span>Move</span>
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                            {set.hasHotel && (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  fontSize: "0.75rem",
+                                  gap: "4px",
+                                }}
+                              >
+                                <span style={{ color: "#ffb77d", fontWeight: 700 }}>🏨 Hotel (+$4M)</span>
+                                {isYourTurn && gameState.turn.phase === "action" && !gameState.pendingResolution && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setMoveBuildingTarget({ buildingType: "hotel", fromSet: set });
+                                    }}
+                                    className="game-wild-switch-btn"
+                                    title="Move Hotel to another completed set (Free Action)"
+                                    style={{ padding: "2px 6px", fontSize: "0.68rem" }}
+                                  >
+                                    <span>🔄</span>
+                                    <span>Move</span>
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
@@ -2163,6 +2290,242 @@ export default function GamePage(props: {
                 onClick={() => setReorganizeTarget(null)}
               >
                 Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Move Building Modal (House / Hotel Reorganization) */}
+      {moveBuildingTarget && (
+        <div className="join-dialog-overlay" role="dialog" aria-modal="true" style={{ zIndex: 210 }}>
+          <div className="dialog-scrim" onClick={() => setMoveBuildingTarget(null)} />
+          <div className="dialog-panel" style={{ maxWidth: "500px" }}>
+            <div className="texture-overlay" />
+            <div className="sheet-handle" />
+
+            <div className="dialog-header">
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span className="material-symbols-outlined" style={{ color: "#38bdf8", fontSize: "24px" }}>
+                  {moveBuildingTarget.buildingType === "house" ? "home" : "apartment"}
+                </span>
+                <div>
+                  <h2 style={{ color: "#f8fafc", fontSize: "1.15rem", margin: 0, fontWeight: 800 }}>
+                    Move {moveBuildingTarget.buildingType === "house" ? "House" : "Hotel"} (Free Action)
+                  </h2>
+                  <span style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
+                    Moving from {moveBuildingTarget.fromSet.color.toUpperCase()} complete set
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="dialog-body" style={{ padding: "16px 20px" }}>
+              <p style={{ margin: "0 0 14px", color: "var(--on-surface-variant)", fontSize: "0.88rem", lineHeight: 1.4 }}>
+                Select another completed property set to move your {moveBuildingTarget.buildingType} to:
+              </p>
+
+              {(() => {
+                const eligibleSets = (you?.propertySets || []).filter((s) => {
+                  if (s.setId === moveBuildingTarget.fromSet.setId) return false;
+                  if (!s.isComplete) return false;
+                  if (s.color === "railroad" || s.color === "utility") return false;
+                  if (moveBuildingTarget.buildingType === "house") {
+                    return !s.hasHouse;
+                  } else {
+                    return s.hasHouse && !s.hasHotel;
+                  }
+                });
+
+                if (eligibleSets.length === 0) {
+                  return (
+                    <div style={{ padding: "20px", textAlign: "center", background: "rgba(255, 255, 255, 0.04)", borderRadius: "10px", border: "1px dashed rgba(255, 255, 255, 0.15)" }}>
+                      <p style={{ color: "var(--outline)", fontSize: "0.85rem", margin: 0 }}>
+                        {moveBuildingTarget.buildingType === "house"
+                          ? "No other complete sets without a House available."
+                          : "No other complete sets with a House (and without a Hotel) available."}
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "8px" }}>
+                    {eligibleSets.map((destSet) => {
+                      const colorHex = COLOR_CONFIG[destSet.color]?.hex || "#38bdf8";
+                      return (
+                        <button
+                          key={destSet.setId}
+                          type="button"
+                          onClick={() => {
+                            sendCommand({
+                              type: "move_building",
+                              playerId: actualPlayerId,
+                              buildingType: moveBuildingTarget.buildingType,
+                              fromSetId: moveBuildingTarget.fromSet.setId,
+                              toSetId: destSet.setId,
+                            });
+                            setMoveBuildingTarget(null);
+                          }}
+                          style={{
+                            padding: "12px 14px",
+                            borderRadius: "10px",
+                            background: "var(--surface)",
+                            border: `2px solid ${colorHex}`,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            cursor: "pointer",
+                            transition: "all 0.15s ease",
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <span
+                              style={{
+                                width: "14px",
+                                height: "14px",
+                                borderRadius: "50%",
+                                backgroundColor: colorHex,
+                                display: "inline-block",
+                              }}
+                            />
+                            <div style={{ textAlign: "left" }}>
+                              <span style={{ fontWeight: 800, fontSize: "0.9rem", textTransform: "uppercase", color: "#FFFFFF", display: "block" }}>
+                                {destSet.color} Set
+                              </span>
+                              <span style={{ fontSize: "0.72rem", color: "var(--muted)" }}>
+                                {destSet.cards.length}/{destSet.setSize} cards • {destSet.hasHouse ? "Has House" : "No House"}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="button button--primary" style={{ padding: "6px 14px", fontSize: "0.8rem", pointerEvents: "none" }}>
+                            Move Here ➔
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+
+            <div className="dialog-footer" style={{ padding: "12px 20px" }}>
+              <button
+                type="button"
+                className="button button--secondary button--full"
+                onClick={() => setMoveBuildingTarget(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Targeted Steal Notification Modal (Victim Alert) */}
+      {stolenAlert && (
+        <div className="join-dialog-overlay" role="dialog" aria-modal="true" style={{ zIndex: 220 }}>
+          <div className="dialog-scrim" onClick={() => setStolenAlert(null)} />
+          <div className="dialog-panel" style={{ maxWidth: "560px", border: "2px solid #ef4444", boxShadow: "0 0 30px rgba(239, 68, 68, 0.45)" }}>
+            <div className="texture-overlay" />
+            <div className="sheet-handle" />
+
+            <div className="dialog-header" style={{ borderBottom: "1px solid rgba(239, 68, 68, 0.2)", paddingBottom: "12px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span className="material-symbols-outlined" style={{ color: "#ef4444", fontSize: "28px" }}>
+                  {stolenAlert.type === "deal_breaker" ? "gavel" : stolenAlert.type === "sly_deal" ? "visibility" : "swap_horiz"}
+                </span>
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ background: "rgba(239, 68, 68, 0.2)", color: "#ef4444", fontSize: "0.68rem", fontWeight: 800, padding: "2px 8px", borderRadius: "4px", textTransform: "uppercase" }}>
+                      Action Played on You
+                    </span>
+                  </div>
+                  <h2 style={{ color: "#f87171", fontSize: "1.2rem", margin: "4px 0 0", fontWeight: 800 }}>
+                    {stolenAlert.type === "deal_breaker"
+                      ? "⚡ Complete Property Set Stolen!"
+                      : stolenAlert.type === "sly_deal"
+                      ? "🕵️ Property Card Stolen!"
+                      : "🔄 Forced Deal Property Swap!"}
+                  </h2>
+                </div>
+              </div>
+            </div>
+
+            <div className="dialog-body" style={{ textAlign: "center", padding: "16px 20px" }}>
+              <p style={{ margin: "0 0 16px", color: "var(--on-surface-variant)", fontSize: "0.95rem", lineHeight: 1.5 }}>
+                <strong style={{ color: "#FFFFFF" }}>{stolenAlert.attackerName}</strong> played{" "}
+                <strong style={{ color: "#ef4444" }}>{stolenAlert.actionName}</strong> targeting your properties!
+              </p>
+
+              {/* Action Card & Stolen Cards Showcase */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px", background: "rgba(0, 0, 0, 0.3)", padding: "16px", borderRadius: "12px", border: "1px solid rgba(255, 255, 255, 0.08)" }}>
+                {stolenAlert.actionCard && (
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", borderBottom: "1px dashed rgba(255, 255, 255, 0.12)", paddingBottom: "14px" }}>
+                    <div style={{ textAlign: "center" }}>
+                      <span style={{ fontSize: "0.72rem", color: "var(--muted)", textTransform: "uppercase", fontWeight: 700, display: "block", marginBottom: "6px" }}>
+                        Action Card Used:
+                      </span>
+                      <div style={{ display: "inline-block", transform: "scale(0.85)", transformOrigin: "top center" }}>
+                        <Card card={resolveCardDef(stolenAlert.actionCard)} size="sm" isInteractive={false} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <span style={{ fontSize: "0.78rem", color: "#f87171", textTransform: "uppercase", fontWeight: 800, display: "block", marginBottom: "10px" }}>
+                    {stolenAlert.type === "deal_breaker"
+                      ? `Cards Stolen From You (${stolenAlert.stolenCards.length}):`
+                      : stolenAlert.type === "sly_deal"
+                      ? "Card Stolen From You:"
+                      : "Card Taken From You:"}
+                  </span>
+
+                  {stolenAlert.stolenCards.length > 0 ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: "8px",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      {stolenAlert.stolenCards.map((c) => (
+                        <div key={c.instanceId} style={{ transform: "scale(0.85)", transformOrigin: "center" }}>
+                          <Card card={resolveCardDef(c)} size="sm" isInteractive={false} />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p style={{ color: "var(--muted)", fontSize: "0.85rem", margin: 0 }}>Property cards transferred.</p>
+                  )}
+                </div>
+
+                {stolenAlert.swappedCard && (
+                  <div style={{ borderTop: "1px dashed rgba(255, 255, 255, 0.12)", paddingTop: "14px" }}>
+                    <span style={{ fontSize: "0.78rem", color: "#34d399", textTransform: "uppercase", fontWeight: 800, display: "block", marginBottom: "10px" }}>
+                      Card Given to You in Return:
+                    </span>
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                      <div style={{ transform: "scale(0.85)", transformOrigin: "center" }}>
+                        <Card card={resolveCardDef(stolenAlert.swappedCard)} size="sm" isInteractive={false} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="dialog-footer" style={{ justifyContent: "center", padding: "16px 20px" }}>
+              <button
+                type="button"
+                className="button button--primary"
+                style={{ width: "100%", maxWidth: "240px", background: "#ef4444", borderColor: "#dc2626" }}
+                onClick={() => setStolenAlert(null)}
+              >
+                Understood / Dismiss
               </button>
             </div>
           </div>

@@ -272,6 +272,11 @@ export function playActionCard(
         throw new GameEngineError("SET_IS_NOT_COMPLETE", "Deal Breaker can only steal complete property sets");
       }
 
+      const stolenCards = [...targetSet.cards];
+      if (targetSet.houseCard) stolenCards.push(targetSet.houseCard);
+      if (targetSet.hotelCard) stolenCards.push(targetSet.hotelCard);
+      baseEvent.stolenCards = stolenCards;
+
       // Check if target has Just Say No
       const hasJSN = targetOpponent.hand.some((c) => c.defId === "action-just-say-no");
       if (hasJSN) {
@@ -481,6 +486,41 @@ export function playActionCard(
         throw new GameEngineError("BUILDING_ON_COMPLETE_SET", "Cannot trade for a house or hotel that is part of a complete property set");
       }
 
+      let offeredCard: CardInstance;
+      let offeredRemainingCards = offeredSet.cards;
+      let keptOfferedHouse = offeredSet.houseCard;
+      let keptOfferedHotel = offeredSet.hotelCard;
+        
+      if (offeredSet.houseCard?.instanceId === offeredCardInstanceId) {
+          offeredCard = offeredSet.houseCard!;
+          keptOfferedHouse = undefined;
+      } else if (offeredSet.hotelCard?.instanceId === offeredCardInstanceId) {
+          offeredCard = offeredSet.hotelCard!;
+          keptOfferedHotel = undefined;
+      } else {
+          offeredCard = offeredSet.cards.find((c) => c.instanceId === offeredCardInstanceId)!;
+          offeredRemainingCards = offeredSet.cards.filter((c) => c.instanceId !== offeredCardInstanceId);
+      }
+
+      let targetCard: CardInstance;
+      let targetRemainingCards = targetSet.cards;
+      let keptTargetHouse = targetSet.houseCard;
+      let keptTargetHotel = targetSet.hotelCard;
+        
+      if (targetSet.houseCard?.instanceId === targetCardInstanceId) {
+          targetCard = targetSet.houseCard!;
+          keptTargetHouse = undefined;
+      } else if (targetSet.hotelCard?.instanceId === targetCardInstanceId) {
+          targetCard = targetSet.hotelCard!;
+          keptTargetHotel = undefined;
+      } else {
+          targetCard = targetSet.cards.find((c) => c.instanceId === targetCardInstanceId)!;
+          targetRemainingCards = targetSet.cards.filter((c) => c.instanceId !== targetCardInstanceId);
+      }
+
+      baseEvent.stolenCards = [targetCard];
+      baseEvent.swappedCard = offeredCard;
+
       const hasJSN = targetOpponent.hand.some((c) => c.defId === "action-just-say-no");
       if (hasJSN) {
         nextState.pendingResolution = {
@@ -496,38 +536,6 @@ export function playActionCard(
         };
       } else {
         // Perform Swap
-        let offeredCard: CardInstance;
-        let offeredRemainingCards = offeredSet.cards;
-        let keptOfferedHouse = offeredSet.houseCard;
-        let keptOfferedHotel = offeredSet.hotelCard;
-        
-        if (offeredSet.houseCard?.instanceId === offeredCardInstanceId) {
-            offeredCard = offeredSet.houseCard!;
-            keptOfferedHouse = undefined;
-        } else if (offeredSet.hotelCard?.instanceId === offeredCardInstanceId) {
-            offeredCard = offeredSet.hotelCard!;
-            keptOfferedHotel = undefined;
-        } else {
-            offeredCard = offeredSet.cards.find((c) => c.instanceId === offeredCardInstanceId)!;
-            offeredRemainingCards = offeredSet.cards.filter((c) => c.instanceId !== offeredCardInstanceId);
-        }
-
-        let targetCard: CardInstance;
-        let targetRemainingCards = targetSet.cards;
-        let keptTargetHouse = targetSet.houseCard;
-        let keptTargetHotel = targetSet.hotelCard;
-        
-        if (targetSet.houseCard?.instanceId === targetCardInstanceId) {
-            targetCard = targetSet.houseCard!;
-            keptTargetHouse = undefined;
-        } else if (targetSet.hotelCard?.instanceId === targetCardInstanceId) {
-            targetCard = targetSet.hotelCard!;
-            keptTargetHotel = undefined;
-        } else {
-            targetCard = targetSet.cards.find((c) => c.instanceId === targetCardInstanceId)!;
-            targetRemainingCards = targetSet.cards.filter((c) => c.instanceId !== targetCardInstanceId);
-        }
-
         // Replace in sets
         const newPlayerSets = player.propertySets
           .map((s) => {

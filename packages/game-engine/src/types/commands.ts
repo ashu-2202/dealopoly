@@ -6,6 +6,7 @@ export type CommandType =
   | "bank_card"
   | "play_property"
   | "reorganize_wild"
+  | "move_building"
   | "play_action"
   | "play_rent"
   | "submit_reaction"
@@ -44,6 +45,13 @@ export interface ReorganizeWildCommand extends BaseCommand {
   fromSetId: string;
   toSetId?: string; // omit if creating a new set
   newColor: CardColor;
+}
+
+export interface MoveBuildingCommand extends BaseCommand {
+  type: "move_building";
+  buildingType: "house" | "hotel";
+  fromSetId: string;
+  toSetId: string;
 }
 
 export interface PlayActionCommand extends BaseCommand {
@@ -89,6 +97,7 @@ export type GameCommand =
   | BankCardCommand
   | PlayPropertyCommand
   | ReorganizeWildCommand
+  | MoveBuildingCommand
   | PlayActionCommand
   | PlayRentCommand
   | SubmitReactionCommand

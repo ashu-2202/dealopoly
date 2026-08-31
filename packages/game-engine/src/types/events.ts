@@ -8,6 +8,7 @@ export type GameEventType =
   | "card_banked"
   | "property_played"
   | "wild_reorganized"
+  | "building_moved"
   | "action_played"
   | "rent_charged"
   | "reaction_prompted"
@@ -71,6 +72,17 @@ export interface WildReorganizedEvent extends BaseGameEvent {
   newColor: CardColor;
 }
 
+export interface BuildingMovedEvent extends BaseGameEvent {
+  type: "building_moved";
+  playerId: string;
+  buildingType: "house" | "hotel";
+  card: CardInstance;
+  fromSetId: string;
+  toSetId: string;
+  fromColor: CardColor;
+  toColor: CardColor;
+}
+
 export interface ActionPlayedEvent extends BaseGameEvent {
   type: "action_played";
   playerId: string;
@@ -78,6 +90,8 @@ export interface ActionPlayedEvent extends BaseGameEvent {
   targetPlayerId?: string;
   targetSetId?: string;
   targetCardId?: string;
+  stolenCards?: CardInstance[];
+  swappedCard?: CardInstance;
 }
 
 export interface RentChargedEvent extends BaseGameEvent {
@@ -112,6 +126,10 @@ export interface ActionCancelledEvent extends BaseGameEvent {
 export interface ActionResolvedEvent extends BaseGameEvent {
   type: "action_resolved";
   actionCard: CardInstance;
+  targetPlayerId?: string;
+  initiatorPlayerId?: string;
+  stolenCards?: CardInstance[];
+  swappedCard?: CardInstance;
 }
 
 export interface PaymentRequestedEvent extends BaseGameEvent {
@@ -156,6 +174,7 @@ export type GameEvent =
   | CardBankedEvent
   | PropertyPlayedEvent
   | WildReorganizedEvent
+  | BuildingMovedEvent
   | ActionPlayedEvent
   | RentChargedEvent
   | ReactionPromptedEvent

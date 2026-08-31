@@ -4,7 +4,7 @@ import type { GameEvent } from "./types/events.js";
 import { GameEngineError } from "./types/errors.js";
 
 import { drawCardsForActivePlayer } from "./rules/draw.js";
-import { playPropertyCard, reorganizeWildCard } from "./rules/property.js";
+import { playPropertyCard, reorganizeWildCard, moveBuilding } from "./rules/property.js";
 import { bankCard, playActionCard } from "./rules/actions.js";
 import { playRentCard } from "./rules/rent.js";
 import { handleReaction } from "./rules/reactions.js";
@@ -114,6 +114,20 @@ export function applyCommand(state: GameState, command: GameCommand): ApplyComma
         command.fromSetId,
         command.toSetId,
         command.newColor,
+      );
+      break;
+    }
+
+    case "move_building": {
+      if (state.turn.phase === "draw") {
+        throw new GameEngineError("MUST_DRAW_FIRST", "Must draw cards before taking actions");
+      }
+      result = moveBuilding(
+        state,
+        command.playerId,
+        command.buildingType,
+        command.fromSetId,
+        command.toSetId,
       );
       break;
     }

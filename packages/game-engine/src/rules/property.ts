@@ -2,7 +2,7 @@ import type { CardColor } from "@dealopoly/shared";
 import { COLOR_CONFIG } from "@dealopoly/shared";
 import type { GameState, PropertySet, CardInstance } from "../types/state.js";
 import { GameEngineError } from "../types/errors.js";
-import type { PropertyPlayedEvent, WildReorganizedEvent } from "../types/events.js";
+import type { PropertyPlayedEvent, WildReorganizedEvent, BuildingMovedEvent } from "../types/events.js";
 
 export function createNewPropertySet(color: CardColor, firstCard: CardInstance): PropertySet {
   const config = COLOR_CONFIG[color];
@@ -307,6 +307,141 @@ export function reorganizeWildCard(
     toSetId: targetSet.setId,
     newColor,
     message: `${player.name} shifted wild card ${card.name} into ${newColor} set.`,
+  };
+
+  const nextState: GameState = {
+    ...state,
+    players: {
+      ...state.players,
+      [playerId]: {
+        ...player,
+        propertySets: updatedSets,
+      },
+    },
+    history: [...state.history, event],
+  };
+
+  return { nextState, events: [event] };
+}
+
+export function moveBuilding(
+  state: GameState,
+  playerId: string,
+  buildingType: "house" | "hotel",
+  fromSetId: string,
+  toSetId: string,
+): { nextState: GameState; events: BuildingMovedEvent[] } {
+  const player = state.players[playerId];
+  if (!player) {
+    throw new GameEngineError("NOT_YOUR_TURN", "Player not found");
+  }
+
+  if (state.turn.activePlayerId !== playerId) {
+    throw new GameEngineError("NOT_YOUR_TURN", "Can only move buildings during your own turn");
+  }
+
+  if (state.turn.phase !== "action") {
+    throw new GameEngineError("MUST_DRAW_FIRST", "Must draw cards before moving buildings");
+  }
+
+  if (state.pendingResolution) {
+    throw new GameEngineError("MUST_RESOLVE_PENDING_ACTION", "Cannot move buildings while an action/payment is pending resolution");
+  }
+
+  if (fromSetId === toSetId) {
+    throw new GameEngineError("INVALID_ACTION_TARGET", "Source and destination property sets must be different");
+  }
+
+  const fromSetIndex = player.propertySets.findIndex((s) => s.setId === fromSetId);
+  if (fromSetIndex === -1) {
+    throw new GameEngineError("PROPERTY_SET_NOT_FOUND", "Source property set not found");
+  }
+  const fromSet = player.propertySets[fromSetIndex]!;
+
+  const toSetIndex = player.propertySets.findIndex((s) => s.setId === toSetId);
+  if (toSetIndex === -1) {
+    throw new GameEngineError("PROPERTY_SET_NOT_FOUND", "Destination property set not found");
+  }
+  const toSet = player.propertySets[toSetIndex]!;
+
+  if (toSet.color === "railroad" || toSet.color === "utility") {
+    throw new GameEngineError("CANNOT_ADD_BUILDING_TO_SPECIAL_SET", "Cannot add buildings to Railroad or Utility sets");
+  }
+
+  if (!toSet.isComplete) {
+    throw new GameEngineError("HOUSE_REQUIRES_FULL_SET", "Destination property set must be a complete set");
+  }
+
+  let movedCard: CardInstance;
+  let updatedFromSet: PropertySet;
+  let updatedToSet: PropertySet;
+
+  if (buildingType === "house") {
+    if (!fromSet.hasHouse || !fromSet.houseCard) {
+      throw new GameEngineError("CARD_NOT_IN_SET", "Source set does not have a House to move");
+    }
+    if (fromSet.hasHotel) {
+      throw new GameEngineError(
+        "CANNOT_BREAK_SET_WITH_BUILDINGS",
+        "Cannot move House while a Hotel is present on the set. A Hotel strictly requires a House.",
+      );
+    }
+    if (toSet.hasHouse) {
+      throw new GameEngineError("HOUSE_REQUIRES_FULL_SET", "Destination property set already has a House");
+    }
+
+    movedCard = fromSet.houseCard;
+    updatedFromSet = {
+      ...fromSet,
+      hasHouse: false,
+      houseCard: undefined,
+    };
+    updatedToSet = {
+      ...toSet,
+      hasHouse: true,
+      houseCard: movedCard,
+    };
+  } else {
+    // Hotel
+    if (!fromSet.hasHotel || !fromSet.hotelCard) {
+      throw new GameEngineError("CARD_NOT_IN_SET", "Source set does not have a Hotel to move");
+    }
+    if (!toSet.hasHouse) {
+      throw new GameEngineError("HOTEL_REQUIRES_HOUSE", "Destination property set must have a House before a Hotel can be added");
+    }
+    if (toSet.hasHotel) {
+      throw new GameEngineError("HOTEL_REQUIRES_HOUSE", "Destination property set already has a Hotel");
+    }
+
+    movedCard = fromSet.hotelCard;
+    updatedFromSet = {
+      ...fromSet,
+      hasHotel: false,
+      hotelCard: undefined,
+    };
+    updatedToSet = {
+      ...toSet,
+      hasHotel: true,
+      hotelCard: movedCard,
+    };
+  }
+
+  const updatedSets = [...player.propertySets];
+  updatedSets[fromSetIndex] = updatedFromSet;
+  updatedSets[toSetIndex] = updatedToSet;
+
+  const event: BuildingMovedEvent = {
+    id: `event-${Date.now()}-move-building`,
+    timestamp: Date.now(),
+    type: "building_moved",
+    playerId,
+    buildingType,
+    card: movedCard,
+    fromSetId,
+    toSetId,
+    fromColor: fromSet.color,
+    toColor: toSet.color,
+    message: `${player.name} moved ${buildingType === "house" ? "House" : "Hotel"} from ${fromSet.color} set to ${toSet.color} set.`,
   };
 
   const nextState: GameState = {
