@@ -1,10 +1,15 @@
-import type { GameState, MaskedGameState } from "./types/state.js";
-import type { GameCommand } from "./types/commands.js";
-import type { GameEvent } from "./types/events.js";
-import { createGame, applyCommand, type ApplyCommandResult } from "./engine.js";
-import type { CreateGameOptions } from "./rules/setup.js";
-import { getMaskedView } from "./masking.js";
-import { BotController } from "./bot.js";
+import {
+  type GameState,
+  type MaskedGameState,
+  type GameCommand,
+  type GameEvent,
+  type CreateGameOptions,
+  type ApplyCommandResult,
+  createGame,
+  applyCommand,
+  getMaskedView,
+  BotController,
+} from "./games/monodeal/index.js";
 
 /**
  * Generic Game Engine Interface
