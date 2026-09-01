@@ -196,6 +196,7 @@ describe("Least Count (Tailored Rules) Game Engine", () => {
         ],
       });
       state.activePlayerId = "bot1";
+      state.turnPhase = "discard";
 
       // Give bot a King (0 pts), a 2 (2 pts), and a Queen (12 pts)
       state.players["bot1"]!.hand = [

@@ -120,6 +120,7 @@ export default function GamePage(props: {
   } | null>(null);
   const [viewingOpponentId, setViewingOpponentId] = useState<string | null>(null);
   const [viewingBankPlayerId, setViewingBankPlayerId] = useState<string | null>(null);
+  const [reactionRemainingSeconds, setReactionRemainingSeconds] = useState<number | null>(null);
 
   // Card Draw Flight Animation State
   const [flyingCards, setFlyingCards] = useState<
@@ -159,6 +160,22 @@ export default function GamePage(props: {
   const you = gameState?.players?.[playerId] || (gameState?.players ? Object.values(gameState.players).find((p) => !p.isBot) || Object.values(gameState.players)[0] : undefined);
   const actualPlayerId = you?.id || playerId;
   const isYourTurn = gameState?.turn?.activePlayerId === actualPlayerId;
+
+  // Live countdown timer for reaction windows
+  useEffect(() => {
+    if (gameState?.pendingResolution?.type === "reaction_window") {
+      const deadline = (gameState.pendingResolution as any).deadline ?? (Date.now() + 7000);
+      const updateTimer = () => {
+        const remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+        setReactionRemainingSeconds(remaining);
+      };
+      updateTimer();
+      const interval = setInterval(updateTimer, 200);
+      return () => clearInterval(interval);
+    } else {
+      setReactionRemainingSeconds(null);
+    }
+  }, [gameState?.pendingResolution]);
 
   useEffect(() => {
     if (!gameState?.history || gameState.history.length === 0) return;
@@ -524,7 +541,7 @@ export default function GamePage(props: {
     setSelectedCard(null);
   };
 
-  const handleReaction = (action: "just_say_no" | "pass", jsnCardId?: string) => {
+  const handleReaction = (action: "just_say_no" | "pass" | "extend_timer", jsnCardId?: string) => {
     sendCommand({
       type: "submit_reaction",
       playerId: actualPlayerId,
@@ -806,7 +823,7 @@ export default function GamePage(props: {
                   ? gameState.pendingResolution.type === "payment"
                     ? `⏳ Waiting for ${gameState.players[gameState.pendingResolution.debtorPlayerId]?.name || "player"} to pay $${gameState.pendingResolution.amountDue}M rent...`
                     : gameState.pendingResolution.type === "reaction_window"
-                      ? `⏳ Waiting for ${gameState.players[gameState.pendingResolution.waitingForPlayerId]?.name || "player"} to respond...`
+                      ? `⏳ Waiting for ${gameState.players[gameState.pendingResolution.waitingForPlayerId]?.name || "player"} to respond${reactionRemainingSeconds !== null ? ` (${reactionRemainingSeconds}s)` : ""}...`
                       : `⏳ Waiting for ${gameState.players[gameState.pendingResolution.playerId]?.name || "player"} to discard cards...`
                   : isYourTurn
                     ? gameState.turn.phase === "draw"
@@ -1620,7 +1637,7 @@ export default function GamePage(props: {
             <div className="texture-overlay" />
             <div className="sheet-handle" />
 
-            <div className="dialog-header">
+            <div className="dialog-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <span className="material-symbols-outlined" style={{ color: "#ef4444", fontSize: "24px" }}>
                   warning
@@ -1628,6 +1645,54 @@ export default function GamePage(props: {
                 <h2 style={{ color: "#ef4444", fontSize: "1.15rem", margin: 0 }}>
                   {pending.justSayNoChainCount > 0 ? "Action Blocked!" : "Action Targeted You!"}
                 </h2>
+              </div>
+
+              {/* Timer Badge + +5s Extension Chip */}
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    background: "rgba(239, 68, 68, 0.15)",
+                    border: "1px solid rgba(239, 68, 68, 0.3)",
+                    color: "#f87171",
+                    padding: "3px 8px",
+                    borderRadius: "12px",
+                    fontSize: "0.78rem",
+                    fontWeight: 700,
+                  }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: "14px" }}>
+                    timer
+                  </span>
+                  {reactionRemainingSeconds !== null ? `${reactionRemainingSeconds}s` : "7s"}
+                </span>
+
+                {/* +5s Extension Chip */}
+                {(pending as any).canExtend !== false && (
+                  <button
+                    type="button"
+                    onClick={() => handleReaction("extend_timer")}
+                    style={{
+                      background: "rgba(59, 130, 246, 0.2)",
+                      border: "1px solid rgba(59, 130, 246, 0.4)",
+                      color: "#60a5fa",
+                      padding: "3px 8px",
+                      borderRadius: "12px",
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "2px",
+                      transition: "all 0.15s ease",
+                    }}
+                    title="Add +5 seconds to decision time"
+                  >
+                    +5s
+                  </button>
+                )}
               </div>
             </div>
 
@@ -1639,11 +1704,11 @@ export default function GamePage(props: {
               </p>
 
               {you?.hand?.some((c) => c.defId === "action-just-say-no") ? (
-                <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "12px" }}>
+                <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginTop: "16px" }}>
                   <button
                     type="button"
                     className="button button--primary"
-                    style={{ background: "#10b981", borderColor: "#10b981" }}
+                    style={{ background: "#10b981", borderColor: "#10b981", fontWeight: 700 }}
                     onClick={() => {
                       const jsn = you.hand?.find((c) => c.defId === "action-just-say-no");
                       handleReaction("just_say_no", jsn?.instanceId);
@@ -1656,20 +1721,18 @@ export default function GamePage(props: {
                     className="button button--secondary"
                     onClick={() => handleReaction("pass")}
                   >
-                    Pass (Accept Action)
+                    Pass (Accept)
                   </button>
                 </div>
               ) : (
-                <div style={{ marginTop: "12px" }}>
-                  <p style={{ fontSize: "0.8rem", color: "var(--outline)", marginBottom: "12px" }}>
-                    (You don&apos;t have a Just Say No card)
-                  </p>
+                <div style={{ marginTop: "16px" }}>
                   <button
                     type="button"
                     className="button button--secondary button--full"
+                    style={{ fontWeight: 600 }}
                     onClick={() => handleReaction("pass")}
                   >
-                    Continue
+                    Accept Action
                   </button>
                 </div>
               )}

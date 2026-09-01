@@ -51,7 +51,7 @@ describe("Rent and Debt Payments", () => {
     game.players["p2"]!.bank = [bobMoney10m];
     game.players["p2"]!.hand = []; // No JSN
 
-    // Alice charges dark blue rent
+    // Alice charges dark blue rent -> enters reaction window
     const res1 = applyCommand(game, {
       type: "play_rent",
       playerId: "p1",
@@ -59,14 +59,23 @@ describe("Rent and Debt Payments", () => {
       chosenColor: "dark-blue",
     });
 
-    expect(res1.nextState.pendingResolution?.type).toBe("payment");
-    if (res1.nextState.pendingResolution?.type === "payment") {
-      expect(res1.nextState.pendingResolution.amountDue).toBe(8);
-      expect(res1.nextState.pendingResolution.debtorPlayerId).toBe("p2");
+    expect(res1.nextState.pendingResolution?.type).toBe("reaction_window");
+
+    // Bob passes reaction -> advances to payment
+    const res1Pass = applyCommand(res1.nextState, {
+      type: "submit_reaction",
+      playerId: "p2",
+      action: "pass",
+    });
+
+    expect(res1Pass.nextState.pendingResolution?.type).toBe("payment");
+    if (res1Pass.nextState.pendingResolution?.type === "payment") {
+      expect(res1Pass.nextState.pendingResolution.amountDue).toBe(8);
+      expect(res1Pass.nextState.pendingResolution.debtorPlayerId).toBe("p2");
     }
 
     // Bob pays with his $10M card (no change given)
-    const res2 = applyCommand(res1.nextState, {
+    const res2 = applyCommand(res1Pass.nextState, {
       type: "submit_payment",
       playerId: "p2",
       paymentCardInstanceIds: [bobMoney10m.instanceId],
@@ -109,7 +118,7 @@ describe("Rent and Debt Payments", () => {
     game.players["p2"]!.bank = [bobMoney2m];
     game.players["p2"]!.hand = [];
 
-    // Alice plays Debt Collector ($5M due)
+    // Alice plays Debt Collector ($5M due) -> enters reaction window
     const res1 = applyCommand(game, {
       type: "play_action",
       playerId: "p1",
@@ -117,8 +126,17 @@ describe("Rent and Debt Payments", () => {
       targetPlayerId: "p2",
     });
 
+    expect(res1.nextState.pendingResolution?.type).toBe("reaction_window");
+
+    // Bob passes reaction -> advances to payment
+    const res1Pass = applyCommand(res1.nextState, {
+      type: "submit_reaction",
+      playerId: "p2",
+      action: "pass",
+    });
+
     // Bob submits all his table assets ($2M)
-    const res2 = applyCommand(res1.nextState, {
+    const res2 = applyCommand(res1Pass.nextState, {
       type: "submit_payment",
       playerId: "p2",
       paymentCardInstanceIds: [bobMoney2m.instanceId],
@@ -212,7 +230,9 @@ describe("Rent and Debt Payments", () => {
 
     expect(botAction).not.toBeNull();
     expect(botAction?.type).toBe("submit_payment");
-    expect(botAction?.paymentCardInstanceIds).toEqual([]);
+    if (botAction?.type === "submit_payment") {
+      expect(botAction.paymentCardInstanceIds).toEqual([]);
+    }
 
     const res = applyCommand(game, botAction!);
     expect(res.nextState.pendingResolution).toBeNull();

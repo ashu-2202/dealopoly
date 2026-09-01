@@ -176,4 +176,124 @@ describe("Just Say No Reaction Windows and Counter Chains", () => {
     expect(res4.nextState.players["p1"]!.propertySets.length).toBe(1);
     expect(res4.nextState.players["p1"]!.propertySets[0]?.color).toBe("dark-blue");
   });
+
+  it("should open universal reaction window even when targeted player holds NO Just Say No", () => {
+    const game = createGame({
+      seed: 300,
+      players: [
+        { id: "p1", name: "Alice" },
+        { id: "p2", name: "Bob" },
+      ],
+    });
+
+    const slyDeal: CardInstance = {
+      instanceId: "alice-sly",
+      defId: "action-sly-deal",
+      name: "Sly Deal",
+      type: "action",
+      value: 3,
+    };
+    const bobProp: CardInstance = {
+      instanceId: "bob-prop-1",
+      defId: "prop-red-1",
+      name: "Red Prop",
+      type: "property",
+      primaryColor: "red",
+      value: 3,
+    };
+
+    game.players["p2"]!.propertySets = [
+      {
+        setId: "bob-set-red",
+        color: "red",
+        cards: [bobProp],
+        hasHouse: false,
+        hasHotel: false,
+        isComplete: false,
+        setSize: 3,
+        rentTiers: [2, 3, 6],
+      },
+    ];
+    game.players["p2"]!.hand = []; // Bob has NO cards in hand
+    game.players["p1"]!.hand = [slyDeal];
+    game.turn.phase = "action";
+
+    // Alice plays Sly Deal
+    const res1 = applyCommand(game, {
+      type: "play_action",
+      playerId: "p1",
+      cardInstanceId: slyDeal.instanceId,
+      targetPlayerId: "p2",
+      targetCardInstanceId: bobProp.instanceId,
+    });
+
+    // Reaction window opens universally
+    expect(res1.nextState.pendingResolution?.type).toBe("reaction_window");
+    if (res1.nextState.pendingResolution?.type === "reaction_window") {
+      expect(res1.nextState.pendingResolution.waitingForPlayerId).toBe("p2");
+      expect(res1.nextState.pendingResolution.canExtend).toBe(true);
+      expect(res1.nextState.pendingResolution.deadline).toBeGreaterThan(Date.now());
+    }
+
+    // Bob passes (no JSN)
+    const res2 = applyCommand(res1.nextState, {
+      type: "submit_reaction",
+      playerId: "p2",
+      action: "pass",
+    });
+
+    expect(res2.nextState.pendingResolution).toBeNull();
+    expect(res2.nextState.players["p1"]!.propertySets[0]?.cards[0]?.instanceId).toBe(bobProp.instanceId);
+  });
+
+  it("should allow extending reaction timer by +5s only once per window", () => {
+    const game = createGame({
+      seed: 300,
+      players: [
+        { id: "p1", name: "Alice" },
+        { id: "p2", name: "Bob" },
+      ],
+    });
+
+    const debtCollector: CardInstance = {
+      instanceId: "alice-debt",
+      defId: "action-debt-collector",
+      name: "Debt Collector",
+      type: "action",
+      value: 3,
+    };
+
+    game.players["p1"]!.hand = [debtCollector];
+    game.players["p2"]!.hand = [];
+    game.turn.phase = "action";
+
+    const res1 = applyCommand(game, {
+      type: "play_action",
+      playerId: "p1",
+      cardInstanceId: debtCollector.instanceId,
+      targetPlayerId: "p2",
+    });
+
+    const initialDeadline = (res1.nextState.pendingResolution as any).deadline;
+
+    // Bob requests +5s extension
+    const res2 = applyCommand(res1.nextState, {
+      type: "submit_reaction",
+      playerId: "p2",
+      action: "extend_timer",
+    });
+
+    const extendedDeadline = (res2.nextState.pendingResolution as any).deadline;
+    expect(extendedDeadline).toBe(initialDeadline + 5000);
+    expect((res2.nextState.pendingResolution as any).canExtend).toBe(false);
+
+    // Attempting a second extension in the same window should throw
+    expect(() =>
+      applyCommand(res2.nextState, {
+        type: "submit_reaction",
+        playerId: "p2",
+        action: "extend_timer",
+      }),
+    ).toThrowError(/already used/i);
+  });
 });

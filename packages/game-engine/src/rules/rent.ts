@@ -140,37 +140,22 @@ export function playRentCard(
   const firstTarget = targetOpponents[0]!;
   const remainingTargets = targetOpponents.slice(1);
 
-  // Check if first target has Just Say No in hand
-  const targetPlayer = state.players[firstTarget];
-  const targetHasJSN = targetPlayer?.hand.some((c) => c.defId === "action-just-say-no");
-
-  let pendingResolution = state.pendingResolution;
-
-  if (targetHasJSN) {
-    // Open reaction window for target
-    pendingResolution = {
-      type: "reaction_window",
-      initiatorPlayerId: playerId,
-      targetPlayerId: firstTarget,
-      actionCard: rentCard,
-      rentAmount,
-      doubleRent: isDoubled,
-      waitingForPlayerId: firstTarget,
-      justSayNoChainCount: 0,
-      isCancelled: false,
-      remainingTargets,
-    };
-  } else {
-    // Direct payment request
-    pendingResolution = {
-      type: "payment",
-      creditorPlayerId: playerId,
-      debtorPlayerId: firstTarget,
-      amountDue: rentAmount,
-      remainingDebtors: remainingTargets,
-      reason: `Rent for ${chosenColor} properties ($${rentAmount}M)`,
-    };
-  }
+  // Universally open reaction window for first target
+  const pendingResolution: GameState["pendingResolution"] = {
+    type: "reaction_window",
+    initiatorPlayerId: playerId,
+    targetPlayerId: firstTarget,
+    actionCard: rentCard,
+    rentAmount,
+    doubleRent: isDoubled,
+    waitingForPlayerId: firstTarget,
+    justSayNoChainCount: 0,
+    isCancelled: false,
+    remainingTargets,
+    deadline: Date.now() + 7000,
+    durationMs: 7000,
+    canExtend: true,
+  };
 
   const nextState: GameState = {
     ...state,

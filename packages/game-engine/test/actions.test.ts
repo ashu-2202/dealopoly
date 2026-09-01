@@ -295,13 +295,22 @@ describe("Action Cards & Banking", () => {
     game.players["p1"]!.hand = [forcedDeal];
     game.turn.phase = "action";
 
-    const { nextState } = applyCommand(game, {
+    const { nextState: pendingState } = applyCommand(game, {
       type: "play_action",
       playerId: "p1",
       cardInstanceId: forcedDeal.instanceId,
       targetPlayerId: "p2",
       targetCardInstanceId: bobRed.instanceId,
       offeredCardInstanceId: aliceYellow.instanceId,
+    });
+
+    expect(pendingState.pendingResolution?.type).toBe("reaction_window");
+
+    // Bob passes reaction
+    const { nextState } = applyCommand(pendingState, {
+      type: "submit_reaction",
+      playerId: "p2",
+      action: "pass",
     });
 
     // Verify Alice now has Bob's Red card
@@ -369,12 +378,21 @@ describe("Action Cards & Banking", () => {
     game.turn.phase = "action";
     game.turn.actionsRemaining = 3;
 
-    const { nextState } = applyCommand(game, {
+    const { nextState: reactionState } = applyCommand(game, {
       type: "play_rent",
       playerId: "p1",
       rentCardInstanceId: rentCard.instanceId,
       chosenColor: "dark-blue",
       doubleRentCardInstanceId: doubleRentCard.instanceId,
+    });
+
+    expect(reactionState.pendingResolution?.type).toBe("reaction_window");
+
+    // Bob passes reaction window -> advances to payment
+    const { nextState } = applyCommand(reactionState, {
+      type: "submit_reaction",
+      playerId: "p2",
+      action: "pass",
     });
 
     // Rent for 1 dark blue is $3M, doubled is $6M

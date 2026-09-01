@@ -28,6 +28,7 @@ import type { Room, RoomSeat, PublicRoomInfo, RoomStatus } from "./types.js";
 export class RoomManager {
   private rooms = new Map<string, Room>();
   private disconnectTimers = new Map<string, NodeJS.Timeout>();
+  private reactionTimers = new Map<string, NodeJS.Timeout>();
   private hasAttemptedHydration = false;
 
   constructor() {
@@ -482,6 +483,7 @@ export class RoomManager {
     }
 
     room.lastActivityAt = Date.now();
+    this.handleReactionTimer(code, room);
     this.broadcastGameState(room, result.events);
 
     // Persist to Neon Postgres asynchronously
@@ -660,6 +662,10 @@ export class RoomManager {
       message: reason === "host_left" ? "The host has ended the game." : "The game was abandoned due to host inactivity.",
     });
 
+    if (this.reactionTimers.has(code)) {
+      clearTimeout(this.reactionTimers.get(code)!);
+      this.reactionTimers.delete(code);
+    }
     this.rooms.delete(code);
 
     // Update DB
@@ -682,6 +688,48 @@ export class RoomManager {
       this.abandonRoom(code, "host_disconnected");
     } else {
       this.convertPlayerToBot(code, playerId);
+    }
+  }
+
+  private handleReactionTimer(code: string, room: Room): void {
+    // Clear any existing reaction timer for this room
+    if (this.reactionTimers.has(code)) {
+      clearTimeout(this.reactionTimers.get(code)!);
+      this.reactionTimers.delete(code);
+    }
+
+    if (!room.gameState || room.status !== "in_progress") return;
+
+    if (room.gameState.pendingResolution?.type === "reaction_window") {
+      const waitingId = room.gameState.pendingResolution.waitingForPlayerId;
+      const waitingSeat = room.seats.find((s) => s.playerId === waitingId);
+
+      // If waiting player is a human player (or connected player)
+      if (!waitingSeat?.isBot) {
+        const deadline = room.gameState.pendingResolution.deadline ?? Date.now() + 7000;
+        const delay = Math.max(200, deadline - Date.now() + 150);
+
+        const timer = setTimeout(async () => {
+          this.reactionTimers.delete(code);
+          try {
+            const currentRoom = this.rooms.get(code);
+            if (
+              currentRoom?.gameState?.pendingResolution?.type === "reaction_window" &&
+              currentRoom.gameState.pendingResolution.waitingForPlayerId === waitingId
+            ) {
+              await this.applyCommand(code, waitingId, {
+                type: "submit_reaction",
+                playerId: waitingId,
+                action: "pass",
+              });
+            }
+          } catch (err) {
+            console.error(`[Reaction Timer Error] Room ${code}:`, err);
+          }
+        }, delay);
+
+        this.reactionTimers.set(code, timer);
+      }
     }
   }
 
