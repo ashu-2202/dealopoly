@@ -277,36 +277,20 @@ export function playActionCard(
       if (targetSet.hotelCard) stolenCards.push(targetSet.hotelCard);
       baseEvent.stolenCards = stolenCards;
 
-      // Check if target has Just Say No
-      const hasJSN = targetOpponent.hand.some((c) => c.defId === "action-just-say-no");
-      if (hasJSN) {
-        nextState.pendingResolution = {
-          type: "reaction_window",
-          initiatorPlayerId: playerId,
-          targetPlayerId,
-          actionCard,
-          targetPropertySetId: targetSetId,
-          waitingForPlayerId: targetPlayerId,
-          justSayNoChainCount: 0,
-          isCancelled: false,
-        };
-      } else {
-        // Transfer set immediately
-        const opponentRemainingSets = targetOpponent.propertySets.filter((s) => s.setId !== targetSetId);
-        const playerNewSets = [...nextState.players[playerId]!.propertySets, targetSet];
-
-        nextState.players = {
-          ...nextState.players,
-          [targetPlayerId]: {
-            ...targetOpponent,
-            propertySets: opponentRemainingSets,
-          },
-          [playerId]: {
-            ...nextState.players[playerId]!,
-            propertySets: playerNewSets,
-          },
-        };
-      }
+      // Open universal reaction window for target player
+      nextState.pendingResolution = {
+        type: "reaction_window",
+        initiatorPlayerId: playerId,
+        targetPlayerId,
+        actionCard,
+        targetPropertySetId: targetSetId,
+        waitingForPlayerId: targetPlayerId,
+        justSayNoChainCount: 0,
+        isCancelled: false,
+        deadline: Date.now() + 7000,
+        durationMs: 7000,
+        canExtend: true,
+      };
       break;
     }
 
@@ -342,94 +326,20 @@ export function playActionCard(
         throw new GameEngineError("BUILDING_ON_COMPLETE_SET", "Sly Deal cannot steal a house or hotel that is part of a complete property set");
       }
 
-      const hasJSN = targetOpponent.hand.some((c) => c.defId === "action-just-say-no");
-      if (hasJSN) {
-        nextState.pendingResolution = {
-          type: "reaction_window",
-          initiatorPlayerId: playerId,
-          targetPlayerId,
-          actionCard,
-          targetCardInstanceId,
-          waitingForPlayerId: targetPlayerId,
-          justSayNoChainCount: 0,
-          isCancelled: false,
-        };
-      } else {
-        // Transfer single card
-        let stolenCard: CardInstance;
-        let setRemainingCards = setWithCard.cards;
-        let keptHouse = setWithCard.houseCard;
-        let keptHotel = setWithCard.hotelCard;
-        
-        if (setWithCard.houseCard?.instanceId === targetCardInstanceId) {
-            stolenCard = setWithCard.houseCard!;
-            keptHouse = undefined;
-        } else if (setWithCard.hotelCard?.instanceId === targetCardInstanceId) {
-            stolenCard = setWithCard.hotelCard!;
-            keptHotel = undefined;
-        } else {
-            stolenCard = setWithCard.cards.find((c) => c.instanceId === targetCardInstanceId)!;
-            setRemainingCards = setWithCard.cards.filter((c) => c.instanceId !== targetCardInstanceId);
-        }
-
-        let opponentSets = [...targetOpponent.propertySets];
-        if (setRemainingCards.length === 0 && !keptHouse && !keptHotel) {
-          opponentSets = opponentSets.filter((s) => s.setId !== setWithCard.setId);
-        } else {
-          const idx = opponentSets.findIndex((s) => s.setId === setWithCard.setId);
-          opponentSets[idx] = {
-            ...setWithCard,
-            cards: setRemainingCards,
-            isComplete: setRemainingCards.length >= setWithCard.setSize,
-            hasHouse: !!keptHouse,
-            hasHotel: !!keptHotel,
-            houseCard: keptHouse,
-            hotelCard: keptHotel,
-          };
-        }
-
-        // Add to player's properties
-        const color = stolenCard.currentColor ?? stolenCard.primaryColor ?? "brown";
-        const matchingSetIndex = nextState.players[playerId]!.propertySets.findIndex(
-          (s) => s.color === color && !s.isComplete,
-        );
-
-        const playerSets = [...nextState.players[playerId]!.propertySets];
-        if (matchingSetIndex !== -1) {
-          const mSet = playerSets[matchingSetIndex]!;
-          const newCards = [...mSet.cards, stolenCard];
-          playerSets[matchingSetIndex] = {
-            ...mSet,
-            cards: newCards,
-            isComplete: newCards.length >= mSet.setSize,
-          };
-        } else {
-          // New set
-          const newSet: PropertySet = {
-            setId: `set-${Date.now()}-${color}`,
-            color,
-            cards: [stolenCard],
-            hasHouse: false,
-            hasHotel: false,
-            isComplete: false,
-            setSize: stolenCard.setSize ?? 3,
-            rentTiers: [1, 2, 3],
-          };
-          playerSets.push(newSet);
-        }
-
-        nextState.players = {
-          ...nextState.players,
-          [targetPlayerId]: {
-            ...nextState.players[targetPlayerId]!,
-            propertySets: opponentSets,
-          },
-          [playerId]: {
-            ...nextState.players[playerId]!,
-            propertySets: playerSets,
-          },
-        };
-      }
+      // Open universal reaction window for target player
+      nextState.pendingResolution = {
+        type: "reaction_window",
+        initiatorPlayerId: playerId,
+        targetPlayerId,
+        actionCard,
+        targetCardInstanceId,
+        waitingForPlayerId: targetPlayerId,
+        justSayNoChainCount: 0,
+        isCancelled: false,
+        deadline: Date.now() + 7000,
+        durationMs: 7000,
+        canExtend: true,
+      };
       break;
     }
 
@@ -521,116 +431,21 @@ export function playActionCard(
       baseEvent.stolenCards = [targetCard];
       baseEvent.swappedCard = offeredCard;
 
-      const hasJSN = targetOpponent.hand.some((c) => c.defId === "action-just-say-no");
-      if (hasJSN) {
-        nextState.pendingResolution = {
-          type: "reaction_window",
-          initiatorPlayerId: playerId,
-          targetPlayerId,
-          actionCard,
-          targetCardInstanceId,
-          swappedCardInstanceId: offeredCardInstanceId,
-          waitingForPlayerId: targetPlayerId,
-          justSayNoChainCount: 0,
-          isCancelled: false,
-        };
-      } else {
-        // Perform Swap
-        // Replace in sets
-        const newPlayerSets = player.propertySets
-          .map((s) => {
-            if (s.setId === offeredSet.setId) {
-              if (offeredRemainingCards.length === 0 && !keptOfferedHouse && !keptOfferedHotel) return null;
-              return { 
-                  ...s, 
-                  cards: offeredRemainingCards, 
-                  isComplete: offeredRemainingCards.length >= s.setSize,
-                  hasHouse: !!keptOfferedHouse,
-                  hasHotel: !!keptOfferedHotel,
-                  houseCard: keptOfferedHouse,
-                  hotelCard: keptOfferedHotel,
-              };
-            }
-            return s;
-          })
-          .filter(Boolean) as PropertySet[];
-
-        const newOpponentSets = targetOpponent.propertySets
-          .map((s) => {
-            if (s.setId === targetSet.setId) {
-              if (targetRemainingCards.length === 0 && !keptTargetHouse && !keptTargetHotel) return null;
-              return { 
-                  ...s, 
-                  cards: targetRemainingCards, 
-                  isComplete: targetRemainingCards.length >= s.setSize,
-                  hasHouse: !!keptTargetHouse,
-                  hasHotel: !!keptTargetHotel,
-                  houseCard: keptTargetHouse,
-                  hotelCard: keptTargetHotel,
-              };
-            }
-            return s;
-          })
-          .filter(Boolean) as PropertySet[];
-
-        // Place target card in player sets
-        if (targetCard.type === "action") {
-            nextState.players[playerId]!.bank.push(targetCard);
-        } else {
-            const pColor = targetCard.currentColor ?? targetCard.primaryColor ?? "brown";
-            const pMatchIdx = newPlayerSets.findIndex((s) => s.color === pColor && !s.isComplete);
-            if (pMatchIdx !== -1) {
-              newPlayerSets[pMatchIdx] = {
-                ...newPlayerSets[pMatchIdx]!,
-                cards: [...newPlayerSets[pMatchIdx]!.cards, targetCard],
-                isComplete: newPlayerSets[pMatchIdx]!.cards.length + 1 >= newPlayerSets[pMatchIdx]!.setSize,
-              };
-            } else {
-              newPlayerSets.push({
-                setId: `set-${Date.now()}-${pColor}`,
-                color: pColor,
-                cards: [targetCard],
-                hasHouse: false,
-                hasHotel: false,
-                isComplete: false,
-                setSize: targetCard.setSize ?? 3,
-                rentTiers: [1, 2, 3],
-              });
-            }
-        }
-
-        // Place offered card in opponent sets
-        if (offeredCard.type === "action") {
-            nextState.players[targetPlayerId]!.bank.push(offeredCard);
-        } else {
-            const oColor = offeredCard.currentColor ?? offeredCard.primaryColor ?? "brown";
-            const oMatchIdx = newOpponentSets.findIndex((s) => s.color === oColor && !s.isComplete);
-            if (oMatchIdx !== -1) {
-              newOpponentSets[oMatchIdx] = {
-                ...newOpponentSets[oMatchIdx]!,
-                cards: [...newOpponentSets[oMatchIdx]!.cards, offeredCard],
-                isComplete: newOpponentSets[oMatchIdx]!.cards.length + 1 >= newOpponentSets[oMatchIdx]!.setSize,
-              };
-            } else {
-              newOpponentSets.push({
-                setId: `set-${Date.now()}-${oColor}`,
-                color: oColor,
-                cards: [offeredCard],
-                hasHouse: false,
-                hasHotel: false,
-                isComplete: false,
-                setSize: offeredCard.setSize ?? 3,
-                rentTiers: [1, 2, 3],
-              });
-            }
-        }
-
-        nextState.players = {
-          ...nextState.players,
-          [playerId]: { ...nextState.players[playerId]!, propertySets: newPlayerSets },
-          [targetPlayerId]: { ...nextState.players[targetPlayerId]!, propertySets: newOpponentSets },
-        };
-      }
+      // Open universal reaction window for target player
+      nextState.pendingResolution = {
+        type: "reaction_window",
+        initiatorPlayerId: playerId,
+        targetPlayerId,
+        actionCard,
+        targetCardInstanceId,
+        swappedCardInstanceId: offeredCardInstanceId,
+        waitingForPlayerId: targetPlayerId,
+        justSayNoChainCount: 0,
+        isCancelled: false,
+        deadline: Date.now() + 7000,
+        durationMs: 7000,
+        canExtend: true,
+      };
       break;
     }
 
@@ -649,28 +464,20 @@ export function playActionCard(
         throw new GameEngineError("TARGET_PLAYER_NOT_FOUND", "Target player not found");
       }
 
-      const hasJSN = targetOpponent.hand.some((c) => c.defId === "action-just-say-no");
-      if (hasJSN) {
-        nextState.pendingResolution = {
-          type: "reaction_window",
-          initiatorPlayerId: playerId,
-          targetPlayerId,
-          actionCard,
-          rentAmount: 5,
-          waitingForPlayerId: targetPlayerId,
-          justSayNoChainCount: 0,
-          isCancelled: false,
-        };
-      } else {
-        nextState.pendingResolution = {
-          type: "payment",
-          creditorPlayerId: playerId,
-          debtorPlayerId: targetPlayerId,
-          amountDue: 5,
-          remainingDebtors: [],
-          reason: "Debt Collector ($5M)",
-        };
-      }
+      // Open universal reaction window for target player
+      nextState.pendingResolution = {
+        type: "reaction_window",
+        initiatorPlayerId: playerId,
+        targetPlayerId,
+        actionCard,
+        rentAmount: 5,
+        waitingForPlayerId: targetPlayerId,
+        justSayNoChainCount: 0,
+        isCancelled: false,
+        deadline: Date.now() + 7000,
+        durationMs: 7000,
+        canExtend: true,
+      };
       break;
     }
 
@@ -684,31 +491,21 @@ export function playActionCard(
       const firstOpponent = opponents[0]!;
       const remaining = opponents.slice(1);
 
-      const targetOpponent = state.players[firstOpponent];
-      const hasJSN = targetOpponent?.hand.some((c) => c.defId === "action-just-say-no");
-
-      if (hasJSN) {
-        nextState.pendingResolution = {
-          type: "reaction_window",
-          initiatorPlayerId: playerId,
-          targetPlayerId: firstOpponent,
-          actionCard,
-          rentAmount: 2,
-          waitingForPlayerId: firstOpponent,
-          justSayNoChainCount: 0,
-          isCancelled: false,
-          remainingTargets: remaining,
-        };
-      } else {
-        nextState.pendingResolution = {
-          type: "payment",
-          creditorPlayerId: playerId,
-          debtorPlayerId: firstOpponent,
-          amountDue: 2,
-          remainingDebtors: remaining,
-          reason: "It's My Birthday ($2M)",
-        };
-      }
+      // Open universal reaction window for first target opponent
+      nextState.pendingResolution = {
+        type: "reaction_window",
+        initiatorPlayerId: playerId,
+        targetPlayerId: firstOpponent,
+        actionCard,
+        rentAmount: 2,
+        waitingForPlayerId: firstOpponent,
+        justSayNoChainCount: 0,
+        isCancelled: false,
+        remainingTargets: remaining,
+        deadline: Date.now() + 7000,
+        durationMs: 7000,
+        canExtend: true,
+      };
       break;
     }
 

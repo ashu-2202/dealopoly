@@ -10,7 +10,7 @@ import type {
 export function handleReaction(
   state: GameState,
   playerId: string,
-  action: "just_say_no" | "pass",
+  action: "just_say_no" | "pass" | "extend_timer",
   justSayNoCardInstanceId?: string,
 ): { nextState: GameState; events: GameEvent[] } {
   if (!state.pendingResolution || state.pendingResolution.type !== "reaction_window") {
@@ -31,6 +31,38 @@ export function handleReaction(
   }
 
   const events: GameEvent[] = [];
+
+  // Handle +5s time extension
+  if (action === "extend_timer") {
+    if (reaction.canExtend === false) {
+      throw new GameEngineError("TIME_EXTENSION_ALREADY_USED", "Time extension already used for this reaction window");
+    }
+
+    const currentDeadline = reaction.deadline ?? Date.now() + 7000;
+    const newDeadline = currentDeadline + 5000;
+
+    const extendEvent: ReactionSubmittedEvent = {
+      id: `event-${Date.now()}-extend`,
+      timestamp: Date.now(),
+      type: "reaction_submitted",
+      playerId,
+      passed: false,
+      message: `${player.name} extended reaction time (+5s).`,
+    };
+    events.push(extendEvent);
+
+    const nextState: GameState = {
+      ...state,
+      pendingResolution: {
+        ...reaction,
+        deadline: newDeadline,
+        canExtend: false,
+      },
+      history: [...state.history, extendEvent],
+    };
+
+    return { nextState, events };
+  }
 
   if (action === "just_say_no") {
     if (!justSayNoCardInstanceId) {
@@ -79,6 +111,9 @@ export function handleReaction(
         ...reaction,
         waitingForPlayerId: nextWaitingPlayerId,
         justSayNoChainCount: chainCount,
+        deadline: Date.now() + 7000,
+        durationMs: 7000,
+        canExtend: true,
       },
       history: [...state.history, jsnEvent],
     };
@@ -113,32 +148,21 @@ export function handleReaction(
     };
     events.push(cancelEvent);
 
-    // If multi-target exists, move to next target
+    // If multi-target exists, move to next target with a fresh universal reaction window
     if (reaction.remainingTargets && reaction.remainingTargets.length > 0) {
       const nextTargetId = reaction.remainingTargets[0]!;
       const remaining = reaction.remainingTargets.slice(1);
-      const nextTarget = state.players[nextTargetId];
-      const targetHasJSN = nextTarget?.hand.some((c) => c.defId === "action-just-say-no");
 
-      let nextPending: GameState["pendingResolution"] = null;
-      if (targetHasJSN) {
-        nextPending = {
-          ...reaction,
-          targetPlayerId: nextTargetId,
-          waitingForPlayerId: nextTargetId,
-          justSayNoChainCount: 0,
-          remainingTargets: remaining,
-        };
-      } else {
-        nextPending = {
-          type: "payment",
-          creditorPlayerId: reaction.initiatorPlayerId,
-          debtorPlayerId: nextTargetId,
-          amountDue: reaction.rentAmount ?? 2,
-          remainingDebtors: remaining,
-          reason: `${reaction.actionCard.name} payment`,
-        };
-      }
+      const nextPending: GameState["pendingResolution"] = {
+        ...reaction,
+        targetPlayerId: nextTargetId,
+        waitingForPlayerId: nextTargetId,
+        justSayNoChainCount: 0,
+        remainingTargets: remaining,
+        deadline: Date.now() + 7000,
+        durationMs: 7000,
+        canExtend: true,
+      };
 
       return {
         nextState: {
@@ -291,7 +315,7 @@ export function handleReaction(
         [reaction.initiatorPlayerId]: { ...initiator, propertySets: pSets },
       };
     }
-  } else if (reaction.actionCard.defId === "action-force-deal") {
+  } else if (reaction.actionCard.defId === "action-force-deal" || reaction.actionCard.defId === "action-forced-deal") {
     // Swap cards
     const targetPlayer = state.players[reaction.targetPlayerId]!;
     const initiator = state.players[reaction.initiatorPlayerId]!;

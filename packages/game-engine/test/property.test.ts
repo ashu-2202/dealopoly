@@ -414,7 +414,7 @@ describe("Property Sets and Wilds", () => {
     expect(blueSet?.isComplete).toBe(true);
     expect(blueSet?.cards.length).toBe(2);
 
-    // Action 2: Play rent card on complete dark-blue set
+    // Action 2: Play rent card on complete dark-blue set -> enters reaction window
     const step2 = applyCommand(step1.nextState, {
       type: "play_rent",
       playerId: "p1",
@@ -423,10 +423,19 @@ describe("Property Sets and Wilds", () => {
     });
 
     expect(step2.nextState.turn.actionsRemaining).toBe(1);
-    expect(step2.nextState.pendingResolution?.type).toBe("payment");
+    expect(step2.nextState.pendingResolution?.type).toBe("reaction_window");
+
+    // Bob passes reaction -> advances to payment
+    const step2Pass = applyCommand(step2.nextState, {
+      type: "submit_reaction",
+      playerId: "p2",
+      action: "pass",
+    });
+
+    expect(step2Pass.nextState.pendingResolution?.type).toBe("payment");
 
     // Bob pays the $8M rent
-    const step3 = applyCommand(step2.nextState, {
+    const step3 = applyCommand(step2Pass.nextState, {
       type: "submit_payment",
       playerId: "p2",
       paymentCardInstanceIds: ["bob-money-5", "bob-money-5-2"],

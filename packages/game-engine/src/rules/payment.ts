@@ -158,37 +158,27 @@ export function handlePayment(
   if (payment.remainingDebtors.length > 0) {
     const nextDebtorId = payment.remainingDebtors[0]!;
     const remaining = payment.remainingDebtors.slice(1);
-    const nextDebtor = state.players[nextDebtorId];
-    const debtorHasJSN = nextDebtor?.hand.some((c) => c.defId === "action-just-say-no");
 
-    if (debtorHasJSN) {
-      nextPending = {
-        type: "reaction_window",
-        initiatorPlayerId: payment.creditorPlayerId,
-        targetPlayerId: nextDebtorId,
-        actionCard: {
-          instanceId: "inst-payment",
-          defId: "payment-obligation",
-          name: payment.reason,
-          type: "action",
-          value: 0,
-        },
-        rentAmount: payment.amountDue,
-        waitingForPlayerId: nextDebtorId,
-        justSayNoChainCount: 0,
-        isCancelled: false,
-        remainingTargets: remaining,
-      };
-    } else {
-      nextPending = {
-        type: "payment",
-        creditorPlayerId: payment.creditorPlayerId,
-        debtorPlayerId: nextDebtorId,
-        amountDue: payment.amountDue,
-        remainingDebtors: remaining,
-        reason: payment.reason,
-      };
-    }
+    nextPending = {
+      type: "reaction_window",
+      initiatorPlayerId: payment.creditorPlayerId,
+      targetPlayerId: nextDebtorId,
+      actionCard: {
+        instanceId: "inst-payment",
+        defId: "payment-obligation",
+        name: payment.reason,
+        type: "action",
+        value: 0,
+      },
+      rentAmount: payment.amountDue,
+      waitingForPlayerId: nextDebtorId,
+      justSayNoChainCount: 0,
+      isCancelled: false,
+      remainingTargets: remaining,
+      deadline: Date.now() + 7000,
+      durationMs: 7000,
+      canExtend: true,
+    };
   }
 
   const nextState: GameState = {

@@ -35,6 +35,7 @@ export type GameErrorCode =
   | "INVALID_DISCARD_COUNT"
   | "WILD_CARD_REQUIRES_EXISTING_PROPERTY"
   | "CANNOT_BREAK_SET_WITH_BUILDINGS"
+  | "TIME_EXTENSION_ALREADY_USED"
   | "UNKNOWN_ERROR";
 
 export class GameEngineError extends Error {

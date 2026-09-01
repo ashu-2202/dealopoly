@@ -73,7 +73,7 @@ export interface PlayRentCommand extends BaseCommand {
 
 export interface SubmitReactionCommand extends BaseCommand {
   type: "submit_reaction";
-  action: "just_say_no" | "pass";
+  action: "just_say_no" | "pass" | "extend_timer";
   justSayNoCardInstanceId?: string;
 }
 
